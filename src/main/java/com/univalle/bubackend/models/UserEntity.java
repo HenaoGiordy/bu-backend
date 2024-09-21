@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -53,4 +55,6 @@ public class UserEntity {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    private List<Reservation> reservations;
 }
