@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,8 +35,13 @@ public class JwtUtils {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.joining(","));
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.HOUR, 8);
+            Date expirationDate = calendar.getTime();
+
             return JWT.create()
                     .withIssuer(issuer)
+                    .withExpiresAt(expirationDate)
                     .withSubject(username)
                     .withClaim("authorities", authorities)
                     .sign(algorithm);
@@ -60,15 +67,4 @@ public class JwtUtils {
         }
     }
 
-    public String extractUsername(DecodedJWT decodedJWT){
-        return decodedJWT.getSubject();
-    }
-
-    public Claim extractClaim(DecodedJWT decodedJWT, String claimName){
-        return decodedJWT.getClaim(claimName);
-    }
-
-    public Map<String, Claim> extractAllClaims(DecodedJWT decodedJWT){
-        return decodedJWT.getClaims();
-    }
 }

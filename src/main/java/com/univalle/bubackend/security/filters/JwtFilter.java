@@ -1,6 +1,7 @@
 package com.univalle.bubackend.security.filters;
 
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -22,7 +23,7 @@ import java.util.Collection;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
     public JwtFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
@@ -36,23 +37,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
+        try {
+            if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
 
-            jwtToken = jwtToken.substring(7);
-            DecodedJWT token = jwtUtils.validateToken(jwtToken);
+                jwtToken = jwtToken.substring(7);
+                DecodedJWT token = jwtUtils.validateToken(jwtToken);
 
-            String username = token.getSubject();
-            String stringauthorities = token.getClaim("authorities").asString();
+                String username = token.getSubject();
+                String stringauthorities = token.getClaim("authorities").asString();
 
-            Collection<? extends GrantedAuthority> authorities = AuthorityUtils
-                    .commaSeparatedStringToAuthorityList(stringauthorities);
+                Collection<? extends GrantedAuthority> authorities = AuthorityUtils
+                        .commaSeparatedStringToAuthorityList(stringauthorities);
 
-            SecurityContext context = SecurityContextHolder.getContext();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            context.setAuthentication(authentication);
-            SecurityContextHolder.setContext(context);
+                SecurityContext context = SecurityContextHolder.getContext();
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                context.setAuthentication(authentication);
+                SecurityContextHolder.setContext(context);
+            }
+
+        }catch (JWTVerificationException exc){
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
-
 
         filterChain.doFilter(request, response);
     }
