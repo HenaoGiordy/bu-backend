@@ -1,7 +1,6 @@
 package com.univalle.bubackend.security.filters;
 
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -37,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        try {
+
             if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
 
                 jwtToken = jwtToken.substring(7);
@@ -54,11 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 context.setAuthentication(authentication);
                 SecurityContextHolder.setContext(context);
             }
-
-        }catch (JWTVerificationException exc){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
 
         filterChain.doFilter(request, response);
     }

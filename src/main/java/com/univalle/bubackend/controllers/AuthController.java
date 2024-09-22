@@ -2,6 +2,8 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.auth.AuthRequest;
 import com.univalle.bubackend.DTOs.auth.AuthResponse;
+import com.univalle.bubackend.DTOs.auth.VerifyRequest;
+import com.univalle.bubackend.DTOs.auth.VerifyResponse;
 import com.univalle.bubackend.services.UserDetailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         return new ResponseEntity<>(userDetailsService.login(authRequest), HttpStatus.OK);
+    }
+
+    @PostMapping("/verify-token")
+    public ResponseEntity<VerifyResponse> verifyToken(@RequestBody VerifyRequest verifyRequest) {
+        return new ResponseEntity<>(userDetailsService.verifyToken(verifyRequest), HttpStatus.OK);
     }
 
 }
