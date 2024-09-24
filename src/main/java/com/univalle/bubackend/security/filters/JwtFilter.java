@@ -22,7 +22,7 @@ import java.util.Collection;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
     public JwtFilter(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
@@ -36,23 +36,23 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
 
-            jwtToken = jwtToken.substring(7);
-            DecodedJWT token = jwtUtils.validateToken(jwtToken);
+            if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
 
-            String username = token.getSubject();
-            String stringauthorities = token.getClaim("authorities").asString();
+                jwtToken = jwtToken.substring(7);
+                DecodedJWT token = jwtUtils.validateToken(jwtToken);
 
-            Collection<? extends GrantedAuthority> authorities = AuthorityUtils
-                    .commaSeparatedStringToAuthorityList(stringauthorities);
+                String username = token.getSubject();
+                String stringauthorities = token.getClaim("authorities").asString();
 
-            SecurityContext context = SecurityContextHolder.getContext();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
-            context.setAuthentication(authentication);
-            SecurityContextHolder.setContext(context);
-        }
+                Collection<? extends GrantedAuthority> authorities = AuthorityUtils
+                        .commaSeparatedStringToAuthorityList(stringauthorities);
 
+                SecurityContext context = SecurityContextHolder.getContext();
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                context.setAuthentication(authentication);
+                SecurityContextHolder.setContext(context);
+            }
 
         filterChain.doFilter(request, response);
     }

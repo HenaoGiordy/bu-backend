@@ -1,10 +1,7 @@
 package com.univalle.bubackend.services;
 
 
-import com.univalle.bubackend.DTOs.auth.AuthRequest;
-import com.univalle.bubackend.DTOs.auth.AuthResponse;
-import com.univalle.bubackend.DTOs.auth.RegisterRequest;
-import com.univalle.bubackend.DTOs.auth.RegisterResponse;
+import com.univalle.bubackend.DTOs.auth.*;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.security.utils.JwtUtils;
@@ -67,6 +64,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
             throw new BadCredentialsException("Wrong password");
         }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    public VerifyResponse verifyToken(VerifyRequest verifyRequest){
+        String validToken = jwtUtils.validateToken(verifyRequest.token()).getToken();
+        return new VerifyResponse("Verified", validToken);
     }
 
     public RegisterResponse register(RegisterRequest register){

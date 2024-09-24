@@ -4,8 +4,6 @@ package com.univalle.bubackend.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,17 +35,17 @@ public class UserEntity {
     @NotBlank
     private String email;
 
-    @NotBlank
-    private String code;
 
     @NotBlank
     private String plan;
+
+    private Boolean isActive = Boolean.TRUE;
 
     private Boolean lunchBeneficiary = false;
 
     private Boolean snackBeneficiary = false;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
