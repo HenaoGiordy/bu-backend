@@ -39,10 +39,13 @@ public class UserEntity {
     @NotBlank
     private String plan;
 
+    @Builder.Default
     private Boolean isActive = Boolean.TRUE;
 
+    @Builder.Default
     private Boolean lunchBeneficiary = false;
 
+    @Builder.Default
     private Boolean snackBeneficiary = false;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -51,6 +54,7 @@ public class UserEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
