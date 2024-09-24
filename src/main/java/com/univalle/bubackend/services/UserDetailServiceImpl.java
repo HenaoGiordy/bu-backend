@@ -81,6 +81,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
         return new RegisterResponse(username, "Usuario creado satisfactoriamente");
     }
 
+    public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
+        return null;
+    }
 
     public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
         return null;

@@ -1,4 +1,4 @@
 package com.univalle.bubackend.DTOs.auth;
 
-public record ResetPasswordRequest() {
+public record ResetPasswordRequest(String password, String passwordConfirmation) {
 }
