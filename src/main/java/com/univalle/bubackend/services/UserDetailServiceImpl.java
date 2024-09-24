@@ -80,4 +80,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 .build());
         return new RegisterResponse(username, "Usuario creado satisfactoriamente");
     }
+
+    public
+
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        return null;
+    }
 }

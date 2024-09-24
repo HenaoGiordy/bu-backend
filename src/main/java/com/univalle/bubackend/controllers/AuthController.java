@@ -1,9 +1,6 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.auth.AuthRequest;
-import com.univalle.bubackend.DTOs.auth.AuthResponse;
-import com.univalle.bubackend.DTOs.auth.VerifyRequest;
-import com.univalle.bubackend.DTOs.auth.VerifyResponse;
+import com.univalle.bubackend.DTOs.auth.*;
 import com.univalle.bubackend.services.UserDetailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +22,11 @@ public class AuthController {
     @PostMapping("/verify-token")
     public ResponseEntity<VerifyResponse> verifyToken(@RequestBody VerifyRequest verifyRequest) {
         return new ResponseEntity<>(userDetailsService.verifyToken(verifyRequest), HttpStatus.OK);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ResetPasswordResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest){
+        return new ResponseEntity<>(userDetailsService.resetPassword(resetPasswordRequest), HttpStatus.OK);
     }
 
 }
