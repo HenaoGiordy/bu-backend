@@ -26,7 +26,6 @@ public class InitDatabase {
                     .lastName("Bienestar")
                     .username("admin")
                     .email("admin@admin.com")
-                    .code("12345")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(adminRole))
                     .password(passwordEncoder.encode("admin"))
