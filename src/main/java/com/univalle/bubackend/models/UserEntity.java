@@ -35,11 +35,11 @@ public class UserEntity {
     @NotBlank
     private String email;
 
-    @NotBlank
-    private String code;
 
     @NotBlank
     private String plan;
+
+    private Boolean isActive = Boolean.TRUE;
 
     private Boolean lunchBeneficiary = false;
 
