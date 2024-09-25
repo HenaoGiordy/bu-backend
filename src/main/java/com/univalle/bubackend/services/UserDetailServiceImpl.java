@@ -3,6 +3,9 @@ package com.univalle.bubackend.services;
 
 import com.univalle.bubackend.DTOs.auth.*;
 import com.univalle.bubackend.exceptions.AlreadyLinkHasBeenCreated;
+import com.univalle.bubackend.exceptions.PasswordDoesNotMatch;
+import com.univalle.bubackend.exceptions.TokenExpired;
+import com.univalle.bubackend.exceptions.TokenNotFound;
 import com.univalle.bubackend.models.PasswordResetToken;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.PasswordResetTokenRepositoy;
@@ -114,7 +117,26 @@ public class UserDetailServiceImpl implements UserDetailsService {
         return new SendResetPasswordResponse("Se envió un correo con un link para reestabler la contraseña", sendResetPasswordRequest.email());
     }
 
-    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        return null;
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest, String token) {
+        Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepositoy.findByToken(token);
+
+        PasswordResetToken passwordResetToken = tokenOpt.orElseThrow(() -> new TokenNotFound("Token Inválido"));
+
+        if (!passwordResetToken.getUsedToken() && !passwordResetToken.getExpiryDate().before(Calendar.getInstance().getTime())) {
+
+            Optional<UserEntity> userOp = userEntityRepository.findById(passwordResetToken.getUser().getId());
+            UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+            if(resetPasswordRequest.password().equals(resetPasswordRequest.passwordConfirmation())){
+                usuario.setPassword(passwordEncoder.encode(resetPasswordRequest.password()));
+                passwordResetTokenRepositoy.delete(passwordResetToken);
+                return new ResetPasswordResponse("Se ha cambiado la contraseña con exito");
+            }else {
+                throw new PasswordDoesNotMatch("Las contraseñas no coinciden");
+            }
+
+        }else {
+            throw new TokenExpired("El token para cambiar la contraseña ya expiró");
+        }
     }
 }

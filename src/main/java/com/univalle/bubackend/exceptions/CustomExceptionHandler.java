@@ -23,4 +23,28 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(map, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(PasswordDoesNotMatch.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handlePasswordDoesNotMatch(PasswordDoesNotMatch ex) {
+        Map<String, String> map = new HashMap<>();
+        map.put("Error", ex.getMessage());
+        return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TokenExpired.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Map<String, String>> handleTokenExpired(TokenExpired ex) {
+        Map<String, String> map = new HashMap<>();
+        map.put("Error", ex.getMessage());
+        return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(TokenNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleTokenNotFound(TokenNotFound ex) {
+        Map<String, String> map = new HashMap<>();
+        map.put("Error", ex.getMessage());
+        return new ResponseEntity<>(map, HttpStatus.NOT_FOUND);
+    }
+
 }
