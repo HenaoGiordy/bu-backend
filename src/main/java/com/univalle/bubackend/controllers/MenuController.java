@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/menu")
@@ -21,7 +18,13 @@ public class MenuController {
     @PostMapping
     public ResponseEntity<CreateMenuRequest> createMenu(@RequestBody CreateMenuRequest createMenuRequest) {
         return new ResponseEntity<>(menuService.createMenu(createMenuRequest), HttpStatus.CREATED);
+    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CreateMenuRequest> getMenu(@PathVariable Integer id) {
+        return menuService.getMenu(id)
+                .map(menu -> new ResponseEntity<>(menu, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }
