@@ -1,5 +1,6 @@
 package com.univalle.bubackend.models;
 
+import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,9 +22,15 @@ public class Menu {
     @Column(nullable = false)
     private String drink;
 
-    @Column(nullable = false)
     private String dessert;
 
     @Column(nullable = false)
     private Integer price;
+
+    public Menu(CreateMenuRequest createMenuRequest) {
+        this.mainDish = createMenuRequest.mainDish();
+        this.drink = createMenuRequest.drink();
+        this.dessert = createMenuRequest.dessert();
+        this.price = createMenuRequest.price();
+    }
 }
