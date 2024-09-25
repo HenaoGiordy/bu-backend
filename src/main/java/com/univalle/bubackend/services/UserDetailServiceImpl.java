@@ -2,7 +2,10 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
+import com.univalle.bubackend.exceptions.AlreadyLinkHasBeenCreated;
+import com.univalle.bubackend.models.PasswordResetToken;
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.repository.PasswordResetTokenRepositoy;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -16,8 +19,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 
 @Service
@@ -29,6 +32,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private JwtUtils jwtUtils;
 
     private PasswordEncoder passwordEncoder;
+
+    private EmailServiceImpl emailServiceImpl;
+
+    private PasswordResetTokenRepositoy passwordResetTokenRepositoy;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -82,7 +89,29 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
-        return null;
+        Optional<UserEntity> userOp = userEntityRepository.findByEmail(sendResetPasswordRequest.email());
+        UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        Optional<PasswordResetToken> passwordResetTokenOp = passwordResetTokenRepositoy.findByUser(usuario);
+
+        if(passwordResetTokenOp.isPresent()){
+            throw new AlreadyLinkHasBeenCreated("Ya se ha enviado un link a esta dirección");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 8);
+        Date expirationDate = calendar.getTime();
+
+        passwordResetTokenRepositoy.save(PasswordResetToken.builder()
+                .user(usuario)
+                .token(token)
+                .expiryDate(expirationDate)
+                .build());
+
+        emailServiceImpl.sendPasswordResetEmail(sendResetPasswordRequest.email(), token);
+        return new SendResetPasswordResponse("Se envió un correo con un link para reestabler la contraseña", sendResetPasswordRequest.email());
     }
 
     public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {

@@ -24,6 +24,11 @@ public class AuthController {
         return new ResponseEntity<>(userDetailsService.verifyToken(verifyRequest), HttpStatus.OK);
     }
 
+    @PostMapping("/email-reset")
+    public ResponseEntity<SendResetPasswordResponse> emailResetPassword(@RequestBody SendResetPasswordRequest sendResetPasswordRequest) {
+        return new ResponseEntity<>(userDetailsService.sendResetPassword(sendResetPasswordRequest), HttpStatus.OK);
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<ResetPasswordResponse> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest){
         return new ResponseEntity<>(userDetailsService.resetPassword(resetPasswordRequest), HttpStatus.OK);
