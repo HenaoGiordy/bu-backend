@@ -1,16 +1,15 @@
-package com.univalle.bubackend.services;
+package com.univalle.bubackend.services.student;
 
 import com.univalle.bubackend.DTOs.auth.UserRequest;
+import com.univalle.bubackend.DTOs.auth.UserResponse;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Collections;
 
 @Service
 public class UserServiceImpl {
@@ -23,7 +22,7 @@ public class UserServiceImpl {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserEntity createUser(UserRequest userRequest) {
+    public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
             throw new RuntimeException("El nombre de usuario ya está en uso.");
@@ -44,15 +43,16 @@ public class UserServiceImpl {
                 .roles(roles)
                 .build();
 
-        return userEntityRepository.save(user);
+        userEntityRepository.save(user);
+        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
-    public UserEntity findStudentsByUsername(String username) {
+    public UserResponse findStudentsByUsername(String username) {
         Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
 
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
 
-        return user;
+        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
 }

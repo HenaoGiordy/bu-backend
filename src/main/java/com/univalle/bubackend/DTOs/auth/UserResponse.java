@@ -5,7 +5,7 @@ import com.univalle.bubackend.models.Role;
 import java.util.Set;
 
 public record UserResponse(
-        String code,
+        String username,
         String name,
         String email,
         String plan,

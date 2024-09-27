@@ -11,6 +11,7 @@ import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.PasswordResetTokenRepositoy;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.security.utils.JwtUtils;
+import com.univalle.bubackend.services.email.EmailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
