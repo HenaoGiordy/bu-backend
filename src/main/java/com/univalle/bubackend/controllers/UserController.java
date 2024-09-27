@@ -1,8 +1,11 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.auth.UserRequest;
-import com.univalle.bubackend.DTOs.auth.UserResponse;
+import com.univalle.bubackend.DTOs.user.EditUserRequest;
+import com.univalle.bubackend.DTOs.user.EditUserResponse;
+import com.univalle.bubackend.DTOs.user.UserRequest;
+import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.services.student.UserServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +29,11 @@ public class UserController {
     @GetMapping("/search")
     public ResponseEntity<UserResponse> searchStudentsByCode(@RequestParam("username") String username) {
         return new ResponseEntity<>(userService.findStudentsByUsername(username), HttpStatus.OK);
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<EditUserResponse> editUser(@Valid @RequestBody EditUserRequest editUserRequest) {
+        return new ResponseEntity<>(userService.editUser(editUserRequest), HttpStatus.OK);
     }
 
 }

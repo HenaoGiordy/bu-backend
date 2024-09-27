@@ -1,4 +1,4 @@
-package com.univalle.bubackend.DTOs.auth;
+package com.univalle.bubackend.DTOs.user;
 
 import com.univalle.bubackend.models.Role;
 import jakarta.validation.constraints.Email;

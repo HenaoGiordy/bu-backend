@@ -3,7 +3,7 @@ package com.univalle.bubackend.models;
 public enum RoleName {
     ESTUDIANTE,
     MONITOR,
-    ADMINISTRATOR,
+    ADMINISTRADOR,
     PSICOLOGO,
     ENFERMERO,
     ODONTOLOGO,

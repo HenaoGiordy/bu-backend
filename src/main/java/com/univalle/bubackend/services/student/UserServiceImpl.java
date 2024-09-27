@@ -1,7 +1,9 @@
 package com.univalle.bubackend.services.student;
 
-import com.univalle.bubackend.DTOs.auth.UserRequest;
-import com.univalle.bubackend.DTOs.auth.UserResponse;
+import com.univalle.bubackend.DTOs.user.EditUserRequest;
+import com.univalle.bubackend.DTOs.user.EditUserResponse;
+import com.univalle.bubackend.DTOs.user.UserRequest;
+import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.UserEntityRepository;
@@ -53,6 +55,25 @@ public class UserServiceImpl {
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
 
         return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+    }
+
+    public EditUserResponse editUser(EditUserRequest editUserRequest) {
+        Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
+        UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
+        
+        user.setName(editUserRequest.name());
+        user.setLastName(editUserRequest.lastName());
+        user.setEmail(editUserRequest.email());
+        user.setPlan(editUserRequest.plan());
+        user.setRoles(editUserRequest.roles());
+        user.setIsActive(editUserRequest.isActive());
+        user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());
+        user.setRoles(editUserRequest.roles());
+        
+
+        userEntityRepository.save(user);
+
+        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
     }
 
 }

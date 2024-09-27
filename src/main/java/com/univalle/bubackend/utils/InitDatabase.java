@@ -19,7 +19,7 @@ public class InitDatabase {
     CommandLineRunner database(PasswordEncoder passwordEncoder, UserEntityRepository userEntityRepository) {
         return args -> {
             Role adminRole = Role.builder()
-                    .name(RoleName.ADMINISTRATOR)
+                    .name(RoleName.ADMINISTRADOR)
                     .build();
 
             UserEntity adminUser = UserEntity.builder()
