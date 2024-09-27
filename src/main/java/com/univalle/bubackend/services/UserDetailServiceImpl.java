@@ -2,7 +2,13 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
+import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
+import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
+import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
+import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
+import com.univalle.bubackend.models.PasswordResetToken;
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.repository.PasswordResetTokenRepositoy;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -16,8 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 
 @Service
@@ -29,6 +35,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private JwtUtils jwtUtils;
 
     private PasswordEncoder passwordEncoder;
+
+    private EmailServiceImpl emailServiceImpl;
+
+    private PasswordResetTokenRepositoy passwordResetTokenRepositoy;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -79,5 +89,54 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 .password(passwordEncoder.encode(password))
                 .build());
         return new RegisterResponse(username, "Usuario creado satisfactoriamente");
+    }
+
+    public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
+        Optional<UserEntity> userOp = userEntityRepository.findByEmail(sendResetPasswordRequest.email());
+        UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        Optional<PasswordResetToken> passwordResetTokenOp = passwordResetTokenRepositoy.findByUser(usuario);
+
+        if(passwordResetTokenOp.isPresent()){
+            throw new AlreadyLinkHasBeenCreated("Ya se ha enviado un link a esta dirección");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 8);
+        Date expirationDate = calendar.getTime();
+
+        passwordResetTokenRepositoy.save(PasswordResetToken.builder()
+                .user(usuario)
+                .token(token)
+                .expiryDate(expirationDate)
+                .build());
+
+        emailServiceImpl.sendPasswordResetEmail(sendResetPasswordRequest.email(), token);
+        return new SendResetPasswordResponse("Se envió un correo con un link para reestabler la contraseña", sendResetPasswordRequest.email());
+    }
+
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest, String token) {
+        Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepositoy.findByToken(token);
+
+        PasswordResetToken passwordResetToken = tokenOpt.orElseThrow(() -> new TokenNotFound("Token Inválido"));
+
+        if (!passwordResetToken.getUsedToken() && !passwordResetToken.getExpiryDate().before(Calendar.getInstance().getTime())) {
+
+            Optional<UserEntity> userOp = userEntityRepository.findById(passwordResetToken.getUser().getId());
+            UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+            if(resetPasswordRequest.password().equals(resetPasswordRequest.passwordConfirmation())){
+                usuario.setPassword(passwordEncoder.encode(resetPasswordRequest.password()));
+                passwordResetTokenRepositoy.delete(passwordResetToken);
+                return new ResetPasswordResponse("Se ha cambiado la contraseña con exito");
+            }else {
+                throw new PasswordDoesNotMatch("Las contraseñas no coinciden");
+            }
+
+        }else {
+            throw new TokenExpired("El token para cambiar la contraseña ya expiró");
+        }
     }
 }
