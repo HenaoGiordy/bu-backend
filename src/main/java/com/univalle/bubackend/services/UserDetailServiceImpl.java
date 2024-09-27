@@ -2,10 +2,10 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
-import com.univalle.bubackend.exceptions.AlreadyLinkHasBeenCreated;
-import com.univalle.bubackend.exceptions.PasswordDoesNotMatch;
-import com.univalle.bubackend.exceptions.TokenExpired;
-import com.univalle.bubackend.exceptions.TokenNotFound;
+import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
+import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
+import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
+import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
 import com.univalle.bubackend.models.PasswordResetToken;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.PasswordResetTokenRepositoy;

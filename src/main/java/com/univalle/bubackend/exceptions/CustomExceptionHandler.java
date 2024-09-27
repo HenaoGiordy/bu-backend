@@ -1,5 +1,9 @@
 package com.univalle.bubackend.exceptions;
 
+import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
+import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
+import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
+import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
