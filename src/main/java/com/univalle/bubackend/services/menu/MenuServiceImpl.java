@@ -1,6 +1,7 @@
 package com.univalle.bubackend.services.menu;
 
 import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
+import com.univalle.bubackend.exceptions.menu.MenuNotFound;
 import com.univalle.bubackend.models.Menu;
 import com.univalle.bubackend.repository.MenuRepository;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,22 @@ public class MenuServiceImpl implements IMenuService{
                         .dessert(menu.getDessert())
                         .build());
 
+    }
+
+    @Override
+    public CreateMenuRequest editMenu(CreateMenuRequest createMenuRequest) {
+        Optional<Menu> menuRequestOpt = menuRepository.findMenuById(createMenuRequest.id());
+        if (menuRequestOpt.isPresent()) {
+            Menu menuExist = menuRequestOpt.get();
+            menuExist.setMainDish(createMenuRequest.mainDish());
+            menuExist.setDrink(createMenuRequest.drink());
+            menuExist.setDessert(createMenuRequest.dessert());
+            menuExist.setPrice(createMenuRequest.price());
+            menuRepository.save(menuExist);
+            return createMenuRequest;
+        } else {
+            throw new MenuNotFound("Menu no encontrado");
+        }
     }
 
 
