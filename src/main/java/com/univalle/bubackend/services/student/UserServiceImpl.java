@@ -152,21 +152,33 @@ public class UserServiceImpl {
 
     public UserResponse importUser(UserRequest userRequest) {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
+        UserEntity newUser;
         if (userOpt.isPresent()) {
-            throw new RuntimeException("El usuario ya existe");
-        }
-        String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
+            newUser = userOpt.get();
 
-        UserEntity newUser = UserEntity.builder()
-                .username(userRequest.username())
-                .name(userRequest.name())
-                .lastName(userRequest.lastName())
-                .plan(userRequest.plan())
-                .password(passwordEncoder.encode(generatedPassword))
-                .email(userRequest.email())
-                .roles(userRequest.roles())
-                .isActive(true)
-                .build();
+            newUser.setName(userRequest.name());
+            newUser.setLastName(userRequest.lastName());
+            newUser.setEmail(userRequest.email());
+            newUser.setPlan(userRequest.plan());
+          //  newUser.setRoles(userRequest.roles());
+            String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
+            newUser.setPassword(passwordEncoder.encode(updatePassword));
+            newUser.setIsActive(true);
+
+        } else {
+            String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
+
+            newUser = UserEntity.builder()
+                    .username(userRequest.username())
+                    .name(userRequest.name())
+                    .lastName(userRequest.lastName())
+                    .plan(userRequest.plan())
+                    .password(passwordEncoder.encode(generatedPassword))
+                    .email(userRequest.email())
+                    .roles(userRequest.roles())
+                    .isActive(true)
+                    .build();
+        }
 
         userEntityRepository.save(newUser);
 
