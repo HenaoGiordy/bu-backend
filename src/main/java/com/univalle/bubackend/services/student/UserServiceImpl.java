@@ -4,6 +4,9 @@ import com.univalle.bubackend.DTOs.user.EditUserRequest;
 import com.univalle.bubackend.DTOs.user.EditUserResponse;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.exceptions.CSVFieldException;
+import com.univalle.bubackend.exceptions.CustomExceptionHandler;
+import com.univalle.bubackend.exceptions.RoleNotFound;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
@@ -96,39 +99,36 @@ public class UserServiceImpl {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(';').withHeader());
 
             for (CSVRecord record : csvParser) {
-                // Verificación de valores
                 String username = record.get("username");
                 String name = record.get("name");
                 String lastName = record.get("lastName");
                 String email = record.get("email");
                 String plan = record.get("plan");
 
-                // Validaciones para asegurar que los campos no estén vacíos
                 if (username == null || username.trim().isEmpty()) {
-                    throw new RuntimeException("El campo 'username' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'username' está vacío en el archivo CSV.");
                 }
                 if (name == null || name.trim().isEmpty()) {
-                    throw new RuntimeException("El campo 'name' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'name' está vacío en el archivo CSV.");
                 }
                 if (lastName == null || lastName.trim().isEmpty()) {
-                    throw new RuntimeException("El campo 'lastName' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'lastName' está vacío en el archivo CSV.");
                 }
                 if (email == null || email.trim().isEmpty()) {
-                    throw new RuntimeException("El campo 'email' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'email' está vacío en el archivo CSV.");
                 }
                 if (plan == null || plan.trim().isEmpty()) {
-                    throw new RuntimeException("El campo 'plan' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'plan' está vacío en el archivo CSV.");
                 }
 
-                // Crear UserRequest
                 UserRequest userRequest = new UserRequest(
                         username.trim(),
                         name.trim(),
                         lastName.trim(),
                         email.trim(),
-                        null, // Password será generado después
+                        null,
                         plan.trim(),
-                        Set.of(getRole(roleName)) // Obtener el rol de la función getRole
+                        Set.of(getRole(roleName))
                 );
 
                 UserResponse userResponse = importUser(userRequest);
@@ -147,7 +147,7 @@ public class UserServiceImpl {
 
     private Role getRole(RoleName roleName) {
         return  roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("No se encontro el rol"));
+                .orElseThrow(() -> new RoleNotFound("No se encontro el rol"));
     }
 
     public UserResponse importUser(UserRequest userRequest) {
