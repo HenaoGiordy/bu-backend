@@ -13,7 +13,7 @@ public record UserRequest(
         @NotBlank @Email String email,
         @NotBlank String password,
         @NotBlank String plan,
-        @NotEmpty Set<Role> roles
+        @NotEmpty Set<String> roles
 ) {
 
 }

@@ -87,4 +87,10 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
 
+    @ExceptionHandler(RoleNotFound.class)
+    public ResponseEntity<ExceptionDTO> roleNotFoundException(RoleNotFound ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
 }

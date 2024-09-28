@@ -4,24 +4,31 @@ import com.univalle.bubackend.DTOs.user.EditUserRequest;
 import com.univalle.bubackend.DTOs.user.EditUserResponse;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.exceptions.RoleNotFound;
 import com.univalle.bubackend.models.Role;
+import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.repository.RoleRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl {
 
     private final UserEntityRepository userEntityRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     public UserResponse createUser(UserRequest userRequest) {
@@ -30,10 +37,22 @@ public class UserServiceImpl {
             throw new RuntimeException("El nombre de usuario ya está en uso.");
         }
 
-        Set<Role> roles = userRequest.roles();
-        if (roles == null || roles.isEmpty()) {
+        try{
+            userRequest.roles().forEach(RoleName::valueOf);
+        }catch (IllegalArgumentException e){
+            throw new RoleNotFound("El nombre de role no existe");
+        }
+
+        Set<Role> roles = userRequest.roles().stream()
+                .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest))
+                        .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
+                .collect(Collectors.toSet());
+
+        if (roles.isEmpty()) {
             throw new RuntimeException("Debe proporcionar al menos un rol para el usuario.");
         }
+
+
 
         UserEntity user = UserEntity.builder()
                 .name(userRequest.name())
