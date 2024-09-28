@@ -9,7 +9,6 @@ import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.RoleRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
-import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
