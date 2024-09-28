@@ -9,7 +9,7 @@ import java.util.Set;
 public record UserRequest(
         @NotBlank String username,
         @NotBlank String name,
-        @NotBlank String lastName,
+        String lastName,
         @NotBlank @Email String email,
         @NotBlank String password,
         @NotBlank String plan,
