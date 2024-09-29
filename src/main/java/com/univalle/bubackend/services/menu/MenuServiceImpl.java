@@ -1,6 +1,6 @@
 package com.univalle.bubackend.services.menu;
 
-import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.CreateMenuRequest;
 import com.univalle.bubackend.exceptions.menu.MenuNotFound;
 import com.univalle.bubackend.models.Menu;
 import com.univalle.bubackend.repository.MenuRepository;
@@ -18,7 +18,7 @@ public class MenuServiceImpl implements IMenuService{
     public CreateMenuRequest createMenu(CreateMenuRequest createMenuRequest) {
         Menu menu = new Menu(createMenuRequest);
         menuRepository.save(menu);
-        return new CreateMenuRequest(menu.getId(), menu.getMainDish(), menu.getDrink(), menu.getDessert(), menu.getPrice());
+        return new CreateMenuRequest(menu.getId(), menu.getMainDish(), menu.getDrink(), menu.getDessert(), menu.getPrice(), menu.getNote());
 
     }
 
@@ -31,6 +31,7 @@ public class MenuServiceImpl implements IMenuService{
                         .drink(menu.getDrink())
                         .price(menu.getPrice())
                         .dessert(menu.getDessert())
+                        .note(menu.getNote())
                         .build());
 
     }
@@ -44,6 +45,7 @@ public class MenuServiceImpl implements IMenuService{
             menuExist.setDrink(createMenuRequest.drink());
             menuExist.setDessert(createMenuRequest.dessert());
             menuExist.setPrice(createMenuRequest.price());
+            menuExist.setNote(createMenuRequest.note());
             menuRepository.save(menuExist);
             return createMenuRequest;
         } else {

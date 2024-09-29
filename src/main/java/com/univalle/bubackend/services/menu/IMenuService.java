@@ -1,6 +1,6 @@
 package com.univalle.bubackend.services.menu;
 
-import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.CreateMenuRequest;
 
 import java.util.Optional;
 

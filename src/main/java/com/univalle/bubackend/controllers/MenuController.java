@@ -1,6 +1,6 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.CreateMenuRequest;
 import com.univalle.bubackend.services.menu.IMenuService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
