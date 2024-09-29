@@ -13,7 +13,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.HashMap;
@@ -91,6 +90,14 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> roleNotFoundException(RoleNotFound ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
+
+    @ExceptionHandler(CSVFieldException.class)
+    public ResponseEntity<Map<String, String>> handleCSVFieldException(CSVFieldException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMessage());
+        return ResponseEntity.badRequest().body(errors);
     }
 
 }
