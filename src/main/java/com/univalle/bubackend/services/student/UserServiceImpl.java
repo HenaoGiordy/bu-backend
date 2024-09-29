@@ -4,8 +4,11 @@ import com.univalle.bubackend.DTOs.user.EditUserRequest;
 import com.univalle.bubackend.DTOs.user.EditUserResponse;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+
 import com.univalle.bubackend.exceptions.CSVFieldException;
 import com.univalle.bubackend.exceptions.CustomExceptionHandler;
+
+
 import com.univalle.bubackend.exceptions.RoleNotFound;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.RoleName;
@@ -24,13 +27,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.Arrays;
+
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl {
 
     private final UserEntityRepository userEntityRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
@@ -46,17 +54,29 @@ public class UserServiceImpl {
             throw new RuntimeException("El nombre de usuario ya está en uso.");
         }
 
-        Set<Role> roles = userRequest.roles();
-        if (roles == null || roles.isEmpty()) {
-            throw new RuntimeException("Debe proporcionar al menos un rol para el usuario.");
+        try{
+            userRequest.roles().forEach(RoleName::valueOf);
+        }catch (IllegalArgumentException e){
+            throw new RoleNotFound("El nombre de role no existe");
         }
+
+        Set<Role> roles = userRequest.roles().stream()
+                .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest))
+                        .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
+                .collect(Collectors.toSet());
+
+        if (roles.isEmpty()) {
+            throw new RoleNotFound("Debe proporcionar al menos un rol para el usuario.");
+        }
+
+        String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
 
         UserEntity user = UserEntity.builder()
                 .name(userRequest.name())
                 .lastName(userRequest.lastName())
                 .email(userRequest.email())
                 .username(userRequest.username())
-                .password(passwordEncoder.encode(userRequest.password()))
+                .password(passwordEncoder.encode(generatedPassword))
                 .plan(userRequest.plan())
                 .roles(roles)
                 .build();
@@ -91,6 +111,7 @@ public class UserServiceImpl {
 
         return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
     }
+
 
     public List<UserResponse> importUsers(MultipartFile file, RoleName roleName) {
         List<UserResponse> users = new ArrayList<>();

@@ -13,7 +13,7 @@ public record UserRequest(
         @NotBlank(message = "Debes proporcionar el email") @Email(message = "Formato de email incorrecto") String email,
         @NotBlank(message = "Debes proporcionar la contraseña") String password,
         @NotBlank(message = "Debes proporcionar el plan") String plan,
-        @NotEmpty(message = "Debe tener por lo menos un rol")  Set<Role> roles
+        @NotEmpty(message = "Debe tener por lo menos un rol")  Set<String> roles
 ) {
 
 }

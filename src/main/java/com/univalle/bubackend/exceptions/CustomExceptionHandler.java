@@ -92,6 +92,7 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
     }
 
+
     @ExceptionHandler(CSVFieldException.class)
     public ResponseEntity<Map<String, String>> handleCSVFieldException(CSVFieldException ex) {
         Map<String, String> errors = new HashMap<>();

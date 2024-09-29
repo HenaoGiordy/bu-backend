@@ -2,6 +2,7 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.auth.CreateMenuRequest;
 import com.univalle.bubackend.services.menu.IMenuService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,11 @@ public class MenuController {
         return menuService.getMenu(id)
                 .map(menu -> new ResponseEntity<>(menu, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping
+    public ResponseEntity<CreateMenuRequest> editMenu(@Valid @RequestBody CreateMenuRequest createMenuRequest) {
+        return new ResponseEntity<>(menuService.editMenu(createMenuRequest), HttpStatus.OK);
     }
 
 }
