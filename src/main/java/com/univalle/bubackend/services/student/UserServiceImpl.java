@@ -6,7 +6,6 @@ import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.DTOs.user.UserResponse;
 
 import com.univalle.bubackend.exceptions.CSVFieldException;
-import com.univalle.bubackend.exceptions.CustomExceptionHandler;
 
 
 import com.univalle.bubackend.exceptions.RoleNotFound;
@@ -159,12 +158,6 @@ public class UserServiceImpl {
 
         return users;
     }
-
-    private Role getRole(String roleName) {
-        return  roleRepository.findByName(RoleName.valueOf(roleName))
-                .orElseThrow(() -> new RoleNotFound("No se encontro el rol"));
-    }
-
 
     public UserResponse importUser(UserRequest userRequest) {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
