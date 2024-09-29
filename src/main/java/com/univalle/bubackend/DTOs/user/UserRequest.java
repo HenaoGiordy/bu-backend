@@ -11,7 +11,7 @@ public record UserRequest(
         @NotBlank String name,
         @NotBlank String lastName,
         @NotBlank @Email String email,
-        @NotBlank String password,
+        String password,
         @NotBlank String plan,
         @NotEmpty Set<String> roles
 ) {

@@ -49,17 +49,17 @@ public class UserServiceImpl {
                 .collect(Collectors.toSet());
 
         if (roles.isEmpty()) {
-            throw new RuntimeException("Debe proporcionar al menos un rol para el usuario.");
+            throw new RoleNotFound("Debe proporcionar al menos un rol para el usuario.");
         }
 
-
+        String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
 
         UserEntity user = UserEntity.builder()
                 .name(userRequest.name())
                 .lastName(userRequest.lastName())
                 .email(userRequest.email())
                 .username(userRequest.username())
-                .password(passwordEncoder.encode(userRequest.password()))
+                .password(passwordEncoder.encode(generatedPassword))
                 .plan(userRequest.plan())
                 .roles(roles)
                 .build();
@@ -93,6 +93,14 @@ public class UserServiceImpl {
         userEntityRepository.save(user);
 
         return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
+    }
+
+    private String generatePassword(String name, String username,
+                                    String lastName) {
+        String initialName = name.substring(0, 1).toUpperCase();
+        String initialLastName = lastName.substring(0, 1).toUpperCase();
+
+        return initialName + username + initialLastName;
     }
 
 }
