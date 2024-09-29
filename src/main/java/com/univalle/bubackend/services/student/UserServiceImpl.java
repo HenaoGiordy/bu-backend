@@ -25,13 +25,8 @@ import org.apache.commons.csv.CSVParser;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import java.util.Arrays;
-
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +35,6 @@ public class UserServiceImpl {
     private final UserEntityRepository userEntityRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
 
     public UserServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userEntityRepository = userEntityRepository;
@@ -149,7 +143,7 @@ public class UserServiceImpl {
                         email.trim(),
                         null,
                         plan.trim(),
-                        Set.of(getRole(roleName))
+                        Set.of(roleName.name())
                 );
 
                 UserResponse userResponse = importUser(userRequest);
@@ -166,14 +160,18 @@ public class UserServiceImpl {
         return users;
     }
 
-    private Role getRole(RoleName roleName) {
-        return  roleRepository.findByName(roleName)
+    private Role getRole(String roleName) {
+        return  roleRepository.findByName(RoleName.valueOf(roleName))
                 .orElseThrow(() -> new RoleNotFound("No se encontro el rol"));
     }
+
 
     public UserResponse importUser(UserRequest userRequest) {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
         UserEntity newUser;
+
+
+
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
 
@@ -188,6 +186,9 @@ public class UserServiceImpl {
 
         } else {
             String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
+            Set<Role> roles = userRequest.roles().stream().map(role -> roleRepository.findByName(RoleName.valueOf(role.toUpperCase()))
+                    .orElseThrow(() -> new RoleNotFound("No se encontro el rol"))).collect(Collectors.toSet());
+
 
             newUser = UserEntity.builder()
                     .username(userRequest.username())
@@ -196,7 +197,7 @@ public class UserServiceImpl {
                     .plan(userRequest.plan())
                     .password(passwordEncoder.encode(generatedPassword))
                     .email(userRequest.email())
-                    .roles(userRequest.roles())
+                    .roles(roles)
                     .isActive(true)
                     .build();
         }

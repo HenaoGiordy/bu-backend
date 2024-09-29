@@ -25,10 +25,13 @@ public class Reservation {
     @NotNull
     private LocalTime time;
 
+    @Builder.Default
     private Boolean paid = false;
 
+    @Builder.Default
     private Boolean snack = false;
 
+    @Builder.Default
     private Boolean lunch = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
