@@ -1,5 +1,6 @@
 package com.univalle.bubackend.exceptions;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
@@ -95,6 +96,13 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(CSVFieldException.class)
     public ResponseEntity<Map<String, String>> handleCSVFieldException(CSVFieldException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("Error", ex.getMessage());
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<Map<String, String>> handleJWTVerificationException(JWTVerificationException ex) {
         Map<String, String> errors = new HashMap<>();
         errors.put("Error", ex.getMessage());
         return ResponseEntity.badRequest().body(errors);

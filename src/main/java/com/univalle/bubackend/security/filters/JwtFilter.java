@@ -1,6 +1,7 @@
 package com.univalle.bubackend.security.filters;
 
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -36,6 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+            try {
 
             if(jwtToken != null && jwtToken.startsWith("Bearer ")) {
 
@@ -52,6 +54,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
                 context.setAuthentication(authentication);
                 SecurityContextHolder.setContext(context);
+            }
+            }catch (JWTVerificationException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                String body = "{\"error\": \"Ingresaste un token inválido o no autorizado\"}";
+                response.getWriter().write(body);
+                response.getWriter().flush();
+                return;
             }
 
         filterChain.doFilter(request, response);
