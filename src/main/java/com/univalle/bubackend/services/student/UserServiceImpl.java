@@ -1,14 +1,14 @@
 package com.univalle.bubackend.services.student;
 
-import com.univalle.bubackend.DTOs.user.EditUserRequest;
-import com.univalle.bubackend.DTOs.user.EditUserResponse;
-import com.univalle.bubackend.DTOs.user.UserRequest;
-import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.DTOs.user.*;
 
 import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
+import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.RoleNotFound;
+import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
@@ -212,6 +212,26 @@ public class UserServiceImpl {
         String initialLastName = lastName.substring(0, 1).toUpperCase();
 
         return initialName + username + initialLastName;
+    }
+
+    public PasswordResponse changePassword(PasswordRequest passwordRequest) {
+
+        Optional<UserEntity> userOpt = userEntityRepository.findByUsername(passwordRequest.username());
+        UserEntity user = userOpt.orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
+
+        if (!passwordEncoder.matches(passwordRequest.password(), user.getPassword())) {
+            throw new PasswordError("La contraseña actual es incorrecta");
+        }
+
+        if (!passwordRequest.newPassword().equals(passwordRequest.confirmPassword())) {
+            throw new PasswordDoesNotMatch("Las contraseñas no coinciden");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordRequest.newPassword()));
+        userEntityRepository.save(user);
+
+        return new PasswordResponse("Contraseña cambiada con exito");
+
     }
 
 }

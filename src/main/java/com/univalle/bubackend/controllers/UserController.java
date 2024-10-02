@@ -1,9 +1,6 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.user.EditUserRequest;
-import com.univalle.bubackend.DTOs.user.EditUserResponse;
-import com.univalle.bubackend.DTOs.user.UserRequest;
-import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.services.student.UserServiceImpl;
 import jakarta.validation.Valid;
@@ -45,6 +42,11 @@ public class UserController {
                                                          @RequestParam("role") RoleName roleName) {
         List<UserResponse> users = userService.importUsers(file, roleName);
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<PasswordResponse> changePassword(@Valid @RequestBody PasswordRequest passwordRequest) {
+        return new ResponseEntity<>(userService.changePassword(passwordRequest), HttpStatus.OK);
     }
 
 }
