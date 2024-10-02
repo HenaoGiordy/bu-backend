@@ -118,6 +118,7 @@ public class UserServiceImpl {
                 String lastName = record.get("lastName");
                 String email = record.get("email");
                 String plan = record.get("plan");
+                String beca = record.isMapped("beca") ? record.get("beca") : null;
 
                 if (username == null || username.trim().isEmpty()) {
                     throw new CSVFieldException("El campo 'username' está vacío en el archivo CSV.");
@@ -142,7 +143,8 @@ public class UserServiceImpl {
                         email.trim(),
                         null,
                         plan.trim(),
-                        Set.of(roleName.name())
+                        Set.of(roleName.name()),
+                        beca
                 );
 
                 UserResponse userResponse = importUser(userRequest);
@@ -172,6 +174,19 @@ public class UserServiceImpl {
             newUser.setLastName(userRequest.lastName());
             newUser.setEmail(userRequest.email());
             newUser.setPlan(userRequest.plan());
+
+            String beca = userRequest.beca();
+            if ("almuerzo".equalsIgnoreCase(beca)) {
+                newUser.setLunchBeneficiary(true);
+                newUser.setSnackBeneficiary(false);
+            } else if ("refrigerio".equalsIgnoreCase(beca)) {
+                newUser.setLunchBeneficiary(false);
+                newUser.setSnackBeneficiary(true);
+            } else {
+                newUser.setLunchBeneficiary(false);
+                newUser.setSnackBeneficiary(false);
+            }
+
           //  newUser.setRoles(userRequest.roles());
             String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
             newUser.setPassword(passwordEncoder.encode(updatePassword));
@@ -192,6 +207,8 @@ public class UserServiceImpl {
                     .email(userRequest.email())
                     .roles(roles)
                     .isActive(true)
+                    .lunchBeneficiary("almuerzo".equalsIgnoreCase(userRequest.beca()))
+                    .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
         }
 
