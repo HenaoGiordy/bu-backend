@@ -18,9 +18,6 @@ import org.springframework.http.HttpHeaders;
                         name = "Bienestar Universitario",
                         email = "bienestaruniversitario29@gmail.com"
                 )
-        ),
-        security = @SecurityRequirement(
-                name = "Security Token"
         )
 )
 @SecurityScheme(

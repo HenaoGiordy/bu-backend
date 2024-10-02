@@ -6,6 +6,7 @@ import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.services.student.UserServiceImpl;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@SecurityRequirement(name = "Security Token")
 public class UserController {
 
     private final UserServiceImpl userService;
