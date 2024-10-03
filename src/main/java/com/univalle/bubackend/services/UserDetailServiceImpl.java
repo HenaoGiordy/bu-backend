@@ -44,7 +44,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario"));
+                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
 
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
 
@@ -69,10 +69,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private Authentication authenticate(String username, String password) {
         UserDetails userDetails = loadUserByUsername(username);
         if(userDetails == null) {
-            throw new UsernameNotFoundException("User or password is incorrect");
+            throw new PasswordDoesNotMatch("Usuario o contraseña incorrectas");
         }
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new BadCredentialsException("Wrong password");
+            throw new PasswordDoesNotMatch("Usuario o contraseña incorrectas");
         }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
