@@ -4,6 +4,7 @@ package com.univalle.bubackend.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,4 +60,9 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
     private List<Reservation> reservations;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "report_id")
+    private Report report;
+
 }
