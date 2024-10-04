@@ -97,6 +97,10 @@ public class ReportServiceImpl {
         }
     }
 
+    public List<Report> findReportsBySemester(String semester) {
+        return reportRepository.findBySemester(semester);
+    }
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
+import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.services.report.ReportServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/report")
@@ -39,6 +41,11 @@ public class ReportController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(excelStream));
+    }
+
+    @GetMapping("/semester/{semester}")
+    public ResponseEntity<List<Report>> getReportsBySemester(@PathVariable String semester) {
+        return new ResponseEntity<>(reportService.findReportsBySemester(semester), HttpStatus.OK);
     }
 
 
