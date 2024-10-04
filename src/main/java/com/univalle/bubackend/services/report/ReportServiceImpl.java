@@ -53,6 +53,10 @@ public class ReportServiceImpl {
         report.setSemester(reportRequest.semester());
         report.setUserEntities(new HashSet<>(filterUsers));
 
+        for (UserEntity user: filterUsers) {
+            user.setReport(report);
+        }
+
         return reportRepository.save(report);
 
     }
