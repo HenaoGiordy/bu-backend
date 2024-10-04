@@ -1,7 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
-import com.univalle.bubackend.DTOs.report.ReportDaily;
+import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.services.report.ReportServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -56,9 +56,9 @@ public class ReportController {
         return new ResponseEntity<>(reportService.findReportsByDate(localDate), HttpStatus.OK);
     }
 
-    @GetMapping("/viewDaily/{id}")
-    public ResponseEntity<ReportDaily> reportDaily(@PathVariable Integer id) {
-        return new ResponseEntity<>(reportService.reportDaily(id), HttpStatus.OK);
+    @GetMapping("/viewReport/{id}")
+    public ResponseEntity<ReportResponse> reportDaily(@PathVariable Integer id) {
+        return new ResponseEntity<>(reportService.viewReport(id), HttpStatus.OK);
     }
 
 

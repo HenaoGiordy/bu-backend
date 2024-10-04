@@ -1,10 +1,11 @@
 package com.univalle.bubackend.services.report;
 
-import com.univalle.bubackend.DTOs.report.ReportDaily;
+import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.models.Reservation;
 import com.univalle.bubackend.repository.ReportRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Service;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,7 +39,8 @@ public class ReportServiceImpl {
                         user.getLastName(),
                         user.getEmail(),
                         user.getPlan(),
-                        user.getRoles()
+                        user.getRoles(),
+                        null
                 ))
                 .collect(Collectors.toList());
 
@@ -106,21 +108,30 @@ public class ReportServiceImpl {
         return reportRepository.findAllByDate(date);
     }
 
-    public ReportDaily reportDaily(Integer id){
+    public ReportResponse viewReport(Integer id){
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new ReportNotFound("Informe no encontrado"));
 
         List<UserDTO> users = report.getUserEntities().stream()
-                .map(user -> new UserDTO(
-                        user.getUsername(),
-                        user.getName(),
-                        user.getLastName(),
-                        user.getEmail(),
-                        user.getPlan(),
-                        user.getRoles()
-                )).toList();
+                .map(user -> {
+                    long count = user.getReservations().stream()
+                            .filter(Reservation::getPaid)
+                            .filter(reservation -> reservation.getData().toLocalDate().getMonthValue() / 6 == report.getDate().getMonthValue() / 6)
+                            .count();
 
-        return new ReportDaily(report.getId(), report.getName(), report.getDate(), report.getBeca(), users);
+                    return new UserDTO(
+                            user.getUsername(),
+                            user.getName(),
+                            user.getLastName(),
+                            user.getEmail(),
+                            user.getPlan(),
+                            user.getRoles(),
+                            (int) count
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new ReportResponse(report.getId(), report.getName(), report.getDate(), report.getSemester(), report.getBeca(), users);
 
     }
 

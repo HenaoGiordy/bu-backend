@@ -9,5 +9,6 @@ public record UserDTO(String username,
                       String lastName,
                       String email,
                       String plan,
-                      Set<Role> roles) {
+                      Set<Role> roles,
+                      Integer quantity) {
 }
