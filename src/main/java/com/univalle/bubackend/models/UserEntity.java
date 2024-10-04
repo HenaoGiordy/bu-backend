@@ -1,6 +1,7 @@
 package com.univalle.bubackend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -63,8 +64,8 @@ public class UserEntity {
     @JsonManagedReference
     private List<Reservation> reservations;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "report_id")
-    private Report report;
+    @ManyToMany(mappedBy = "userEntities")
+    @JsonBackReference
+    private Set<Report> reports = new HashSet<>();
 
 }
