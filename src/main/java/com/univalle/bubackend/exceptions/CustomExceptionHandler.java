@@ -3,6 +3,7 @@ package com.univalle.bubackend.exceptions;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
@@ -127,6 +128,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleReportNotFound(ReportNotFound ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(BecaInvalid.class)
+    public ResponseEntity<ExceptionDTO> handleBecaInvalid(BecaInvalid ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
 
 }
