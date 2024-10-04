@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Integer> {
     Optional<Report> findByDate(LocalDate date);
+    Optional<Report> findById(Integer id);
 }
