@@ -1,6 +1,7 @@
 package com.univalle.bubackend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -59,6 +60,7 @@ public class UserEntity {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Reservation> reservations;
 
     @ManyToOne(fetch = FetchType.EAGER)
