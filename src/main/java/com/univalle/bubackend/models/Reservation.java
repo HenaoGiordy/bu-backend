@@ -41,5 +41,4 @@ public class Reservation {
     private UserEntity userEntity;
 
 
-
 }

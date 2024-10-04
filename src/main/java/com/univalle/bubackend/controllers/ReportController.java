@@ -63,7 +63,7 @@ public class ReportController {
     }
 
     @GetMapping("/viewReport/{id}")
-    public ResponseEntity<ReportResponse> reportDaily(@PathVariable Integer id) {
+    public ResponseEntity<ReportResponse> viewReport(@PathVariable Integer id) {
         return new ResponseEntity<>(reportService.viewReport(id), HttpStatus.OK);
     }
 

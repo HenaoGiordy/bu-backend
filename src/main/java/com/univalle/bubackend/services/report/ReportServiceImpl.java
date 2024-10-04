@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
+import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.models.UserEntity;
@@ -44,7 +45,7 @@ public class ReportServiceImpl {
         } else if ("refrigerio".equalsIgnoreCase(reportRequest.beca())) {
             filterUsers = userEntityRepository.findUserSnackPaid(startOfDay, endOfDay);
         } else {
-            throw new PasswordError("Tipo de beca no valida");
+            throw new BecaInvalid("Tipo de beca no valida");
         }
 
         Report report = new Report();
@@ -53,17 +54,15 @@ public class ReportServiceImpl {
         report.setSemester(reportRequest.semester());
         report.setUserEntities(new HashSet<>(filterUsers));
 
+        report = reportRepository.save(report);
+
         for (UserEntity user: filterUsers) {
-            user.setReport(report);
+            user.getReports().add(report);
+            userEntityRepository.save(user);
         }
 
-        return reportRepository.save(report);
+        return report;
 
-    }
-
-
-    public LocalDate getReportDate() {
-        return LocalDate.now();
     }
 
     public void deleteReport(Integer id) {
@@ -124,9 +123,15 @@ public class ReportServiceImpl {
 
         List<UserDTO> users = report.getUserEntities().stream()
                 .map(user -> {
-                    long count = user.getReservations().stream()
-                            .filter(Reservation::getPaid)
-                            .filter(reservation -> reservation.getData().toLocalDate().getMonthValue() / 6 == report.getDate().getMonthValue() / 6)
+                    long count = user.getReports().stream()
+                            .filter(r -> {
+                                if ("almuerzo".equalsIgnoreCase(report.getBeca())) {
+                                    return "almuerzo".equalsIgnoreCase(r.getBeca());
+                                } else if ("refrigerio".equalsIgnoreCase(report.getBeca())) {
+                                    return "refrigerio".equalsIgnoreCase(r.getBeca());
+                                }
+                                return false;
+                            })
                             .count();
 
                     return new UserDTO(
@@ -136,6 +141,9 @@ public class ReportServiceImpl {
                             user.getEmail(),
                             user.getPlan(),
                             user.getRoles(),
+                            user.getIsActive(),
+                            user.getLunchBeneficiary(),
+                            user.getSnackBeneficiary(),
                             (int) count
                     );
                 })

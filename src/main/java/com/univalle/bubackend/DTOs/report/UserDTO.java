@@ -10,5 +10,8 @@ public record UserDTO(String username,
                       String email,
                       String plan,
                       Set<Role> roles,
+                      boolean isActive,
+                      boolean lunchBeneficiary,
+                      boolean snackBeneficiary,
                       Integer quantity) {
 }
