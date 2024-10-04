@@ -1,6 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
+import com.univalle.bubackend.DTOs.report.ReportDaily;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.services.report.ReportServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -31,7 +32,7 @@ public class ReportController {
         return new ResponseEntity<>(new DeleteResponse("Informe eliminado correctamente."), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/download/{id}")
     public ResponseEntity<InputStreamResource> downloadReport(@PathVariable Integer id) {
         ByteArrayInputStream excelStream = reportService.generateExcelReport(id);
 
@@ -53,6 +54,11 @@ public class ReportController {
     public ResponseEntity<List<Report>> getReportsByDate(@PathVariable String date) {
         LocalDate localDate = LocalDate.parse(date);
         return new ResponseEntity<>(reportService.findReportsByDate(localDate), HttpStatus.OK);
+    }
+
+    @GetMapping("/viewDaily/{id}")
+    public ResponseEntity<ReportDaily> reportDaily(@PathVariable Integer id) {
+        return new ResponseEntity<>(reportService.reportDaily(id), HttpStatus.OK);
     }
 
 

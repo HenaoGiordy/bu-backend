@@ -1,5 +1,6 @@
 package com.univalle.bubackend.services.report;
 
+import com.univalle.bubackend.DTOs.report.ReportDaily;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
@@ -103,6 +104,24 @@ public class ReportServiceImpl {
 
     public List<Report> findReportsByDate(LocalDate date) {
         return reportRepository.findAllByDate(date);
+    }
+
+    public ReportDaily reportDaily(Integer id){
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new ReportNotFound("Informe no encontrado"));
+
+        List<UserDTO> users = report.getUserEntities().stream()
+                .map(user -> new UserDTO(
+                        user.getUsername(),
+                        user.getName(),
+                        user.getLastName(),
+                        user.getEmail(),
+                        user.getPlan(),
+                        user.getRoles()
+                )).toList();
+
+        return new ReportDaily(report.getId(), report.getName(), report.getDate(), report.getBeca(), users);
+
     }
 
 
