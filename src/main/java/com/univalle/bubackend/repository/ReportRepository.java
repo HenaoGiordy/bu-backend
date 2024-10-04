@@ -15,4 +15,5 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     Optional<Report> findById(Integer id);
     List<Report> findBySemester(String semester);
     List<Report> findAllByDate(LocalDate date);
+
 }

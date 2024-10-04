@@ -1,7 +1,9 @@
 package com.univalle.bubackend.services.report;
 
+import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
+import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.models.UserEntity;
@@ -19,6 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,27 +32,31 @@ public class ReportServiceImpl {
     private final UserEntityRepository userEntityRepository;
     private final ReportRepository reportRepository;
 
-    public List<UserDTO> generateReport() {
-        LocalDateTime today = LocalDateTime.now();
-        List<UserEntity> users = userEntityRepository.findAllByReservations_PaidAndDate(true, today);
+    public Report generateReport(ReportRequest reportRequest) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-        return users.stream()
-                .map(user -> new UserDTO(
-                        user.getUsername(),
-                        user.getName(),
-                        user.getLastName(),
-                        user.getEmail(),
-                        user.getPlan(),
-                        user.getRoles(),
-                        null
-                ))
-                .collect(Collectors.toList());
+        List<UserEntity> filterUsers;
+
+        if ("almuerzo".equalsIgnoreCase(reportRequest.beca())) {
+            filterUsers = userEntityRepository.findUserLunchPaid(startOfDay, endOfDay);
+        } else if ("refrigerio".equalsIgnoreCase(reportRequest.beca())) {
+            filterUsers = userEntityRepository.findUserSnackPaid(startOfDay, endOfDay);
+        } else {
+            throw new PasswordError("Tipo de beca no valida");
+        }
+
+        Report report = new Report();
+        report.setDate(today);
+        report.setBeca(reportRequest.beca());
+        report.setSemester(reportRequest.semester());
+        report.setUserEntities(new HashSet<>(filterUsers));
+
+        return reportRepository.save(report);
 
     }
 
-    public String generateReportName(Report report) {
-        return report.getBeca() + " " + report.getId();
-    }
 
     public LocalDate getReportDate() {
         return LocalDate.now();
@@ -69,12 +77,10 @@ public class ReportServiceImpl {
             XSSFSheet sheet = workbook.createSheet("Reporte");
 
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Nombre del reporte");
-            headerRow.createCell(1).setCellValue(report.getName());
-            headerRow.createCell(2).setCellValue("Fecha");
-            headerRow.createCell(3).setCellValue(report.getDate().toString());
-            headerRow.createCell(4).setCellValue("Tipo de beca");
-            headerRow.createCell(5).setCellValue(report.getBeca());
+            headerRow.createCell(0).setCellValue("Fecha");
+            headerRow.createCell(1).setCellValue(report.getDate().toString());
+            headerRow.createCell(2).setCellValue("Tipo de beca");
+            headerRow.createCell(3).setCellValue(report.getBeca());
 
             Row userHeader = sheet.createRow(2);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
@@ -131,7 +137,7 @@ public class ReportServiceImpl {
                 })
                 .collect(Collectors.toList());
 
-        return new ReportResponse(report.getId(), report.getName(), report.getDate(), report.getSemester(), report.getBeca(), users);
+        return new ReportResponse(report.getId(), report.getDate(), report.getSemester(), report.getBeca(), users);
 
     }
 

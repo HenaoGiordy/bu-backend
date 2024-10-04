@@ -1,6 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
+import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.services.report.ReportServiceImpl;
@@ -25,6 +26,11 @@ import java.util.List;
 @SecurityRequirement(name = "Security Token")
 public class ReportController {
     private final ReportServiceImpl reportService;
+
+    @PostMapping
+    public ResponseEntity<Report> generateReport(@RequestBody ReportRequest reportRequest) {
+        return new ResponseEntity<>(reportService.generateReport(reportRequest), HttpStatus.CREATED);
+    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<DeleteResponse> deleteReport(@PathVariable Integer id) {

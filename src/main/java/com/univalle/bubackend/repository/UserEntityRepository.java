@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,10 @@ import java.util.Optional;
 public interface UserEntityRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findByUsername(String username);
     Optional<UserEntity> findByEmail(String email);
-    @Query("SELECT u FROM UserEntity u JOIN u.reservations r WHERE r.paid = :paid AND r.data = :date")
-    List<UserEntity> findAllByReservations_PaidAndDate(@Param("paid") Boolean paid, @Param("date") LocalDateTime date);
 
+    @Query("SELECT u FROM UserEntity u JOIN u.reservations r WHERE r.lunch = true AND r.paid = true AND r.data BETWEEN :startOfDay AND :endOfDay")
+    List<UserEntity> findUserLunchPaid(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+
+    @Query("SELECT u FROM UserEntity u JOIN u.reservations r WHERE r.snack = true AND r.paid = true AND r.data BETWEEN :startOfDay AND :endOfDay")
+    List<UserEntity> findUserSnackPaid(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 }
