@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -48,6 +49,11 @@ public class ReportController {
         return new ResponseEntity<>(reportService.findReportsBySemester(semester), HttpStatus.OK);
     }
 
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<Report>> getReportsByDate(@PathVariable String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        return new ResponseEntity<>(reportService.findReportsByDate(localDate), HttpStatus.OK);
+    }
 
 
 }

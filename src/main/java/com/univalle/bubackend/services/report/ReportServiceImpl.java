@@ -101,6 +101,10 @@ public class ReportServiceImpl {
         return reportRepository.findBySemester(semester);
     }
 
+    public List<Report> findReportsByDate(LocalDate date) {
+        return reportRepository.findAllByDate(date);
+    }
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.univalle.bubackend.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class Report {
     @Column(nullable = false)
     private String beca;
 
-    @Column(nullable = false)
+    @NotNull
     private LocalDate date;
 
     private String semester;
