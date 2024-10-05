@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +55,20 @@ public class ReportServiceImpl {
         report.setBeca(reportRequest.beca());
         report.setSemester(reportRequest.semester());
         report.setUserEntities(new HashSet<>(filterUsers));
+
+        Map<Integer, Integer> countReports = new HashMap<>();
+        for (UserEntity user : filterUsers) {
+
+            long count = user.getReports().stream()
+                    .filter(r -> r.getBeca().equalsIgnoreCase("almuerzo") && reportRequest.beca().equalsIgnoreCase("almuerzo"))
+                    .count() + user.getReports().stream()
+                    .filter(r -> r.getBeca().equalsIgnoreCase("refrigerio") && reportRequest.beca().equalsIgnoreCase("refrigerio"))
+                    .count();
+
+            countReports.put(user.getId(), (int) count);
+
+        }
+        report.setUserReportCount(countReports);
 
         report = reportRepository.save(report);
 
@@ -91,6 +107,11 @@ public class ReportServiceImpl {
             userHeader.createCell(2).setCellValue("Plan/Area");
             userHeader.createCell(3).setCellValue("Correo");
 
+            int countCellIndex = 4;
+            if (report.getSemester() != null) {
+                userHeader.createCell(countCellIndex).setCellValue("Cantidad de " + report.getBeca());
+            }
+
             int rowNum = 3;
             for (UserEntity user : report.getUserEntities()) {
                 Row row = sheet.createRow(rowNum++);
@@ -98,6 +119,12 @@ public class ReportServiceImpl {
                 row.createCell(1).setCellValue(user.getName() + " " + user.getLastName());
                 row.createCell(2).setCellValue(user.getPlan());
                 row.createCell(3).setCellValue(user.getEmail());
+
+                if (report.getSemester() != null) {
+                    int count = report.getUserReportCount().getOrDefault(user.getId(), 0);
+                    row.createCell(countCellIndex).setCellValue(count);
+                }
+
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -123,28 +150,18 @@ public class ReportServiceImpl {
 
         List<UserDTO> users = report.getUserEntities().stream()
                 .map(user -> {
-                    long count = user.getReports().stream()
-                            .filter(r -> {
-                                if ("almuerzo".equalsIgnoreCase(report.getBeca())) {
-                                    return "almuerzo".equalsIgnoreCase(r.getBeca());
-                                } else if ("refrigerio".equalsIgnoreCase(report.getBeca())) {
-                                    return "refrigerio".equalsIgnoreCase(r.getBeca());
-                                }
-                                return false;
-                            })
-                            .count();
+                    int count = report.getUserReportCount().getOrDefault(user.getId(), 0);
 
                     return new UserDTO(
                             user.getUsername(),
-                            user.getName(),
-                            user.getLastName(),
+                            user.getName() + " " + user.getLastName(),
                             user.getEmail(),
                             user.getPlan(),
                             user.getRoles(),
                             user.getIsActive(),
                             user.getLunchBeneficiary(),
                             user.getSnackBeneficiary(),
-                            (int) count
+                            count
                     );
                 })
                 .collect(Collectors.toList());

@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -38,6 +40,7 @@ public class Report {
     @JsonManagedReference
     private Set<UserEntity> userEntities = new HashSet<>();
 
-
+    @ElementCollection
+    private Map<Integer, Integer> userReportCount = new HashMap<>();
 
 }
