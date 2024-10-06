@@ -136,4 +136,10 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
 
+    @ExceptionHandler(SettingNotFound.class)
+    public ResponseEntity<ExceptionDTO> handleSettingNotFound(SettingNotFound ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
 }
