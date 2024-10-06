@@ -42,7 +42,7 @@ public class InitDatabase {
                     .name("admin")
                     .lastName("Bienestar")
                     .username("admin")
-                    .email("admin@admin.com")
+                    .email("henaogiordy@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(adminRole))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("admin"))

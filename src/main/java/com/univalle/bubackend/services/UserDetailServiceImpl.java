@@ -2,6 +2,7 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
+import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
@@ -94,7 +95,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
         Optional<UserEntity> userOp = userEntityRepository.findByEmail(sendResetPasswordRequest.email());
-        UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        UserEntity usuario = userOp.orElseThrow(() -> new UserNotFound("Usuario no encontrado"));
 
         Optional<PasswordResetToken> passwordResetTokenOp = passwordResetTokenRepositoy.findByUser(usuario);
 
