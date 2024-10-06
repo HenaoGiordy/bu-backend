@@ -6,6 +6,7 @@ import com.univalle.bubackend.exceptions.appointment.NotProfessional;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.RoleName;
+import com.univalle.bubackend.models.TypeAppointment;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
@@ -36,9 +37,11 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
         List<AvailableDates> dates = requestAvailableDate.availableDates().stream().map(x ->
                                 AvailableDates.builder()
-                                .dateTime(x.dateTime())
-                                .professional(professional)
-                                .build()).toList();
+                                        .dateTime(x.dateTime())
+                                        .typeAppointment(TypeAppointment.valueOf(x.typeAppointment()))
+                                        .professional(professional)
+                                        .build())
+                                        .toList();
 
         availableDatesRepository.saveAll(dates);
 
