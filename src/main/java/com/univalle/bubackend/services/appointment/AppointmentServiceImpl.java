@@ -2,17 +2,17 @@ package com.univalle.bubackend.services.appointment;
 
 import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
-import com.univalle.bubackend.exceptions.NotProfessional;
+import com.univalle.bubackend.exceptions.appointment.NotProfessional;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -34,8 +34,15 @@ public class AppointmentServiceImpl implements IAppointmentService {
             throw new NotProfessional("Debes ser un profesional para asignar un horario" + acceptableRoles);
         }
 
+        List<AvailableDates> dates = requestAvailableDate.availableDates().stream().map(x ->
+                                AvailableDates.builder()
+                                .dateTime(x.dateTime())
+                                .professional(professional)
+                                .build()).toList();
+
+        availableDatesRepository.saveAll(dates);
 
 
-        return null;
+        return new ResponseAvailableDate("Se crearon las citas", professional.getId(), requestAvailableDate.availableDates());
     }
 }

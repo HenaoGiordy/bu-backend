@@ -24,6 +24,9 @@ public class AvailableDates {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime dateTime;
 
+    @Enumerated(EnumType.STRING)
+    private TypeAppointment typeAppointment;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "professional_id")
     private UserEntity professional;

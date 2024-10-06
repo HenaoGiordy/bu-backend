@@ -1,6 +1,7 @@
 package com.univalle.bubackend.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.univalle.bubackend.exceptions.appointment.NotProfessional;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
@@ -134,6 +135,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleBecaInvalid(BecaInvalid ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(NotProfessional.class)
+    public ResponseEntity<ExceptionDTO> handleNotProfessional(NotProfessional ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionDTO(errorMessage) );
     }
 
 }
