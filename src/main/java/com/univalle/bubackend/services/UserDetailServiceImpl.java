@@ -141,4 +141,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
             throw new TokenExpired("El token para cambiar la contraseña ya expiró");
         }
     }
+
+    public Boolean verifyResetToken(String token){
+        return passwordResetTokenRepositoy.findByToken(token).isPresent();
+    }
 }

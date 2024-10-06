@@ -34,4 +34,9 @@ public class AuthController {
         return new ResponseEntity<>(userDetailsService.resetPassword(resetPasswordRequest, token), HttpStatus.OK);
     }
 
+    @PostMapping("reset-token")
+    public ResponseEntity<Boolean> resetToken(@RequestParam("token") String token){
+        return new ResponseEntity<>(userDetailsService.verifyResetToken(token), HttpStatus.OK);
+    }
+
 }
