@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @ControllerAdvice
@@ -87,9 +89,22 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ExceptionDTO> handleSQLIntegrityConstraintViolationException(DataIntegrityViolationException ex) {
-        String errorMessage = "Ya existe un usuario con ese username";
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    public ResponseEntity<ExceptionDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        String errorMessage = "Error de integridad de datos.";
+
+        // Obtener el mensaje de error
+        String message = Objects.requireNonNull(ex.getRootCause()).getMessage();
+
+        //No hayan dos citas en la misma hora
+        if (message.contains("available_dates_date_time_professional_id_key")) {
+            errorMessage = "El profesional ya tiene una cita asignada en esa fecha y hora.";
+        }
+        //Para el username del UserEntity
+        if (message.contains("user_entity_username_key")) {
+            errorMessage = "Ya existe un usuario con ese nombre de usuario.";
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage));
     }
 
     @ExceptionHandler(RoleNotFound.class)
@@ -141,6 +156,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleNotProfessional(NotProfessional ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(UserNameAlreadyExist.class)
+    public ResponseEntity<ExceptionDTO> handleUserNameAlreadyExist(UserNameAlreadyExist ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
 
 }

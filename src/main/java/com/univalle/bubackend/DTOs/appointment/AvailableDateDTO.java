@@ -18,5 +18,12 @@ public record AvailableDateDTO(
         @NotEmpty(message = "debe proporcionar un tipo de cita")
         String typeAppointment
 ) {
-
+        public AvailableDateDTO(AvailableDates availableDates){
+                this(
+                        availableDates.getDateTime(),
+                        availableDates.getProfessional().getId(),
+                        availableDates.getAvailable(),
+                        availableDates.getTypeAppointment().name()
+                );
+        }
 }
