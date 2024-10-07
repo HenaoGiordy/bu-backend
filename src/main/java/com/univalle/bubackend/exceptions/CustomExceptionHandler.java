@@ -2,6 +2,7 @@ package com.univalle.bubackend.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.univalle.bubackend.exceptions.appointment.NotProfessional;
+import com.univalle.bubackend.exceptions.appointment.NotValidTypeAppointment;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -162,6 +162,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleUserNameAlreadyExist(UserNameAlreadyExist ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(NotValidTypeAppointment.class)
+    public ResponseEntity<ExceptionDTO> handleNotValidTypeAppointment(NotValidTypeAppointment ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
 
 }
