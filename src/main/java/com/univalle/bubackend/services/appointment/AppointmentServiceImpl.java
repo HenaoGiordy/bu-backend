@@ -35,12 +35,12 @@ public class AppointmentServiceImpl implements IAppointmentService {
         appointmentDateCreationValidations.validateIsProfessional(professional);
 
         requestAvailableDate.availableDates().forEach(
-                x -> isValidTypeAppointment.validateTypeAppointment(x.typeAppointment()));
+                x -> isValidTypeAppointment.validateTypeAppointment(x.typeAppointment().toUpperCase()));
 
         List<AvailableDates> dates = requestAvailableDate.availableDates().stream().map(x ->
                                 AvailableDates.builder()
                                         .dateTime(x.dateTime())
-                                        .typeAppointment(TypeAppointment.valueOf(x.typeAppointment()))
+                                        .typeAppointment(TypeAppointment.valueOf(x.typeAppointment().toUpperCase()))
                                         .professional(professional)
                                         .build())
                                         .toList();
