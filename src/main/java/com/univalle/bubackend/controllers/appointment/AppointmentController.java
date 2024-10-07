@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
 import com.univalle.bubackend.services.appointment.IAppointmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AppointmentController {
     private IAppointmentService appointmentService;
 
     @PostMapping("/create-date")
-    public ResponseEntity<ResponseAvailableDate> createDate(@RequestBody RequestAvailableDate requestAvailableDate) {
+    public ResponseEntity<ResponseAvailableDate> createDate(@Valid @RequestBody RequestAvailableDate requestAvailableDate) {
         return new ResponseEntity<>(appointmentService.availableDatesAssign(requestAvailableDate), HttpStatus.CREATED);
     }
 }
