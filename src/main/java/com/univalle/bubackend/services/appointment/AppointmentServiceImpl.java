@@ -2,7 +2,10 @@ package com.univalle.bubackend.services.appointment;
 
 import com.univalle.bubackend.DTOs.appointment.AvailableDateDTO;
 import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
+import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
+import com.univalle.bubackend.DTOs.user.UserEntityDTO;
+import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.TypeAppointment;
@@ -14,6 +17,7 @@ import com.univalle.bubackend.services.appointment.validations.IsValidTypeAppoin
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -50,5 +54,18 @@ public class AppointmentServiceImpl implements IAppointmentService {
         List<AvailableDateDTO> dateDTOS = dates.stream().map(AvailableDateDTO::new).toList();
 
         return new ResponseAvailableDate("Se crearon las citas", professional.getId(), dateDTOS);
+    }
+
+    @Override
+    public ResponseAllAvailableDates getAllDatesProfessional(Integer professionalId) {
+        Optional<UserEntity> professional = userEntityRepository.findById(professionalId);
+        Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByProfessionalId(professionalId);
+        List<AvailableDates> dates = datesOp.orElseThrow(()->new HasNoAvailableDates("El profesional no tiene horarios disponibles"));
+
+        List<AvailableDateDTO> dateDTOS = dates.stream().map(AvailableDateDTO::new).toList();
+        UserEntity userEntity = professional.orElseThrow(()->new UserNotFound("No se encontro un usuario"));
+
+        UserEntityDTO userEntityDTO = new UserEntityDTO(userEntity);
+        return new ResponseAllAvailableDates(dateDTOS, userEntityDTO);
     }
 }

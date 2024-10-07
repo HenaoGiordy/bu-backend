@@ -1,6 +1,7 @@
 package com.univalle.bubackend.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
 import com.univalle.bubackend.exceptions.appointment.NotProfessional;
 import com.univalle.bubackend.exceptions.appointment.NotValidTypeAppointment;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
@@ -166,6 +167,12 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(NotValidTypeAppointment.class)
     public ResponseEntity<ExceptionDTO> handleNotValidTypeAppointment(NotValidTypeAppointment ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(HasNoAvailableDates.class)
+    public ResponseEntity<ExceptionDTO> handleNotValidTypeAppointment(HasNoAvailableDates ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
