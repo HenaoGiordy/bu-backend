@@ -175,7 +175,8 @@ public class CustomExceptionHandler {
     @ExceptionHandler(HasNoAvailableDates.class)
     public ResponseEntity<ExceptionDTO> handleNotValidTypeAppointment(HasNoAvailableDates ex) {
         String errorMessage = ex.getMessage();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage));
+    }
 
     @ExceptionHandler(SettingNotFound.class)
     public ResponseEntity<ExceptionDTO> handleSettingNotFound(SettingNotFound ex) {
