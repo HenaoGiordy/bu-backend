@@ -67,5 +67,10 @@ public class ReportController {
         return new ResponseEntity<>(reportService.viewReport(id), HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<ReportResponse>> getReports() {
+        return new ResponseEntity<>(reportService.listReports(), HttpStatus.OK);
+    }
+
 
 }
