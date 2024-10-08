@@ -2,6 +2,7 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
+import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
@@ -64,7 +65,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         String token = jwtUtils.createToken(authentication);
 
-        return new AuthResponse(username,"Successful",token);
+        UserEntity userEntity = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
+
+        UserResponse userResponse = new UserResponse(username, userEntity.getName(),
+                userEntity.getEmail(), userEntity.getPlan(), userEntity.getRoles(), userEntity.getIsActive());
+
+        return new AuthResponse(userResponse,"Successful",token);
     }
 
     private Authentication authenticate(String username, String password) {

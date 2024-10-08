@@ -35,20 +35,30 @@ public class InitDatabase {
 
             // Recuperar los roles persistidos desde la base de datos
             Role adminRole = roleRepository.findByName(RoleName.ADMINISTRADOR).orElseThrow();
-            Role estudentRole = roleRepository.findByName(RoleName.ESTUDIANTE).orElseThrow();
+            Role enfermero = roleRepository.findByName(RoleName.ENFERMERO).orElseThrow();
 
             // Crear usuarios asignando los roles gestionados por JPA
             UserEntity adminUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
                     .username("admin")
-                    .email("henaogiordy@gmail.com")
+                    .email("aaaaa")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(adminRole))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("admin"))
                     .build();
 
-            userEntityRepository.saveAll(List.of(adminUser));
+            UserEntity profesionalUser = UserEntity.builder()
+                    .name("admin")
+                    .lastName("Bienestar")
+                    .username("giordy")
+                    .email("henaogiordy@gmail.com")
+                    .plan("Bienestar Universitario")
+                    .roles(Set.of(enfermero))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("giordy"))
+                    .build();
+
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser));
         };
     }
 }
