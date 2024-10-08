@@ -34,6 +34,6 @@ public class AppointmentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDeleteAvailableDate> deleteDate(@PathVariable Integer id) {
-        return new ResponseEntity<>(appointmentService.deleteAvailableDate(id), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(appointmentService.deleteAvailableDate(id), HttpStatus.OK);
     }
 }

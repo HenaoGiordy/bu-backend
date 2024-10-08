@@ -32,8 +32,8 @@ public class AvailableDates {
     @Enumerated(EnumType.STRING)
     private TypeAppointment typeAppointment;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "professional_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professional_id", nullable = false)
     private UserEntity professional;
 
     @Builder.Default
