@@ -1,15 +1,19 @@
 package com.univalle.bubackend.DTOs.user;
 
 import com.univalle.bubackend.models.Role;
+import lombok.Builder;
 
 import java.util.Set;
 
-public record UserResponse(
+@Builder
+public record ListUser(
         Integer id,
         String username,
         String name,
         String email,
         String plan,
-        Set<Role>roles,
-        boolean isActive
-) {}
+        Boolean isActive,
+        Boolean lunchBeneficiary,
+        Boolean snackBeneficiary,
+        Set<Role> roles) {
+}

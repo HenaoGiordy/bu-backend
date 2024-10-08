@@ -51,4 +51,9 @@ public class UserController {
         return new ResponseEntity<>(userService.changePassword(passwordRequest), HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<ListUser>> getAllUsers() {
+        return new ResponseEntity<>(userService.listUsers(), HttpStatus.OK);
+    }
+
 }
