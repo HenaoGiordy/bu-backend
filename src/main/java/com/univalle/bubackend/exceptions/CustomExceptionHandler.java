@@ -185,4 +185,10 @@ public class CustomExceptionHandler {
 
     }
 
+    @ExceptionHandler(NoAvailableDateFound.class)
+    public ResponseEntity<ExceptionDTO> handleNoAvailableDateFound(NoAvailableDateFound ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
 }
