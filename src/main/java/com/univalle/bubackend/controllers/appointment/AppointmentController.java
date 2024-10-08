@@ -5,6 +5,11 @@ import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseDeleteAvailableDate;
 import com.univalle.bubackend.services.appointment.IAppointmentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,16 +27,62 @@ public class AppointmentController {
 
     private IAppointmentService appointmentService;
 
+    @Operation(
+            summary = "Crear una nueva fecha disponible",
+            description = "Permite a un profesional crear una nueva fecha disponible para citas. Roles permitidos: ODONTOLOGO, ENFERMERO, PSICOLOGO."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Fecha disponible creada exitosamente",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseAvailableDate.class))}),
+            @ApiResponse(responseCode = "400", description = "Error de validación en la solicitud",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuario no autenticado o token inválido",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
+                    content = @Content)
+    })
     @PostMapping("/create-date")
     public ResponseEntity<ResponseAvailableDate> createDate(@Valid @RequestBody RequestAvailableDate requestAvailableDate) {
         return new ResponseEntity<>(appointmentService.availableDatesAssign(requestAvailableDate), HttpStatus.CREATED);
     }
 
+
+    @Operation(
+            summary = "Obtener todos los horarios",
+            description = "Permite obtener todos los horarios permitidos de un profesional. Roles permitidos: ODONTOLOGO, ENFERMERO, PSICOLOGO."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseAllAvailableDates.class))}),
+            @ApiResponse(responseCode = "400", description = "Error de validación en la solicitud",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuario no autenticado o token inválido",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
+                    content = @Content)
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ResponseAllAvailableDates> getAllAvailableDatesProfessional(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentService.getAllDatesProfessional(id), HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Borrar un horario disponible del profesional",
+            description = "Permite eliminar un horario disponible de un profesional. Roles permitidos: ODONTOLOGO, ENFERMERO, PSICOLOGO."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseDeleteAvailableDate.class))}),
+            @ApiResponse(responseCode = "400", description = "Error de validación en la solicitud",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuario no autenticado o token inválido",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
+                    content = @Content)
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDeleteAvailableDate> deleteDate(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentService.deleteAvailableDate(id), HttpStatus.OK);
