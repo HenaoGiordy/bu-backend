@@ -1,15 +1,14 @@
 package com.univalle.bubackend.services.student;
 
-import com.univalle.bubackend.DTOs.user.*;
+import com.univalle.bubackend.DTOs.user.EditUserRequest;
+import com.univalle.bubackend.DTOs.user.EditUserResponse;
+import com.univalle.bubackend.DTOs.user.UserRequest;
+import com.univalle.bubackend.DTOs.user.UserResponse;
 
 import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
-import com.univalle.bubackend.exceptions.UserNameAlreadyExist;
-import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.RoleNotFound;
-import com.univalle.bubackend.exceptions.change_password.UserNotFound;
-import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
@@ -45,7 +44,7 @@ public class UserServiceImpl {
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
-            throw new UserNameAlreadyExist("El nombre de usuario ya está en uso.");
+            throw new RuntimeException("El nombre de usuario ya está en uso.");
         }
 
         try{
@@ -76,7 +75,7 @@ public class UserServiceImpl {
                 .build();
 
         userEntityRepository.save(user);
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
     public UserResponse findStudentsByUsername(String username) {
@@ -84,13 +83,13 @@ public class UserServiceImpl {
 
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
 
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
-
+        
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
@@ -99,11 +98,11 @@ public class UserServiceImpl {
         user.setIsActive(editUserRequest.isActive());
         user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());
         user.setRoles(editUserRequest.roles());
-
+        
 
         userEntityRepository.save(user);
 
-        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
+        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
     }
 
 
@@ -119,7 +118,6 @@ public class UserServiceImpl {
                 String lastName = record.get("lastName");
                 String email = record.get("email");
                 String plan = record.get("plan");
-                String beca = record.isMapped("beca") ? record.get("beca") : null;
 
                 if (username == null || username.trim().isEmpty()) {
                     throw new CSVFieldException("El campo 'username' está vacío en el archivo CSV.");
@@ -144,8 +142,7 @@ public class UserServiceImpl {
                         email.trim(),
                         null,
                         plan.trim(),
-                        Set.of(roleName.name()),
-                        beca
+                        Set.of(roleName.name())
                 );
 
                 UserResponse userResponse = importUser(userRequest);
@@ -175,19 +172,6 @@ public class UserServiceImpl {
             newUser.setLastName(userRequest.lastName());
             newUser.setEmail(userRequest.email());
             newUser.setPlan(userRequest.plan());
-
-            String beca = userRequest.beca();
-            if ("almuerzo".equalsIgnoreCase(beca)) {
-                newUser.setLunchBeneficiary(true);
-                newUser.setSnackBeneficiary(false);
-            } else if ("refrigerio".equalsIgnoreCase(beca)) {
-                newUser.setLunchBeneficiary(false);
-                newUser.setSnackBeneficiary(true);
-            } else {
-                newUser.setLunchBeneficiary(false);
-                newUser.setSnackBeneficiary(false);
-            }
-
           //  newUser.setRoles(userRequest.roles());
             String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
             newUser.setPassword(passwordEncoder.encode(updatePassword));
@@ -208,15 +192,12 @@ public class UserServiceImpl {
                     .email(userRequest.email())
                     .roles(roles)
                     .isActive(true)
-                    .lunchBeneficiary("almuerzo".equalsIgnoreCase(userRequest.beca()))
-                    .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
         }
 
         userEntityRepository.save(newUser);
 
         return new UserResponse(
-                newUser.getId(),
                 newUser.getUsername(),
                 newUser.getName(),
                 newUser.getEmail(),
@@ -231,42 +212,6 @@ public class UserServiceImpl {
         String initialLastName = lastName.substring(0, 1).toUpperCase();
 
         return initialName + username + initialLastName;
-    }
-
-    public PasswordResponse changePassword(PasswordRequest passwordRequest) {
-
-        Optional<UserEntity> userOpt = userEntityRepository.findByUsername(passwordRequest.username());
-        UserEntity user = userOpt.orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
-
-        if (!passwordEncoder.matches(passwordRequest.password(), user.getPassword())) {
-            throw new PasswordError("La contraseña actual es incorrecta");
-        }
-
-        if (!passwordRequest.newPassword().equals(passwordRequest.confirmPassword())) {
-            throw new PasswordDoesNotMatch("Las contraseñas no coinciden");
-        }
-
-        user.setPassword(passwordEncoder.encode(passwordRequest.newPassword()));
-        userEntityRepository.save(user);
-
-        return new PasswordResponse("Contraseña cambiada con exito");
-
-    }
-
-    public List<ListUser> listUsers(){
-        List<UserEntity> users = userEntityRepository.findAll();
-        return users.stream().map(user -> ListUser.builder()
-                .id(user.getId())
-                .snackBeneficiary(user.getSnackBeneficiary())
-                .lunchBeneficiary(user.getLunchBeneficiary())
-                .roles(user.getRoles())
-                .plan(user.getPlan())
-                .email(user.getEmail())
-                .username(user.getUsername())
-                .isActive(user.getIsActive())
-                .name(user.getName() + " " + user.getLastName())
-                .build()
-        ).collect(Collectors.toList());
     }
 
 }

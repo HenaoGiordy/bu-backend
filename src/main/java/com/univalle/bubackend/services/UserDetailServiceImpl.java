@@ -2,8 +2,6 @@ package com.univalle.bubackend.services;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
-import com.univalle.bubackend.DTOs.user.UserResponse;
-import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
@@ -46,7 +44,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
+                .orElseThrow(() -> new UsernameNotFoundException("No se encontró el usuario"));
 
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
 
@@ -65,22 +63,16 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         String token = jwtUtils.createToken(authentication);
 
-        UserEntity userEntity = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
-
-        UserResponse userResponse = new UserResponse(userEntity.getId() ,username, userEntity.getName(),
-                userEntity.getEmail(), userEntity.getPlan(), userEntity.getRoles(), userEntity.getIsActive());
-
-        return new AuthResponse(userResponse,"Successful",token);
+        return new AuthResponse(username,"Successful",token);
     }
 
     private Authentication authenticate(String username, String password) {
         UserDetails userDetails = loadUserByUsername(username);
         if(userDetails == null) {
-            throw new PasswordDoesNotMatch("Usuario o contraseña incorrectas");
+            throw new UsernameNotFoundException("User or password is incorrect");
         }
         if(!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new PasswordDoesNotMatch("Usuario o contraseña incorrectas");
+            throw new BadCredentialsException("Wrong password");
         }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
@@ -102,7 +94,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
         Optional<UserEntity> userOp = userEntityRepository.findByEmail(sendResetPasswordRequest.email());
-        UserEntity usuario = userOp.orElseThrow(() -> new UserNotFound("Usuario no encontrado"));
+        UserEntity usuario = userOp.orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         Optional<PasswordResetToken> passwordResetTokenOp = passwordResetTokenRepositoy.findByUser(usuario);
 
@@ -147,9 +139,5 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }else {
             throw new TokenExpired("El token para cambiar la contraseña ya expiró");
         }
-    }
-
-    public Boolean verifyResetToken(String token){
-        return passwordResetTokenRepositoy.findByToken(token).isPresent();
     }
 }

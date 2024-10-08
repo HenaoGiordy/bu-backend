@@ -28,6 +28,7 @@ public class Menu {
     @Column(nullable = false)
     private Integer price;
 
+    @NotBlank
     private String note;
 
     public Menu(CreateMenuRequest createMenuRequest) {
