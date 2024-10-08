@@ -1,11 +1,9 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.user.EditUserRequest;
-import com.univalle.bubackend.DTOs.user.EditUserResponse;
-import com.univalle.bubackend.DTOs.user.UserRequest;
-import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.services.student.UserServiceImpl;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@SecurityRequirement(name = "Security Token")
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -45,6 +44,16 @@ public class UserController {
                                                          @RequestParam("role") RoleName roleName) {
         List<UserResponse> users = userService.importUsers(file, roleName);
         return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<PasswordResponse> changePassword(@Valid @RequestBody PasswordRequest passwordRequest) {
+        return new ResponseEntity<>(userService.changePassword(passwordRequest), HttpStatus.OK);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ListUser>> getAllUsers() {
+        return new ResponseEntity<>(userService.listUsers(), HttpStatus.OK);
     }
 
 }

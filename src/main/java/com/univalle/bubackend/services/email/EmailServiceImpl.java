@@ -17,7 +17,7 @@ public class EmailServiceImpl implements IEmailService {
         message.setTo(email);
         message.setSubject("Password Reset");
         message.setText("Para restablecer tu contraseña, haz clic en el siguiente enlace: " +
-                "http://localhost:8080/reset-password?token=" + token);
+                "http://localhost:5173/confirmarcontrasena?token=" + token);
         mailSender.send(message);
     }
 }

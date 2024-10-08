@@ -2,6 +2,7 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.auth.*;
 import com.univalle.bubackend.services.UserDetailServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,13 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<ResetPasswordResponse> resetPassword(@RequestParam("token") String token,@RequestBody ResetPasswordRequest resetPasswordRequest){
+    public ResponseEntity<ResetPasswordResponse> resetPassword(@RequestParam("token") String token,@Valid @RequestBody ResetPasswordRequest resetPasswordRequest){
         return new ResponseEntity<>(userDetailsService.resetPassword(resetPasswordRequest, token), HttpStatus.OK);
+    }
+
+    @PostMapping("reset-token")
+    public ResponseEntity<Boolean> resetToken(@RequestParam("token") String token){
+        return new ResponseEntity<>(userDetailsService.verifyResetToken(token), HttpStatus.OK);
     }
 
 }

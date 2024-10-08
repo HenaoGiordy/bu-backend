@@ -11,9 +11,10 @@ public record UserRequest(
         @NotBlank(message = "Debes proporcionar el nombre") String name,
         @NotBlank(message = "Debes proporcionar el apellido") String lastName,
         @NotBlank(message = "Debes proporcionar el email") @Email(message = "Formato de email incorrecto") String email,
-        @NotBlank(message = "Debes proporcionar la contraseña") String password,
+        String password,
         @NotBlank(message = "Debes proporcionar el plan") String plan,
-        @NotEmpty(message = "Debe tener por lo menos un rol")  Set<String> roles
+        @NotEmpty(message = "Debe tener por lo menos un rol")  Set<String> roles,
+        String beca
 ) {
 
 }
