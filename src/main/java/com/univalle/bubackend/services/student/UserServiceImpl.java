@@ -76,7 +76,7 @@ public class UserServiceImpl {
                 .build();
 
         userEntityRepository.save(user);
-        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
     public UserResponse findStudentsByUsername(String username) {
@@ -84,13 +84,13 @@ public class UserServiceImpl {
 
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
 
-        return new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
     }
 
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
-        
+
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
@@ -99,11 +99,11 @@ public class UserServiceImpl {
         user.setIsActive(editUserRequest.isActive());
         user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());
         user.setRoles(editUserRequest.roles());
-        
+
 
         userEntityRepository.save(user);
 
-        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
+        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
     }
 
 
@@ -216,6 +216,7 @@ public class UserServiceImpl {
         userEntityRepository.save(newUser);
 
         return new UserResponse(
+                newUser.getId(),
                 newUser.getUsername(),
                 newUser.getName(),
                 newUser.getEmail(),
@@ -250,6 +251,22 @@ public class UserServiceImpl {
 
         return new PasswordResponse("Contraseña cambiada con exito");
 
+    }
+
+    public List<ListUser> listUsers(){
+        List<UserEntity> users = userEntityRepository.findAll();
+        return users.stream().map(user -> ListUser.builder()
+                .id(user.getId())
+                .snackBeneficiary(user.getSnackBeneficiary())
+                .lunchBeneficiary(user.getLunchBeneficiary())
+                .roles(user.getRoles())
+                .plan(user.getPlan())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .isActive(user.getIsActive())
+                .name(user.getName() + " " + user.getLastName())
+                .build()
+        ).collect(Collectors.toList());
     }
 
 }
