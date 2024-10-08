@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record AvailableDateDTO(
+        Integer id,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
         @NotNull(message = "debe proporcionar una fecha")
         LocalDateTime dateTime,
@@ -20,6 +21,7 @@ public record AvailableDateDTO(
 ) {
         public AvailableDateDTO(AvailableDates availableDates){
                 this(
+                        availableDates.getId(),
                         availableDates.getDateTime(),
                         availableDates.getProfessional().getId(),
                         availableDates.getAvailable(),
