@@ -1,12 +1,9 @@
 package com.univalle.bubackend.models;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +48,7 @@ public class UserEntity {
     @Builder.Default
     private Boolean snackBeneficiary = false;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -61,11 +58,5 @@ public class UserEntity {
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<Reservation> reservations;
-
-    @ManyToMany(mappedBy = "userEntities")
-    @JsonBackReference
-    private Set<Report> reports = new HashSet<>();
-
 }

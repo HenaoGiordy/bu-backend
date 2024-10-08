@@ -2,7 +2,6 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.CreateMenuRequest;
 import com.univalle.bubackend.services.menu.IMenuService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/menu")
 @AllArgsConstructor
 @PreAuthorize("isAuthenticated()")
-@SecurityRequirement(name = "Security Token")
 public class MenuController {
     private IMenuService menuService;
 
