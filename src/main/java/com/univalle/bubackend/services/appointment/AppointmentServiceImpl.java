@@ -1,10 +1,8 @@
 package com.univalle.bubackend.services.appointment;
 
-import com.univalle.bubackend.DTOs.appointment.AvailableDateDTO;
-import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
-import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
-import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
+import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.user.UserEntityDTO;
+import com.univalle.bubackend.exceptions.NoAvailableDateFound;
 import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.models.AvailableDates;
@@ -67,5 +65,13 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
         UserEntityDTO userEntityDTO = new UserEntityDTO(userEntity);
         return new ResponseAllAvailableDates(dateDTOS, userEntityDTO);
+    }
+
+    @Override
+    public ResponseDeleteAvailableDate deleteAvailableDate(Integer id) {
+        Optional<AvailableDates> availableDatesOpt = availableDatesRepository.findById(id);
+        AvailableDates availableDates = availableDatesOpt.orElseThrow(() -> new NoAvailableDateFound("No se encontró el horario"));
+        availableDatesRepository.delete(availableDates);
+        return new ResponseDeleteAvailableDate("Se eliminó el horario", new AvailableDateDTO(availableDates));
     }
 }

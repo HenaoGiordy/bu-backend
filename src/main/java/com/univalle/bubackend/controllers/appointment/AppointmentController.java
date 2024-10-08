@@ -3,6 +3,7 @@ package com.univalle.bubackend.controllers.appointment;
 import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
+import com.univalle.bubackend.DTOs.appointment.ResponseDeleteAvailableDate;
 import com.univalle.bubackend.services.appointment.IAppointmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -29,5 +30,10 @@ public class AppointmentController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseAllAvailableDates> getAllAvailableDatesProfessional(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentService.getAllDatesProfessional(id), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDeleteAvailableDate> deleteDate(@PathVariable Integer id) {
+        return new ResponseEntity<>(appointmentService.deleteAvailableDate(id), HttpStatus.NO_CONTENT);
     }
 }
