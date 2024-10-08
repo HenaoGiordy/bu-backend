@@ -170,6 +170,16 @@ public class ReportServiceImpl {
 
     }
 
+    public List<ReportResponse> listReports() {
+        List<Report> reports = reportRepository.findAll();
+        return reports.stream().map(report -> ReportResponse.builder()
+                .beca(report.getBeca())
+                .date(report.getDate())
+                .id(report.getId())
+                .semester(report.getSemester())
+                .build()
+        ).collect(Collectors.toList());
 
+    }
 
 }
