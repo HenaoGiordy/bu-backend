@@ -68,7 +68,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         UserEntity userEntity = userEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
 
-        UserResponse userResponse = new UserResponse(username, userEntity.getName(),
+        UserResponse userResponse = new UserResponse(userEntity.getId() ,username, userEntity.getName(),
                 userEntity.getEmail(), userEntity.getPlan(), userEntity.getRoles(), userEntity.getIsActive());
 
         return new AuthResponse(userResponse,"Successful",token);
