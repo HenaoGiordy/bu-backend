@@ -5,6 +5,7 @@ import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
+import com.univalle.bubackend.exceptions.UserNameAlreadyExist;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.RoleNotFound;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
@@ -44,7 +45,9 @@ public class UserServiceImpl {
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
+
             throw new RuntimeException("El usuario ya está en registrado.");
+
         }
 
         try{
