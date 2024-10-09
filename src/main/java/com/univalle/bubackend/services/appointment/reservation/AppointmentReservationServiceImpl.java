@@ -1,8 +1,6 @@
 package com.univalle.bubackend.services.appointment.reservation;
 
-import com.univalle.bubackend.DTOs.appointment.AvailableDateDTO;
-import com.univalle.bubackend.DTOs.appointment.RequestAppointmentReservation;
-import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservation;
+import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.exceptions.appointment.DateNotAvailable;
 import com.univalle.bubackend.exceptions.appointment.IsExterno;
@@ -18,6 +16,7 @@ import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,5 +55,15 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         appointmentReservationRepository.save(appointmentReservation);
 
         return new ResponseAppointmentReservation("Cita reservada con éxito", new AvailableDateDTO(availableDates), new UserResponse(userEntity));
+    }
+
+    @Override
+    public ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId) {
+        Optional<List<AppointmentReservation>> appointmentReservationsOpt = appointmentReservationRepository.findByAvailableDates_ProfessionalId(professionalId);
+        List<AppointmentReservationDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
+                .stream()
+                .map(AppointmentReservationDTO::new).toList();
+
+        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
     }
 }
