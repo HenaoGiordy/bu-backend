@@ -1,4 +1,4 @@
-package com.univalle.bubackend.services.appointment;
+package com.univalle.bubackend.services.appointment.dates;
 
 import com.univalle.bubackend.DTOs.appointment.*;
 

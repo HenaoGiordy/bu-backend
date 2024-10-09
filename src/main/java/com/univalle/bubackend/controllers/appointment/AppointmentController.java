@@ -4,7 +4,7 @@ import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
 import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
 import com.univalle.bubackend.DTOs.appointment.ResponseDeleteAvailableDate;
-import com.univalle.bubackend.services.appointment.IAppointmentService;
+import com.univalle.bubackend.services.appointment.dates.IAppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

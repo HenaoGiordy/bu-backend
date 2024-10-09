@@ -1,9 +1,7 @@
 package com.univalle.bubackend.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
-import com.univalle.bubackend.exceptions.appointment.NotProfessional;
-import com.univalle.bubackend.exceptions.appointment.NotValidTypeAppointment;
+import com.univalle.bubackend.exceptions.appointment.*;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
@@ -189,6 +187,18 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleNoAvailableDateFound(NoAvailableDateFound ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(IsExterno.class)
+    public ResponseEntity<ExceptionDTO> handleIsExterno(IsExterno ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(DateNotAvailable.class)
+    public ResponseEntity<ExceptionDTO> handleDateNotAvailable(DateNotAvailable ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
 
 }

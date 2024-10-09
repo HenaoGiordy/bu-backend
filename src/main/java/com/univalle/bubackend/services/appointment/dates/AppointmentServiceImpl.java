@@ -1,8 +1,8 @@
-package com.univalle.bubackend.services.appointment;
+package com.univalle.bubackend.services.appointment.dates;
 
 import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.user.UserEntityDTO;
-import com.univalle.bubackend.exceptions.NoAvailableDateFound;
+import com.univalle.bubackend.exceptions.appointment.NoAvailableDateFound;
 import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.models.AvailableDates;
