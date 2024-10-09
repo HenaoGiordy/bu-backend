@@ -5,13 +5,14 @@ import com.univalle.bubackend.models.AvailableDates;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDateTime;
 
 public record AvailableDateDTO(
         Integer id,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
         @NotNull(message = "debe proporcionar una fecha")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
         LocalDateTime dateTime,
         @NotNull(message = "debe proporcionar un profesional")
         Integer professionalId,

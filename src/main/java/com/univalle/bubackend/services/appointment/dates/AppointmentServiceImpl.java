@@ -11,6 +11,8 @@ import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.appointment.validations.AppointmentDateCreationValidation;
+import com.univalle.bubackend.services.appointment.validations.DateTimeValidation;
+import com.univalle.bubackend.services.appointment.validations.IsValidDateTime;
 import com.univalle.bubackend.services.appointment.validations.IsValidTypeAppointment;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
     private UserEntityRepository userEntityRepository;
     private AppointmentDateCreationValidation appointmentDateCreationValidations;
     private IsValidTypeAppointment isValidTypeAppointment;
+    private DateTimeValidation isValidDateTime;
 
     @Override
     public ResponseAvailableDate availableDatesAssign(RequestAvailableDate requestAvailableDate) {
@@ -37,7 +40,12 @@ public class AppointmentServiceImpl implements IAppointmentService {
         appointmentDateCreationValidations.validateIsProfessional(professional);
 
         requestAvailableDate.availableDates().forEach(
-                x -> isValidTypeAppointment.validateTypeAppointment(x.typeAppointment().toUpperCase()));
+                x -> {isValidTypeAppointment.validateTypeAppointment(x.typeAppointment().toUpperCase());
+                    isValidDateTime.validateDateTime(x.dateTime().toString());
+
+    });
+
+
 
         List<AvailableDates> dates = requestAvailableDate.availableDates().stream().map(x ->
                                 AvailableDates.builder()
