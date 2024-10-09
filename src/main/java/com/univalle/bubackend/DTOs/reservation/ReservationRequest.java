@@ -1,7 +1,9 @@
 package com.univalle.bubackend.DTOs.reservation;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record ReservationRequest(
-        String userName,
+        @NotBlank String userName,
         boolean lunch,
         boolean snack) {
 }
