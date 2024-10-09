@@ -60,21 +60,21 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     @Override
     public ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId) {
         Optional<List<AppointmentReservation>> appointmentReservationsOpt = appointmentReservationRepository.findByAvailableDates_ProfessionalId(professionalId);
-        List<AppointmentReservationDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
+        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
                 .stream()
-                .map(AppointmentReservationDTO::new).toList();
+                .map(AppointmentReservationProfessionalDTO::new).toList();
 
         return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
     }
 
     @Override
-    public ResponseAppointmentReservationProfessional allAppointmentEstudiante(Integer estudianteId) {
+    public ResponseAppointmentReservationStudent allAppointmentEstudiante(Integer estudianteId) {
 
         Optional<List<AppointmentReservation>> appointmentReservations = appointmentReservationRepository.findByEstudiante_Id(estudianteId);
-        List<AppointmentReservationDTO> appointmentReservationDTOS = appointmentReservations.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
+        List<AppointmentReservationStudentDTO> appointmentReservationDTOS = appointmentReservations.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
                 .stream()
-                .map(AppointmentReservationDTO::new).toList();
+                .map(AppointmentReservationStudentDTO::new).toList();
 
-        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
+        return new ResponseAppointmentReservationStudent(appointmentReservationDTOS);
     }
 }

@@ -3,6 +3,7 @@ package com.univalle.bubackend.controllers.appointment;
 import com.univalle.bubackend.DTOs.appointment.RequestAppointmentReservation;
 import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservation;
 import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservationProfessional;
+import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservationStudent;
 import com.univalle.bubackend.services.appointment.reservation.IAppointmentReservationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ public class AppointmentReservationController {
     }
 
     @GetMapping("/student/{id}")
-    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentByAppointmentId(@PathVariable Integer id) {
+    public ResponseEntity<ResponseAppointmentReservationStudent> getAppointmentByAppointmentId(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentReservationService.allAppointmentEstudiante(id), HttpStatus.OK);
     }
 }
