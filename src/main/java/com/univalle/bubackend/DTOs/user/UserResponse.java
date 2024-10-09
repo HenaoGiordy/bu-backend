@@ -11,5 +11,7 @@ public record UserResponse(
         String email,
         String plan,
         Set<Role>roles,
+        boolean lunchBeneficiary,
+        boolean snackBeneficiary,
         boolean isActive
 ) {}
