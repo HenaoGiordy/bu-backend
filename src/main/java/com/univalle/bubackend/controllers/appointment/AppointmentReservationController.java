@@ -24,8 +24,13 @@ public class AppointmentReservationController {
         return new ResponseEntity<>(appointmentReservationService.reserveAppointment(requestAppointmentReservation), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/professional/{id}")
     public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentById(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessional(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/student/{id}")
+    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentByAppointmentId(@PathVariable Integer id) {
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentEstudiante(id), HttpStatus.OK);
     }
 }

@@ -16,6 +16,7 @@ public record AvailableDateDTO(
         LocalDateTime dateTime,
         @NotNull(message = "debe proporcionar un profesional")
         Integer professionalId,
+        String professionalName,
         Boolean available,
         @NotEmpty(message = "debe proporcionar un tipo de cita")
         String typeAppointment
@@ -25,6 +26,7 @@ public record AvailableDateDTO(
                         availableDates.getId(),
                         availableDates.getDateTime(),
                         availableDates.getProfessional().getId(),
+                        availableDates.getProfessional().getName(),
                         availableDates.getAvailable(),
                         availableDates.getTypeAppointment().name()
                 );

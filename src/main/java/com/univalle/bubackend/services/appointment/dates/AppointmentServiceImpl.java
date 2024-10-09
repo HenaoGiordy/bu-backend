@@ -16,6 +16,8 @@ import com.univalle.bubackend.services.appointment.validations.IsValidDateTime;
 import com.univalle.bubackend.services.appointment.validations.IsValidTypeAppointment;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,5 +83,19 @@ public class AppointmentServiceImpl implements IAppointmentService {
         AvailableDates availableDates = availableDatesOpt.orElseThrow(() -> new NoAvailableDateFound("No se encontró el horario"));
         availableDatesRepository.delete(availableDates);
         return new ResponseDeleteAvailableDate("Se eliminó el horario", new AvailableDateDTO(availableDates));
+    }
+
+    @Override
+    public ResponseAllDatesType getAllAvailableDatesType(String type) {
+        isValidDateTime.validateDateTime(type);
+
+        TypeAppointment typeAppointment = TypeAppointment.valueOf(type.toUpperCase());
+
+        Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByTypeAppointment(typeAppointment);
+        List<AvailableDates> datesType = datesOp.orElseGet(ArrayList::new);
+
+        List<AvailableDateDTO> dateDTOS = datesType.stream().map(AvailableDateDTO::new).toList();
+
+        return new ResponseAllDatesType(type ,dateDTOS);
     }
 }

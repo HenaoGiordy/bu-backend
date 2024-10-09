@@ -66,4 +66,15 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
     }
+
+    @Override
+    public ResponseAppointmentReservationProfessional allAppointmentEstudiante(Integer estudianteId) {
+
+        Optional<List<AppointmentReservation>> appointmentReservations = appointmentReservationRepository.findByEstudiante_Id(estudianteId);
+        List<AppointmentReservationDTO> appointmentReservationDTOS = appointmentReservations.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
+                .stream()
+                .map(AppointmentReservationDTO::new).toList();
+
+        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
+    }
 }

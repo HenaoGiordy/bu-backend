@@ -9,4 +9,5 @@ public interface IAppointmentReservationService {
     ResponseAppointmentReservation reserveAppointment(RequestAppointmentReservation requestAppointmentReservation);
 
     ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId);
+    ResponseAppointmentReservationProfessional allAppointmentEstudiante(Integer estudianteId);
 }

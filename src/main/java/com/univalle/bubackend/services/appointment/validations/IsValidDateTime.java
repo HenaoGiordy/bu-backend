@@ -1,6 +1,5 @@
 package com.univalle.bubackend.services.appointment.validations;
 
-import com.univalle.bubackend.exceptions.InvalidDateFormat;
 import com.univalle.bubackend.exceptions.appointment.HasDatesPending;
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
