@@ -69,7 +69,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
 
         UserResponse userResponse = new UserResponse(userEntity.getId() ,username, userEntity.getName(),
-                userEntity.getEmail(), userEntity.getPlan(), userEntity.getRoles(), userEntity.getIsActive());
+                userEntity.getEmail(), userEntity.getPlan(), userEntity.getRoles(), userEntity.getLunchBeneficiary(), userEntity.getSnackBeneficiary(), userEntity.getIsActive());
 
         return new AuthResponse(userResponse,"Successful",token);
     }
