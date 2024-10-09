@@ -45,7 +45,9 @@ public class UserServiceImpl {
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
-            throw new UserNameAlreadyExist("El nombre de usuario ya está en uso.");
+
+            throw new RuntimeException("El usuario ya está en registrado.");
+
         }
 
         try{
@@ -73,10 +75,12 @@ public class UserServiceImpl {
                 .password(passwordEncoder.encode(generatedPassword))
                 .plan(userRequest.plan())
                 .roles(roles)
+                .lunchBeneficiary("Beneficiario almuerzo".equalsIgnoreCase(userRequest.beca()))
+                .snackBeneficiary("Beneficiario refrigerio".equalsIgnoreCase(userRequest.beca()))
                 .build();
 
         userEntityRepository.save(user);
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getLunchBeneficiary(), user.getSnackBeneficiary(), user.getIsActive());
     }
 
     public UserResponse findStudentsByUsername(String username) {
@@ -84,7 +88,7 @@ public class UserServiceImpl {
 
         UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
 
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive());
+        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getLunchBeneficiary(), user.getSnackBeneficiary(), user.getIsActive());
     }
 
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
@@ -98,12 +102,13 @@ public class UserServiceImpl {
         user.setRoles(editUserRequest.roles());
         user.setIsActive(editUserRequest.isActive());
         user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());
+        user.setSnackBeneficiary(editUserRequest.snackBeneficiary());
         user.setRoles(editUserRequest.roles());
 
 
         userEntityRepository.save(user);
 
-        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive()));
+        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive(), user.getLunchBeneficiary(), user.getSnackBeneficiary()));
     }
 
 
@@ -222,6 +227,8 @@ public class UserServiceImpl {
                 newUser.getEmail(),
                 newUser.getPlan(),
                 newUser.getRoles(),
+                newUser.getLunchBeneficiary(),
+                newUser.getSnackBeneficiary(),
                 newUser.getIsActive());
     }
 
