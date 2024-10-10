@@ -24,6 +24,8 @@ public record UserResponse(
                 userEntity.getEmail(),
                 userEntity.getPlan(),
                 userEntity.getRoles(),
+                userEntity.getLunchBeneficiary(),
+                userEntity.getSnackBeneficiary(),
                 userEntity.getIsActive()
         );
     }
