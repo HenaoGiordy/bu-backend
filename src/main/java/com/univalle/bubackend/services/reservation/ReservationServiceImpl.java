@@ -62,7 +62,7 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     @Override
-    public ReservationResponse cancelReservation(Long reservationId) {
+    public ReservationResponse cancelReservation(Integer reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
