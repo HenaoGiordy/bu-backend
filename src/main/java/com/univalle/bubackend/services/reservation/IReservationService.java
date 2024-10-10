@@ -7,6 +7,6 @@ import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
 
 public interface IReservationService {
     ReservationResponse createReservation(ReservationRequest reservationRequest);
-    ReservationResponse cancelReservation(Long reservationId);
+    ReservationResponse cancelReservation(Integer reservationId);
     ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest);
 }
