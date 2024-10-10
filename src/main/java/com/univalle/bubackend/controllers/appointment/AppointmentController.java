@@ -1,10 +1,7 @@
 package com.univalle.bubackend.controllers.appointment;
 
-import com.univalle.bubackend.DTOs.appointment.RequestAvailableDate;
-import com.univalle.bubackend.DTOs.appointment.ResponseAllAvailableDates;
-import com.univalle.bubackend.DTOs.appointment.ResponseAvailableDate;
-import com.univalle.bubackend.DTOs.appointment.ResponseDeleteAvailableDate;
-import com.univalle.bubackend.services.appointment.IAppointmentService;
+import com.univalle.bubackend.DTOs.appointment.*;
+import com.univalle.bubackend.services.appointment.dates.IAppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -86,5 +83,25 @@ public class AppointmentController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDeleteAvailableDate> deleteDate(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentService.deleteAvailableDate(id), HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Obtener todos los horarios disponibles de citas",
+            description = "Permite obtener todos los horarios de citas por su tipo, [ENFERMERIA, PSICOLOGIA, ODONTOLOGIA]"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseAllDatesType.class))}),
+            @ApiResponse(responseCode = "400", description = "Error de validación en la solicitud",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Usuario no autenticado o token inválido",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
+                    content = @Content)
+    })
+    @GetMapping
+    public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type) {
+        return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type), HttpStatus.OK);
     }
 }

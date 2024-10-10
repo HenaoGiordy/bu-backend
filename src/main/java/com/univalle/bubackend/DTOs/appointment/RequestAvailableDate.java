@@ -8,7 +8,7 @@ import java.util.List;
 
 public record RequestAvailableDate(@NotEmpty(message = "debes ingresar un horario")
                                    @Valid
-                                   List<AvailableDateDTO> availableDates,
+                                   List<RequestAvailableDateDTO> availableDates,
 
                                    @NotNull(message = "Debes proporcionar un profesional") Integer professionalId)
 {

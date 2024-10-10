@@ -1,9 +1,7 @@
 package com.univalle.bubackend.exceptions;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
-import com.univalle.bubackend.exceptions.appointment.NotProfessional;
-import com.univalle.bubackend.exceptions.appointment.NotValidTypeAppointment;
+import com.univalle.bubackend.exceptions.appointment.*;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
@@ -17,6 +15,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -191,4 +190,35 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
     }
 
+    @ExceptionHandler(IsExterno.class)
+    public ResponseEntity<ExceptionDTO> handleIsExterno(IsExterno ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(DateNotAvailable.class)
+    public ResponseEntity<ExceptionDTO> handleDateNotAvailable(DateNotAvailable ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(HasDatesPending.class)
+    public ResponseEntity<ExceptionDTO> handleHasPending(HasDatesPending ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(InvalidDateFormat.class)
+    public ResponseEntity<ExceptionDTO> handleInvalidDateFormat(InvalidDateFormat ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleJsonParseException(HttpMessageNotReadableException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", "Error de deserialización del JSON: " + Objects.requireNonNull(ex.getRootCause()).getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
 }
