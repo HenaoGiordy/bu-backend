@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface SettingRepository extends JpaRepository<Setting, Integer> {
     Optional<Setting> findTopByOrderByIdAsc();
+    Optional<Setting> findSettingById(Integer id);
 }
