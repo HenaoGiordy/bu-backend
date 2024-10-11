@@ -7,5 +7,6 @@ public enum RoleName {
     PSICOLOGO,
     ENFERMERO,
     ODONTOLOGO,
-    EXTERNO
+    EXTERNO,
+    FUNCIONARIO
 }

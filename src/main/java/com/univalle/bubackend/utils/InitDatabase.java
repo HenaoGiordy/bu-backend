@@ -20,22 +20,27 @@ public class InitDatabase {
     CommandLineRunner database(PasswordEncoder passwordEncoder, UserEntityRepository userEntityRepository, RoleRepository roleRepository) {
         return args -> {
 
+            Role estudentRole = null;
             if (roleRepository.count() == 0) {
                 Role adminRole = Role.builder().name(RoleName.ADMINISTRADOR).build();
-                Role estudentRole = Role.builder().name(RoleName.ESTUDIANTE).build();
+                estudentRole = Role.builder().name(RoleName.ESTUDIANTE).build();
                 Role odontologoRole = Role.builder().name(RoleName.ODONTOLOGO).build();
                 Role enfermeroRole = Role.builder().name(RoleName.ENFERMERO).build();
                 Role externoRole = Role.builder().name(RoleName.EXTERNO).build();
                 Role monitoRole = Role.builder().name(RoleName.MONITOR).build();
                 Role psicologoRole = Role.builder().name(RoleName.PSICOLOGO).build();
+                Role funcionarioRole = Role.builder().name(RoleName.FUNCIONARIO).build();
 
                 // Guardar todos los roles
-                roleRepository.saveAll(List.of(adminRole, estudentRole, odontologoRole, enfermeroRole, externoRole, monitoRole, psicologoRole));
+                roleRepository.saveAll(List.of(adminRole, estudentRole, odontologoRole, enfermeroRole, externoRole, monitoRole, psicologoRole, funcionarioRole));
             }
 
             // Recuperar los roles persistidos desde la base de datos
             Role adminRole = roleRepository.findByName(RoleName.ADMINISTRADOR).orElseThrow();
             Role enfermero = roleRepository.findByName(RoleName.ENFERMERO).orElseThrow();
+            Role estudiante = roleRepository.findByName(RoleName.ESTUDIANTE).orElseThrow();
+            Role monitor = roleRepository.findByName(RoleName.MONITOR).orElseThrow();
+
 
             // Crear usuarios asignando los roles gestionados por JPA
             UserEntity adminUser = UserEntity.builder()
@@ -51,14 +56,26 @@ public class InitDatabase {
             UserEntity profesionalUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
-                    .username("giordy")
+                    .username("enfermero")
                     .email("henaogiordy@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(enfermero))  // Usar el role recuperado y gestionado
-                    .password(passwordEncoder.encode("giordy"))
+                    .password(passwordEncoder.encode("enfermero"))
                     .build();
 
-            userEntityRepository.saveAll(List.of(adminUser, profesionalUser));
+            UserEntity estudiantelUser = UserEntity.builder()
+                    .name("admin")
+                    .lastName("Bienestar")
+                    .username("estudiante")
+                    .email("henaogiordy@gmail.com")
+                    .plan("Bienestar Universitario")
+                    .roles(Set.of(estudiante))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("estudiante"))
+                    .build();
+
+
+
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser));
         };
     }
 }
