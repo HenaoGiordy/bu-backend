@@ -7,7 +7,9 @@ import com.univalle.bubackend.repository.MenuRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,16 +25,19 @@ public class MenuServiceImpl implements IMenuService{
     }
 
     @Override
-    public Optional<CreateMenuRequest> getMenu(Integer menuId) {
-        return menuRepository.findMenuById(menuId).
-                map(menu -> CreateMenuRequest.builder()
+    public List<CreateMenuRequest> getMenu() {
+        List<Menu> menus = menuRepository.findTop2ByOrderByIdAsc();
+
+        return menus.stream()
+                .map(menu -> CreateMenuRequest.builder()
                         .id(menu.getId())
                         .mainDish(menu.getMainDish())
                         .drink(menu.getDrink())
                         .price(menu.getPrice())
                         .dessert(menu.getDessert())
                         .note(menu.getNote())
-                        .build());
+                        .build())
+                .collect(Collectors.toList());
 
     }
 
