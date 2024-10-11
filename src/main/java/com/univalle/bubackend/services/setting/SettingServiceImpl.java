@@ -8,6 +8,9 @@ import com.univalle.bubackend.repository.SettingRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 @AllArgsConstructor
@@ -37,33 +40,36 @@ public class SettingServiceImpl implements ISettingService {
     }
 
     @Override
-    public SettingResponse getSetting(Integer id) {
-        Setting setting = settingRepository.findSettingById(id)
-                .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
+    public List<SettingResponse> getSetting() {
+        Optional<Setting> optionalSetting = settingRepository.findTopByOrderByIdAsc();
 
-        SettingRequest settingRequest = new SettingRequest(
-                setting.getId(),
-                setting.getStartSemester(),
-                setting.getEndSemester(),
-                setting.getNumLunch(),
-                setting.getNumSnack(),
-                setting.getStarBeneficiaryLunch(),
-                setting.getEndBeneficiaryLunch(),
-                setting.getStarLunch(),
-                setting.getEndLunch(),
-                setting.getStarBeneficiarySnack(),
-                setting.getEndBeneficiarySnack(),
-                setting.getStarSnack(),
-                setting.getEndSnack()
-        );
-
-        return new SettingResponse(setting.getId(), "Ajuste encontrado exitosamente", settingRequest);
+        if (optionalSetting.isPresent()) {
+            Setting setting = optionalSetting.get();
+            SettingRequest settingRequest = new SettingRequest(
+                    setting.getId(),
+                    setting.getStartSemester(),
+                    setting.getEndSemester(),
+                    setting.getNumLunch(),
+                    setting.getNumSnack(),
+                    setting.getStarBeneficiaryLunch(),
+                    setting.getEndBeneficiaryLunch(),
+                    setting.getStarLunch(),
+                    setting.getEndLunch(),
+                    setting.getStarBeneficiarySnack(),
+                    setting.getEndBeneficiarySnack(),
+                    setting.getStarSnack(),
+                    setting.getEndSnack()
+            );
+            return List.of(new SettingResponse(setting.getId(), "Ajustes encontrado exitosamente", settingRequest));
+        } else {
+            return List.of();
+        }
 
     }
 
     @Override
     public SettingResponse editSetting(SettingRequest settingRequest) {
-        Setting setting = settingRepository.findSettingById(settingRequest.id())
+        Setting setting = settingRepository.findTopByOrderByIdAsc()
                 .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
 
             setting.setStartSemester(settingRequest.startSemester());
