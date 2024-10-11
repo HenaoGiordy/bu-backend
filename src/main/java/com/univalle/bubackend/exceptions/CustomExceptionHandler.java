@@ -6,6 +6,9 @@ import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
+import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
+import com.univalle.bubackend.exceptions.reservation.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
@@ -220,5 +223,23 @@ public class CustomExceptionHandler {
         errors.put("error", "Error de deserialización del JSON: " + Objects.requireNonNull(ex.getRootCause()).getMessage());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    @ExceptionHandler(NoSlotsAvailableException.class)
+    public ResponseEntity<ExceptionDTO> handleNoSlotsAvailable(NoSlotsAvailableException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ExceptionDTO> handleResourceNotFound(ResourceNotFoundException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ExceptionDTO> handleUnauthorizedException(UnauthorizedException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionDTO(errorMessage));
     }
 }

@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
+
 @RestController
 @RequestMapping("/reservations")
 @AllArgsConstructor
@@ -33,5 +36,17 @@ public class ReservationController {
     public ResponseEntity<ReservationPaymentResponse> registerPayment(@RequestBody ReservationPaymentRequest paymentRequest) {
         ReservationPaymentResponse response = reservationService.registerPayment(paymentRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/by-username/{username}")
+    public ResponseEntity<List<ReservationResponse>> findReservationByUsername(@PathVariable String username) {
+        List<ReservationResponse> responses = Collections.singletonList(reservationService.findReservationByUsername(username));
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
+        List<ReservationResponse> responses = reservationService.getActiveReservations();
+        return ResponseEntity.ok(responses);
     }
 }
