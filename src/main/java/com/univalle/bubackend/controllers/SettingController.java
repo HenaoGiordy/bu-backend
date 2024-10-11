@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/setting")
 @AllArgsConstructor
@@ -25,9 +27,9 @@ public class SettingController {
         return new ResponseEntity<>(settingService.createSetting(settingRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SettingResponse> getSetting(@PathVariable Integer id) {
-        return new ResponseEntity<>(settingService.getSetting(id), HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<SettingResponse>> getSetting() {
+        return new ResponseEntity<>(settingService.getSetting(), HttpStatus.OK);
     }
 
     @PutMapping
