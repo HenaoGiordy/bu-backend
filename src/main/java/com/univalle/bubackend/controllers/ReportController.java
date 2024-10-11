@@ -8,6 +8,9 @@ import com.univalle.bubackend.services.report.ReportServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,8 +71,14 @@ public class ReportController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<ReportResponse>> getReports() {
-        return new ResponseEntity<>(reportService.listReports(), HttpStatus.OK);
+    public ResponseEntity<Page<ReportResponse>> getReports(
+            @RequestParam(value = "filter", required = true) String filter,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ReportResponse> reports = reportService.listReports(filter, pageable);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
 

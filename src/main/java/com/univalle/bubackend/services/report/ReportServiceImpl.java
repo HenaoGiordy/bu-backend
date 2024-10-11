@@ -3,6 +3,7 @@ package com.univalle.bubackend.services.report;
 import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
+import com.univalle.bubackend.exceptions.InvalidFilter;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
@@ -13,6 +14,8 @@ import com.univalle.bubackend.repository.ReportRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -170,15 +173,27 @@ public class ReportServiceImpl {
 
     }
 
-    public List<ReportResponse> listReports() {
-        List<Report> reports = reportRepository.findAll();
-        return reports.stream().map(report -> ReportResponse.builder()
+    public Page<ReportResponse> listReports(String filter, Pageable pageable) {
+        Page<Report> reports;
+
+        switch (filter.toLowerCase()) {
+            case "diario":
+                reports = reportRepository.findDailyReports(pageable);
+                break;
+            case "semester":
+                reports = reportRepository.findSemesterReports(pageable);
+                break;
+            default:
+                throw new InvalidFilter("Filtro no válido");
+        }
+
+        return reports.map(report -> ReportResponse.builder()
                 .beca(report.getBeca())
                 .date(report.getDate())
                 .id(report.getId())
                 .semester(report.getSemester())
                 .build()
-        ).collect(Collectors.toList());
+        );
 
     }
 
