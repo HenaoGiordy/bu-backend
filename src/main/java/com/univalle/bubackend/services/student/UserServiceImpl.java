@@ -5,6 +5,7 @@ import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
+import com.univalle.bubackend.exceptions.InvalidFilter;
 import com.univalle.bubackend.exceptions.UserNameAlreadyExist;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.RoleNotFound;
@@ -16,6 +17,8 @@ import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.RoleRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -260,9 +263,24 @@ public class UserServiceImpl {
 
     }
 
-    public List<ListUser> listUsers(){
-        List<UserEntity> users = userEntityRepository.findAll();
-        return users.stream().map(user -> ListUser.builder()
+    public Page<ListUser> listUsers(String filter, Pageable pageable){
+        Page<UserEntity> users;
+
+        switch (filter.toLowerCase()) {
+            case "beneficiarios":
+                users = userEntityRepository.findBeneficiaries(pageable);
+                break;
+            case "funcionarios":
+                users = userEntityRepository.findAllNonStudents(pageable);
+                break;
+            case "estudiantes":
+                users = userEntityRepository.findAllStudents(pageable);
+                break;
+            default:
+                throw new InvalidFilter("Filtro no válido");
+        }
+
+        return users.map(user -> ListUser.builder()
                 .id(user.getId())
                 .snackBeneficiary(user.getSnackBeneficiary())
                 .lunchBeneficiary(user.getLunchBeneficiary())
@@ -273,7 +291,7 @@ public class UserServiceImpl {
                 .isActive(user.getIsActive())
                 .name(user.getName() + " " + user.getLastName())
                 .build()
-        ).collect(Collectors.toList());
+        );
     }
 
     public void deleteBeneficiaries() {

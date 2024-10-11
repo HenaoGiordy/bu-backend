@@ -217,6 +217,12 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
 
+    @ExceptionHandler(InvalidFilter.class)
+    public ResponseEntity<ExceptionDTO> handleInvalidFilter(InvalidFilter ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleJsonParseException(HttpMessageNotReadableException ex) {
         Map<String, String> errors = new HashMap<>();

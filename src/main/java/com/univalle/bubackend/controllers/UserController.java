@@ -7,6 +7,9 @@ import com.univalle.bubackend.services.UserDetailServiceImpl;
 import com.univalle.bubackend.services.student.UserServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -56,8 +59,15 @@ public class UserController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<ListUser>> getAllUsers() {
-        return new ResponseEntity<>(userService.listUsers(), HttpStatus.OK);
+        public ResponseEntity<Page<ListUser>> getAllUsers(
+                @RequestParam(value = "page", defaultValue = "0") int page,
+                @RequestParam(value = "size", defaultValue = "10") int size,
+                @RequestParam(value = "filter", required = true) String filter) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ListUser> users = userService.listUsers(filter, pageable);
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 
@@ -80,5 +90,6 @@ public class UserController {
         return ResponseEntity.ok(userBenefits);
 
     }
+
 
 }
