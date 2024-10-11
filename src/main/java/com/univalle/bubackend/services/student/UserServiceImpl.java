@@ -276,4 +276,26 @@ public class UserServiceImpl {
         ).collect(Collectors.toList());
     }
 
+    public void deleteBeneficiaries() {
+        List<UserEntity> beneficiaries = userEntityRepository.findByLunchBeneficiaryTrueOrSnackBeneficiaryTrue();
+
+        beneficiaries.forEach(user -> {
+            user.setLunchBeneficiary(false);
+            user.setSnackBeneficiary(false);
+        });
+
+        userEntityRepository.saveAll(beneficiaries);
+
+    }
+
+    public void deleteBeneficiary(String username){
+        UserEntity user = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFound("No se encontro el usuario"));
+
+        user.setLunchBeneficiary(false);
+        user.setSnackBeneficiary(false);
+
+        userEntityRepository.save(user);
+    }
+
 }

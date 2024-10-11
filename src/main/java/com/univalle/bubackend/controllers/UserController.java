@@ -1,5 +1,6 @@
 package com.univalle.bubackend.controllers;
 
+import com.univalle.bubackend.DTOs.report.DeleteResponse;
 import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.services.UserDetailServiceImpl;
@@ -59,10 +60,25 @@ public class UserController {
         return new ResponseEntity<>(userService.listUsers(), HttpStatus.OK);
     }
 
+
+    @PutMapping("/delete")
+    public ResponseEntity<DeleteResponse> removeBeneficiaries() {
+        userService.deleteBeneficiaries();
+        return new ResponseEntity<>(new DeleteResponse("Beneficiarios eliminados correctamente"), HttpStatus.OK);
+    }
+
+    @PutMapping("/delete/{username}")
+    public ResponseEntity<DeleteResponse> removeBeneficiary(@PathVariable String username ) {
+        userService.deleteBeneficiary(username);
+        return new ResponseEntity<>(new DeleteResponse("Beneficiario borrado exitosamente"), HttpStatus.OK);
+    }
+
+ 
     @GetMapping("/{username}")
     public ResponseEntity<ViewProfileResponse> getUserBenefits(@PathVariable String username) {
         ViewProfileResponse userBenefits = userDetailServiceImpl.getUserDetails(username);
         return ResponseEntity.ok(userBenefits);
+
     }
 
 }
