@@ -187,8 +187,6 @@ public class ReservationServiceImpl implements IReservationService {
     //tabla
     @Override
     public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
-        Page<Reservation> activeReservations = reservationRepository.findAllByPaidFalse(pageable);
-
         return reservationRepository.findAllByPaidFalse(pageable)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),

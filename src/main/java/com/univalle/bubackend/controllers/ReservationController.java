@@ -5,7 +5,6 @@ import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
 import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
-import com.univalle.bubackend.DTOs.user.ListUser;
 import com.univalle.bubackend.services.reservation.IReservationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
