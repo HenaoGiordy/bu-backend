@@ -6,7 +6,6 @@ import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
 import com.univalle.bubackend.exceptions.InvalidFilter;
-import com.univalle.bubackend.exceptions.UserNameAlreadyExist;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.RoleNotFound;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
@@ -151,19 +150,19 @@ public class UserServiceImpl {
                 String beca = record.isMapped("beca") ? record.get("beca") : null;
 
                 if (username == null || username.trim().isEmpty()) {
-                    throw new CSVFieldException("El campo 'username' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'codigo/cedula' está vacío en el archivo CSV.");
                 }
                 if (name == null || name.trim().isEmpty()) {
-                    throw new CSVFieldException("El campo 'name' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'nombre' está vacío en el archivo CSV.");
                 }
                 if (lastName == null || lastName.trim().isEmpty()) {
-                    throw new CSVFieldException("El campo 'lastName' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'apellido' está vacío en el archivo CSV.");
                 }
                 if (email == null || email.trim().isEmpty()) {
-                    throw new CSVFieldException("El campo 'email' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'correo' está vacío en el archivo CSV.");
                 }
                 if (plan == null || plan.trim().isEmpty()) {
-                    throw new CSVFieldException("El campo 'plan' está vacío en el archivo CSV.");
+                    throw new CSVFieldException("El campo 'plan/area' está vacío en el archivo CSV.");
                 }
 
                 UserRequest userRequest = new UserRequest(
@@ -185,7 +184,7 @@ public class UserServiceImpl {
             csvParser.close();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error en el archivo CSV: " + e.getMessage());
+            throw new CSVFieldException("Error en el archivo CSV: " + e.getMessage());
         }
 
         return users;
