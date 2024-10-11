@@ -24,10 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-
-
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
+
+
 import java.util.*;
 
 import java.util.stream.Collectors;
@@ -118,15 +119,35 @@ public class UserServiceImpl {
     public List<UserResponse> importUsers(MultipartFile file, RoleName roleName) {
         List<UserResponse> users = new ArrayList<>();
         try {
+            String firstLine = new BufferedReader(new InputStreamReader(file.getInputStream())).readLine();
+            char delimiter = detectDelimiter(firstLine);
+
             Reader reader = new InputStreamReader(file.getInputStream());
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(';').withHeader());
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(delimiter).withHeader());
 
             for (CSVRecord record : csvParser) {
-                String username = record.get("username");
-                String name = record.get("name");
-                String lastName = record.get("lastName");
-                String email = record.get("email");
-                String plan = record.get("plan");
+
+                String username = null;
+                if (record.isMapped("codigo/cedula")) {
+                    username = record.get("codigo/cedula");
+                } else if (record.isMapped("codigo")) {
+                    username = record.get("codigo");
+                } else if (record.isMapped("cedula")) {
+                    username = record.get("cedula");
+                }
+                String name = record.get("nombre");
+                String lastName = record.get("apellido");
+                String email = record.get("correo");
+
+                String plan = null;
+                if (record.isMapped("plan/area")) {
+                    plan = record.get("plan/area");
+                } else if (record.isMapped("plan")) {
+                    plan = record.get("plan");
+                } else if (record.isMapped("area")) {
+                    plan = record.get("area");
+                }
+
                 String beca = record.isMapped("beca") ? record.get("beca") : null;
 
                 if (username == null || username.trim().isEmpty()) {
@@ -168,6 +189,18 @@ public class UserServiceImpl {
         }
 
         return users;
+    }
+
+    private char detectDelimiter(String firstLine) {
+        String[] delimiters = {",", ";", "\t", "|"};
+
+        for (String delimiter : delimiters) {
+            if (firstLine.split(delimiter).length > 1) {
+                return delimiter.charAt(0);
+            }
+        }
+
+        throw new IllegalArgumentException("No se pudo detectar un delimitador válido en el archivo CSV.");
     }
 
     public UserResponse importUser(UserRequest userRequest) {

@@ -118,10 +118,10 @@ public class CustomExceptionHandler {
 
 
     @ExceptionHandler(CSVFieldException.class)
-    public ResponseEntity<Map<String, String>> handleCSVFieldException(CSVFieldException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("Error", ex.getMessage());
-        return ResponseEntity.badRequest().body(errors);
+    public ResponseEntity<ExceptionDTO> handleCSVFieldException(CSVFieldException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+
     }
 
     @ExceptionHandler(JWTVerificationException.class)
