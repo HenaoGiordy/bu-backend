@@ -3,6 +3,7 @@ package com.univalle.bubackend.services;
 
 import com.univalle.bubackend.DTOs.auth.*;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.DTOs.user.ViewProfileResponse;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
@@ -151,5 +152,32 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     public Boolean verifyResetToken(String token){
         return passwordResetTokenRepositoy.findByToken(token).isPresent();
+    }
+
+    public ViewProfileResponse getUserDetails(String username) {
+        UserEntity userEntity = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFound("Usuario no encontrado"));
+
+        String benefitType = getUserBenefitType(userEntity);
+
+
+        return new ViewProfileResponse(
+                userEntity.getName(),
+                userEntity.getLastName(),
+                userEntity.getEmail(),
+                benefitType
+        );
+    }
+
+    private String getUserBenefitType(UserEntity userEntity) {
+        if (userEntity.getLunchBeneficiary() && userEntity.getSnackBeneficiary()) {
+            return "Almuerzo y refrigerio";
+        } else if (userEntity.getLunchBeneficiary()) {
+            return "Almuerzo";
+        } else if (userEntity.getSnackBeneficiary()) {
+            return "Refrigerio";
+        } else {
+            return "Sin beneficios";
+        }
     }
 }
