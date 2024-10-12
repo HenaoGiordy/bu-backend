@@ -8,6 +8,8 @@ import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface IReservationService {
     ReservationResponse createReservation(ReservationRequest reservationRequest);
     List<ReservationResponse> getReservationsPerDay(String username);

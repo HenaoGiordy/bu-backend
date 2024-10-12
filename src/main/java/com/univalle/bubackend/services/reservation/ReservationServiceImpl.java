@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -207,15 +208,6 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     //tabla
-    @Override
-
-    public List<ReservationResponse> getActiveReservations() {
-        LocalDate date = LocalDate.now();
-        List<Reservation> activeReservations = reservationRepository.findAllByPaidFalse(date);
-
-        return activeReservations.stream()
-                .map(reservation -> new ReservationResponse(
-                        "Reserva activa encontrada.",
     public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
         return reservationRepository.findAllByPaidFalse(pageable)
                 .map(reservation -> new ListReservationResponse(
