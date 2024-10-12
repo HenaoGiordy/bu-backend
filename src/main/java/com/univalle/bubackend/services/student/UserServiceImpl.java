@@ -147,6 +147,15 @@ public class UserServiceImpl {
                     plan = record.get("area");
                 }
 
+                String nota = null;
+                if (record.isMapped("Las opciones de beca son: almuerzo/refrigerio")) {
+                    nota = record.get("Las opciones de beca son: almuerzo/refrigerio").trim();
+                    if (nota.isEmpty()) {
+                        nota = null;
+                    }
+                }
+
+
                 String beca = record.isMapped("beca") ? record.get("beca") : null;
 
                 if (username == null || username.trim().isEmpty()) {
