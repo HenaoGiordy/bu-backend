@@ -13,6 +13,8 @@ import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
 import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
+import com.univalle.bubackend.exceptions.users.RoleNotFound;
+import com.univalle.bubackend.exceptions.users.UserNameAlreadyExist;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -7,9 +7,10 @@ import com.univalle.bubackend.exceptions.CSVFieldException;
 
 import com.univalle.bubackend.exceptions.InvalidFilter;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
-import com.univalle.bubackend.exceptions.RoleNotFound;
+import com.univalle.bubackend.exceptions.users.RoleNotFound;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
+import com.univalle.bubackend.exceptions.users.UserNameAlreadyExist;
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
@@ -49,7 +50,7 @@ public class UserServiceImpl {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
 
-            throw new RuntimeException("El usuario ya está en registrado.");
+            throw new UserNameAlreadyExist("El usuario ya está en registrado.");
 
         }
 
