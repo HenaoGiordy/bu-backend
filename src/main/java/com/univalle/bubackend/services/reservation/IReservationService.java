@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface IReservationService {
     ReservationResponse createReservation(ReservationRequest reservationRequest);
+    List<ReservationResponse> getReservationsPerDay(String username);
     ReservationResponse cancelReservation(Integer reservationId);
     ReservationResponse findReservationByUsername(String username);
     ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest);
