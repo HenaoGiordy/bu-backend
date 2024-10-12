@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.reservation;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
+import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
@@ -14,6 +15,8 @@ import com.univalle.bubackend.repository.ReservationRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +25,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -184,20 +186,17 @@ public class ReservationServiceImpl implements IReservationService {
 
     //tabla
     @Override
-    public List<ReservationResponse> getActiveReservations() {
-        List<Reservation> activeReservations = reservationRepository.findAllByPaidFalse();
-
-        return activeReservations.stream()
-                .map(reservation -> new ReservationResponse(
-                        "Reserva activa encontrada.",
+    public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
+        return reservationRepository.findAllByPaidFalse(pageable)
+                .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getData(),
                         reservation.getTime(),
                         reservation.getPaid(),
-                        reservation.getLunch(),
                         reservation.getSnack(),
+                        reservation.getLunch(),
                         reservation.getUserEntity().getUsername()
-                )).collect(Collectors.toList());
+                ));
     }
 
 }

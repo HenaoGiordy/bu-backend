@@ -2,6 +2,8 @@ package com.univalle.bubackend.repository;
 
 import com.univalle.bubackend.models.Reservation;
 import com.univalle.bubackend.models.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,6 +24,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findByUserEntityAndPaidFalse(UserEntity userEntity);
 
     @Query("SELECT r FROM Reservation r WHERE r.paid = false")
-    List<Reservation> findAllByPaidFalse();
+    Page<Reservation> findAllByPaidFalse(Pageable pageable);
 
 }
