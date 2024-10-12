@@ -2,11 +2,16 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
+import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
 import com.univalle.bubackend.services.reservation.IReservationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,8 +56,12 @@ public class ReservationController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
-        List<ReservationResponse> responses = reservationService.getActiveReservations();
-        return ResponseEntity.ok(responses);
+    public ResponseEntity<Page<ListReservationResponse>> getAllReservations(
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ListReservationResponse> reservations = reservationService.getActiveReservations(pageable);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 }
