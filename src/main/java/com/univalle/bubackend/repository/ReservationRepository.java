@@ -21,7 +21,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false")
     List<Reservation> findByUserEntityAndPaidFalse(UserEntity userEntity);
 
-    @Query("SELECT r FROM Reservation r WHERE r.paid = false")
-    List<Reservation> findAllByPaidFalse();
+    @Query("SELECT r FROM Reservation r WHERE r.paid = false AND DATE(r.data) = :date")
+    List<Reservation> findAllByPaidFalse(LocalDate date);
+
+    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date")
+    List<Reservation> findReservationsPerDay(UserEntity userEntity, LocalDate date);
 
 }

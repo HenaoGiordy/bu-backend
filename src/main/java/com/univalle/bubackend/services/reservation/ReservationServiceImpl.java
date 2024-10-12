@@ -104,6 +104,28 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     @Override
+    public List<ReservationResponse> getReservationsPerDay(String username){
+        LocalDate date = LocalDate.now();
+
+        UserEntity user = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        List<Reservation> reservations = reservationRepository.findReservationsPerDay(user, date);
+
+        return reservations.stream()
+                .map(reservation -> new ReservationResponse(
+                        "Reserva activa encontrada.",
+                        reservation.getId(),
+                        reservation.getData(),
+                        reservation.getTime(),
+                        reservation.getPaid(),
+                        reservation.getLunch(),
+                        reservation.getSnack(),
+                        reservation.getUserEntity().getUsername()
+                )).collect(Collectors.toList());
+    }
+
+    @Override
     public ReservationResponse cancelReservation(Integer reservationId) {
 
         Reservation reservation = reservationRepository.findById(reservationId)
@@ -185,7 +207,8 @@ public class ReservationServiceImpl implements IReservationService {
     //tabla
     @Override
     public List<ReservationResponse> getActiveReservations() {
-        List<Reservation> activeReservations = reservationRepository.findAllByPaidFalse();
+        LocalDate date = LocalDate.now();
+        List<Reservation> activeReservations = reservationRepository.findAllByPaidFalse(date);
 
         return activeReservations.stream()
                 .map(reservation -> new ReservationResponse(

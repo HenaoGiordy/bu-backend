@@ -26,6 +26,12 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/per-day/{username}")
+    public ResponseEntity<List<ReservationResponse>> getReservationsPerDay(@PathVariable String username) {
+        List<ReservationResponse> responses = reservationService.getReservationsPerDay(username);
+        return ResponseEntity.ok(responses);
+    }
+
     @DeleteMapping("/cancel/{id}")
     public ResponseEntity<ReservationResponse> cancelReservation(@PathVariable Integer id) {
         ReservationResponse response = reservationService.cancelReservation(id);
