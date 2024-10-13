@@ -102,7 +102,7 @@ public class AppointmentController {
     })
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ESTUDIANTE', 'ODONTOLOGO', 'ENFERMERO', 'PSICOLOGO')")
+    @PreAuthorize("hasAnyRole('ESTUDIANTE', 'ODONTOLOGO', 'ENFERMERO', 'PSICOLOGO', 'FUNCIONARIO')")
     public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type) {
         return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type), HttpStatus.OK);
     }
