@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.reservation;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
+import com.univalle.bubackend.DTOs.reservation.AvailabilityResponse;
 import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
@@ -44,7 +45,6 @@ public class ReservationServiceImpl implements IReservationService {
         Setting setting = settingRepository.findSettingById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
-        LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
         // Inicio reserva de almuerzo a beneficiarios
@@ -73,27 +73,20 @@ public class ReservationServiceImpl implements IReservationService {
             throw new UnauthorizedException("No tienes acceso a reservar refrigerio. La venta ya finalizó.");
         }
 
-        int maxLunchSlots = reservationRepository.getMaxRemainingLunchSlots();
-
-        int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
-
-        int remainingSlotsLunch = maxLunchSlots - currentLunchReservations;
-
-
-        int maxSnackSlots = reservationRepository.getMaxRemainingSnackSlots();
-        int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
-        int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
+        // Llamar a getAvailability para obtener los slots restantes
+        AvailabilityResponse availability = getAvailability();
 
         // Validación de slots disponibles para almuerzo
-        if (remainingSlotsLunch <= 0) {
+        if (reservationRequest.lunch() && availability.remainingSlotsLunch() <= 0) {
             throw new NoSlotsAvailableException("No quedan reservas de almuerzo disponibles para hoy.");
         }
 
         // Validación de slots disponibles para refrigerio
-        if (remainingSlotsSnack <= 0) {
+        if (reservationRequest.snack() && availability.remainingSlotsSnack() <= 0) {
             throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
+        // Crear la reserva
         Reservation reservation = Reservation.builder()
                 .userEntity(user)
                 .lunch(reservationRequest.lunch())
@@ -114,6 +107,24 @@ public class ReservationServiceImpl implements IReservationService {
                 reservation.getLunch(),
                 reservation.getSnack(),
                 reservation.getUserEntity().getUsername()
+        );
+    }
+
+
+    @Override
+    public AvailabilityResponse getAvailability() {
+        LocalDate today = LocalDate.now();
+        int maxLunchSlots = reservationRepository.getMaxRemainingLunchSlots();
+        int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
+        int remainingSlotsLunch = maxLunchSlots - currentLunchReservations;
+
+        int maxSnackSlots = reservationRepository.getMaxRemainingSnackSlots();
+        int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
+        int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
+
+        return new AvailabilityResponse(
+                remainingSlotsLunch,
+                remainingSlotsSnack
         );
     }
 
@@ -217,6 +228,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         return new ReservationPaymentResponse("Pago registrado con éxito.", lastReservation.getId());
     }
+
 
     //tabla
     @Override

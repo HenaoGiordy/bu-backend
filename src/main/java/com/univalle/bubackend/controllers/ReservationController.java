@@ -2,6 +2,7 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
+import com.univalle.bubackend.DTOs.reservation.AvailabilityResponse;
 import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
@@ -64,4 +65,11 @@ public class ReservationController {
         Page<ListReservationResponse> reservations = reservationService.getActiveReservations(pageable);
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
+
+    @GetMapping("/availability")
+    public ResponseEntity<AvailabilityResponse> getAvailability() {
+        AvailabilityResponse responses = reservationService.getAvailability();
+        return ResponseEntity.ok(responses);
+    }
+
 }
