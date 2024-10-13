@@ -110,7 +110,6 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
-
     @Override
     public AvailabilityResponse getAvailability() {
         LocalDate today = LocalDate.now();
