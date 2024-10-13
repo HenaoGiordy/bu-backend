@@ -41,9 +41,6 @@ public class ReservationServiceImpl implements IReservationService {
         UserEntity user = userEntityRepository.findByUsername(reservationRequest.userName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-
-        System.out.println("Esto es una prueba");
-
         Setting setting = settingRepository.findSettingById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
