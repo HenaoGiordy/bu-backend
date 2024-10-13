@@ -15,6 +15,7 @@ import com.univalle.bubackend.repository.ReservationRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -72,8 +73,16 @@ public class ReservationServiceImpl implements IReservationService {
             throw new UnauthorizedException("No tienes acceso a reservar refrigerio. La venta ya finalizo");
         }
 
-        int remainingSlotsLunch = reservationRepository.countRemainingLunchSlotsForDay(LocalDate.now(), reservationRequest.lunch());
-        int remainingSlotsSnack = reservationRepository.countRemainingSnacklotsForDay(LocalDate.now(), reservationRequest.snack());
+        LocalDate today = LocalDate.now();
+
+        int maxLunchSlots = reservationRepository.getMaxRemainingLunchSlots();
+        int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
+        int remainingSlotsLunch = maxLunchSlots - currentLunchReservations;
+
+        int maxSnackSlots = reservationRepository.getMaxRemainingSnackSlots();
+        int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
+        int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
+
 
         if (remainingSlotsLunch <= 0 && now.isBefore(setting.getEndLunch()) && now.isAfter(setting.getStarBeneficiaryLunch())) {
             throw new NoSlotsAvailableException("No quedan reservas de almuerzo disponibles para hoy.");
@@ -208,8 +217,10 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     //tabla
+    @Override
     public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
-        return reservationRepository.findAllByPaidFalse(pageable)
+        LocalDate date = LocalDate.now();
+        return reservationRepository.findAllByPaidFalse(pageable, date)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getData(),
