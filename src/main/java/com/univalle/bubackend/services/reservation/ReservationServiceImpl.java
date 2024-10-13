@@ -15,7 +15,6 @@ import com.univalle.bubackend.repository.ReservationRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,54 +41,60 @@ public class ReservationServiceImpl implements IReservationService {
         UserEntity user = userEntityRepository.findByUsername(reservationRequest.userName())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
+
+        System.out.println("Esto es una prueba");
+
         Setting setting = settingRepository.findSettingById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
-
-        LocalTime now = LocalTime.now();
-        //Inicio reserva de almuerzo a beneficiarios
-        if (reservationRequest.lunch() && user.getLunchBeneficiary() && now.isBefore(setting.getStarBeneficiaryLunch())) {
-            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Todavía no inicia la venta");
-        }
-        //Inicio reserva de almuerzo a venta libre
-        if (reservationRequest.lunch() && !user.getLunchBeneficiary() && now.isBefore(setting.getStarLunch())) {
-            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Espera a venta libre");
-        }
-        //Finalización de reserva de almuerzos
-        if (reservationRequest.lunch() && now.isAfter(setting.getEndLunch())) {
-            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. La venta ya finalizo");
-        }
-
-        //Inicio reserva de refrigerio a beneficiarios
-        if (reservationRequest.snack() && user.getSnackBeneficiary() && now.isAfter(setting.getStarBeneficiarySnack())) {
-            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Todavía no inicia la venta");
-        }
-        //Inicio reserva de refrigerio a venta libre
-        if (reservationRequest.snack() && !user.getSnackBeneficiary() && now.isBefore(setting.getStarSnack())) {
-            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Espera a venta libre");
-        }
-        //Finalización de reserva de refrigerio
-        if (reservationRequest.snack() && now.isAfter(setting.getEndSnack())) {
-            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. La venta ya finalizo");
-        }
-
         LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        // Inicio reserva de almuerzo a beneficiarios
+        if (reservationRequest.lunch() && user.getLunchBeneficiary() && now.isBefore(setting.getStarBeneficiaryLunch())) {
+            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Todavía no inicia la venta.");
+        }
+        // Inicio reserva de almuerzo a venta libre
+        if (reservationRequest.lunch() && !user.getLunchBeneficiary() && now.isBefore(setting.getStarLunch())) {
+            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Espera a venta libre.");
+        }
+        // Finalización de reserva de almuerzos
+        if (reservationRequest.lunch() && now.isAfter(setting.getEndLunch())) {
+            throw new UnauthorizedException("No tienes acceso a reservar almuerzo. La venta ya finalizó.");
+        }
+
+        // Inicio reserva de refrigerio a beneficiarios
+        if (reservationRequest.snack() && user.getSnackBeneficiary() && now.isBefore(setting.getStarBeneficiarySnack())) {
+            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Todavía no inicia la venta.");
+        }
+        // Inicio reserva de refrigerio a venta libre
+        if (reservationRequest.snack() && !user.getSnackBeneficiary() && now.isBefore(setting.getStarSnack())) {
+            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Espera a venta libre.");
+        }
+        // Finalización de reserva de refrigerio
+        if (reservationRequest.snack() && now.isAfter(setting.getEndSnack())) {
+            throw new UnauthorizedException("No tienes acceso a reservar refrigerio. La venta ya finalizó.");
+        }
 
         int maxLunchSlots = reservationRepository.getMaxRemainingLunchSlots();
+
         int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
+
         int remainingSlotsLunch = maxLunchSlots - currentLunchReservations;
+
 
         int maxSnackSlots = reservationRepository.getMaxRemainingSnackSlots();
         int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
         int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
 
-
-        if (remainingSlotsLunch <= 0 && now.isBefore(setting.getEndLunch()) && now.isAfter(setting.getStarBeneficiaryLunch())) {
+        // Validación de slots disponibles para almuerzo
+        if (remainingSlotsLunch <= 0) {
             throw new NoSlotsAvailableException("No quedan reservas de almuerzo disponibles para hoy.");
         }
 
-        if (remainingSlotsSnack <= 0 && now.isBefore(setting.getEndSnack()) && now.isAfter(setting.getStarBeneficiarySnack())) {
-            throw new NoSlotsAvailableException("No quedan reservas de almuerzo disponibles para hoy.");
+        // Validación de slots disponibles para refrigerio
+        if (remainingSlotsSnack <= 0) {
+            throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
         Reservation reservation = Reservation.builder()

@@ -20,11 +20,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT s.numSnack FROM Setting s")
     int getMaxRemainingSnackSlots();
 
-    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.lunch = TRUE AND r.data = :today")
-    int countLunchReservationsForDay(LocalDate today);
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.lunch = true AND DATE(r.data) = :date")
+    int countLunchReservationsForDay(LocalDate date);
 
-    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.snack = TRUE AND r.data = :today")
-    int countSnackReservationsForDay(LocalDate today);
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.snack = true AND DATE(r.data) = :date")
+    int countSnackReservationsForDay(LocalDate date);
 
     @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false")
     List<Reservation> findByUserEntityAndPaidFalse(UserEntity userEntity);
