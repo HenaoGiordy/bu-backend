@@ -87,7 +87,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
     @Override
     public ResponseAllDatesType getAllAvailableDatesType(String type) {
-        isValidDateTime.validateDateTime(type);
+        isValidTypeAppointment.validateTypeAppointment(type);
 
         TypeAppointment typeAppointment = TypeAppointment.valueOf(type.toUpperCase());
 
@@ -96,6 +96,6 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
         List<AvailableDateDTO> dateDTOS = datesType.stream().map(AvailableDateDTO::new).toList();
 
-        return new ResponseAllDatesType(type ,dateDTOS);
+        return new ResponseAllDatesType(type.toUpperCase() ,dateDTOS);
     }
 }
