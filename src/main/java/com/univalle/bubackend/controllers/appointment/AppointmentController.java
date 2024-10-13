@@ -100,7 +100,9 @@ public class AppointmentController {
             @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
                     content = @Content)
     })
+
     @GetMapping
+    @PreAuthorize("hasAnyRole('ESTUDIANTE', 'ODONTOLOGO', 'ENFERMERO', 'PSICOLOGO')")
     public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type) {
         return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type), HttpStatus.OK);
     }

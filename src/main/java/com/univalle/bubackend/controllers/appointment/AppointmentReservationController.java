@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/appointment-reservation")
-@PreAuthorize("hasAnyRole('ESTUDIANTE', 'PSICOLOGO', 'ENFERMERO', 'ODONTOLOGO')")
+@PreAuthorize("hasAnyRole('ESTUDIANTE', 'PSICOLOGO', 'ENFERMERO', 'ODONTOLOGO', 'FUNCIONARIO')")
 public class AppointmentReservationController {
 
     private IAppointmentReservationService appointmentReservationService;
