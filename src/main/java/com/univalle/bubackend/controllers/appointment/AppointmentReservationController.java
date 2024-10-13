@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @AllArgsConstructor
@@ -39,7 +38,7 @@ public class AppointmentReservationController {
             @ApiResponse(responseCode = "403", description = "Usuario no autorizado para realizar esta operación",
                     content = @Content)
     })
-    @RequestBody(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Debes Ingresar el Id del paciente y el Id del horario disponible de un profesional.",
             required = true,
             content = @Content(schema = @Schema(implementation = RequestAppointmentReservation.class))
