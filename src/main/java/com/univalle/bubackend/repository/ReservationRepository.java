@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
@@ -23,8 +24,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false")
     List<Reservation> findByUserEntityAndPaidFalse(UserEntity userEntity);
 
-    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date")
-    List<Reservation> findReservationsPerDay(UserEntity userEntity, LocalDate date);
+    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date AND r.snack = true")
+    Optional<Reservation> findSnackReservationPerDay(UserEntity userEntity, LocalDate date);
+
+    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date AND r.lunch = true")
+    Optional<Reservation> findLunchReservationPerDay(UserEntity userEntity, LocalDate date);
 
     @Query("SELECT r FROM Reservation r WHERE r.paid = false AND DATE(r.data) = :date")
     Page<Reservation> findAllByPaidFalse(Pageable pageable, LocalDate date);

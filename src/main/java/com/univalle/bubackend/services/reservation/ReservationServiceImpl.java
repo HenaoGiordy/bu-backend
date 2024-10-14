@@ -24,10 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -146,11 +146,14 @@ public class ReservationServiceImpl implements IReservationService {
         UserEntity user = userEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        List<Reservation> reservations = reservationRepository.findReservationsPerDay(user, date);
+        Optional<Reservation> lunchReservation = reservationRepository.findLunchReservationPerDay(user, date);
+        Optional<Reservation> snackReservation = reservationRepository.findSnackReservationPerDay(user, date);
 
-        return reservations.stream()
-                .map(reservation -> new ReservationResponse(
-                        "Reserva activa encontrada.",
+        List<ReservationResponse> reservationResponses = new ArrayList<>();
+
+        lunchReservation.ifPresent(reservation -> reservationResponses.add(
+                new ReservationResponse(
+                        "Reserva de almuerzo encontrada",
                         reservation.getId(),
                         reservation.getData(),
                         reservation.getTime(),
@@ -158,7 +161,23 @@ public class ReservationServiceImpl implements IReservationService {
                         reservation.getLunch(),
                         reservation.getSnack(),
                         reservation.getUserEntity().getUsername()
-                )).collect(Collectors.toList());
+                )
+        ));
+
+        snackReservation.ifPresent(reservation -> reservationResponses.add(
+                new ReservationResponse(
+                        "Reserva de refrigerio encontrada",
+                        reservation.getId(),
+                        reservation.getData(),
+                        reservation.getTime(),
+                        reservation.getPaid(),
+                        reservation.getLunch(),
+                        reservation.getSnack(),
+                        reservation.getUserEntity().getUsername()
+                )
+        ));
+
+        return reservationResponses;
     }
 
     @Override
