@@ -250,4 +250,10 @@ public class CustomExceptionHandler {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionDTO(errorMessage));
     }
+
+    @ExceptionHandler(ReservationNotFoud.class)
+    public ResponseEntity<ExceptionDTO> handleReservationNotFoud(ReservationNotFoud ex){
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionDTO(errorMessage) );
+    }
 }

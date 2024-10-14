@@ -102,4 +102,9 @@ public class AppointmentReservationController {
     public ResponseEntity<ResponseAppointmentReservationStudent> getAppointmentByAppointmentId(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentReservationService.allAppointmentEstudiante(id), HttpStatus.OK);
     }
+
+    @PostMapping("/cancel/{id}")
+    public ResponseEntity<ResponseAppointmentCancel> cancelAppointment(@PathVariable Integer id) {
+        return new ResponseEntity<>(appointmentReservationService.cancelReservation(id), HttpStatus.OK);
+    }
 }
