@@ -91,7 +91,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
         TypeAppointment typeAppointment = TypeAppointment.valueOf(type.toUpperCase());
 
-        Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByTypeAppointment(typeAppointment);
+        Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByTypeAppointmentAndAvailableTrue(typeAppointment);
         List<AvailableDates> datesType = datesOp.orElseGet(ArrayList::new);
 
         List<AvailableDateDTO> dateDTOS = datesType.stream().map(AvailableDateDTO::new).toList();

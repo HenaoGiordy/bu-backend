@@ -1,9 +1,6 @@
 package com.univalle.bubackend.services.appointment.reservation;
 
-import com.univalle.bubackend.DTOs.appointment.RequestAppointmentReservation;
-import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservation;
-import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservationProfessional;
-import com.univalle.bubackend.DTOs.appointment.ResponseAppointmentReservationStudent;
+import com.univalle.bubackend.DTOs.appointment.*;
 
 public interface IAppointmentReservationService {
 
@@ -11,4 +8,6 @@ public interface IAppointmentReservationService {
 
     ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId);
     ResponseAppointmentReservationStudent allAppointmentEstudiante(Integer estudianteId);
+
+    ResponseAppointmentCancel cancelReservation(Integer id);
 }

@@ -6,6 +6,7 @@ import com.univalle.bubackend.exceptions.appointment.DateNotAvailable;
 import com.univalle.bubackend.exceptions.appointment.IsExterno;
 import com.univalle.bubackend.exceptions.appointment.NoAvailableDateFound;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.exceptions.appointment.ReservationNotFoud;
 import com.univalle.bubackend.models.AppointmentReservation;
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.RoleName;
@@ -13,6 +14,7 @@ import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.AppointmentReservationRepository;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +78,23 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 .map(AppointmentReservationStudentDTO::new).toList();
 
         return new ResponseAppointmentReservationStudent(appointmentReservationDTOS);
+    }
+
+    @Transactional
+    @Override
+    public ResponseAppointmentCancel cancelReservation(Integer id) {
+        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findById(id);
+
+
+        AppointmentReservation appointmentReservation = appointmentReservationOpt.orElseThrow(() ->
+                new ReservationNotFoud("No se encontró la reserva a cancelar o ya se canceló"));
+
+        AvailableDates availableDates = appointmentReservation.getAvailableDates();
+
+        availableDates.setAvailable(true);
+
+        availableDatesRepository.save(availableDates);
+        appointmentReservationRepository.delete(appointmentReservation);
+        return new ResponseAppointmentCancel("Se cancelado la reserva", appointmentReservation.getAvailableDates());
     }
 }

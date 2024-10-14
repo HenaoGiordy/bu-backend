@@ -73,9 +73,19 @@ public class InitDatabase {
                     .password(passwordEncoder.encode("estudiante"))
                     .build();
 
+            UserEntity monitorUser = UserEntity.builder()
+                    .name("admin")
+                    .lastName("Bienestar")
+                    .username("monitor")
+                    .email("henaogiordy@gmail.com")
+                    .plan("Bienestar Universitario")
+                    .roles(Set.of(estudiante ,monitor))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("monitor"))
+                    .build();
 
 
-            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser));
+
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser));
         };
     }
 }
