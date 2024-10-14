@@ -14,12 +14,6 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
 
-    @Query("SELECT s.numLunch FROM Setting s")
-    int getMaxRemainingLunchSlots();
-
-    @Query("SELECT s.numSnack FROM Setting s")
-    int getMaxRemainingSnackSlots();
-
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.lunch = true AND DATE(r.data) = :date")
     int countLunchReservationsForDay(LocalDate date);
 
