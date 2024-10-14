@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.HashSet;
@@ -38,7 +39,6 @@ public class UserEntity {
     @NotBlank
     private String email;
 
-
     @NotBlank
     private String plan;
 
@@ -50,6 +50,14 @@ public class UserEntity {
 
     @Builder.Default
     private Boolean snackBeneficiary = false;
+
+
+    private String eps;
+
+    private String semester;
+
+    @Positive
+    private Integer phone;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(

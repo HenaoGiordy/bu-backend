@@ -4,9 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -30,10 +29,10 @@ public class Setting {
     @NotNull
     private LocalDate endSemester;
 
-    @Positive
+    @PositiveOrZero
     private Integer numLunch;
 
-    @Positive
+    @PositiveOrZero
     private Integer numSnack;
 
     @NotNull
