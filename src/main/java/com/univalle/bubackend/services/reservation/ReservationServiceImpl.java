@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,12 +113,23 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public AvailabilityResponse getAvailability() {
+
         LocalDate today = LocalDate.now();
-        int maxLunchSlots = reservationRepository.getMaxRemainingLunchSlots();
+
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
+        if (setting.isEmpty()) {
+            return new AvailabilityResponse(
+                    0,
+                    0
+            );
+        }
+
+        int maxLunchSlots = setting.get().getNumLunch();
         int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
         int remainingSlotsLunch = maxLunchSlots - currentLunchReservations;
 
-        int maxSnackSlots = reservationRepository.getMaxRemainingSnackSlots();
+        int maxSnackSlots = setting.get().getNumSnack();
         int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
         int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
 
