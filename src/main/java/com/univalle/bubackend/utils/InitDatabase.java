@@ -76,7 +76,7 @@ public class InitDatabase {
             UserEntity monitorUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
-                    .username("monito")
+                    .username("monitor")
                     .email("henaogiordy@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(estudiante ,monitor))  // Usar el role recuperado y gestionado
