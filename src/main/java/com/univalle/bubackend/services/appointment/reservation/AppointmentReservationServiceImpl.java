@@ -14,6 +14,7 @@ import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.AppointmentReservationRepository;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -79,12 +80,21 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         return new ResponseAppointmentReservationStudent(appointmentReservationDTOS);
     }
 
+    @Transactional
     @Override
     public ResponseAppointmentCancel cancelReservation(Integer id) {
         Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findById(id);
 
-        AppointmentReservation appointmentReservation = appointmentReservationOpt.orElseThrow(() -> new ReservationNotFoud("No se encontró la reserva a cancelar o ya se canceló"));
 
+        AppointmentReservation appointmentReservation = appointmentReservationOpt.orElseThrow(() ->
+                new ReservationNotFoud("No se encontró la reserva a cancelar o ya se canceló"));
+
+        AvailableDates availableDates = appointmentReservation.getAvailableDates();
+
+        availableDates.setAvailable(true);
+
+        availableDatesRepository.save(availableDates);
+        appointmentReservationRepository.delete(appointmentReservation);
         return new ResponseAppointmentCancel("Se cancelado la reserva", appointmentReservation.getAvailableDates());
     }
 }
