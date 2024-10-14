@@ -1,4 +1,4 @@
-package com.univalle.bubackend.services.student;
+package com.univalle.bubackend.services.user;
 
 import com.univalle.bubackend.DTOs.user.*;
 
@@ -6,6 +6,7 @@ import com.univalle.bubackend.exceptions.CSVFieldException;
 
 
 import com.univalle.bubackend.exceptions.InvalidFilter;
+import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.users.RoleNotFound;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
@@ -90,14 +91,14 @@ public class UserServiceImpl {
     public UserResponse findStudentsByUsername(String username) {
         Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
 
-        UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getLunchBeneficiary(), user.getSnackBeneficiary(), user.getIsActive());
     }
 
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
-        UserEntity user = optionalUser.orElseThrow(() -> new RuntimeException("ERROR"));
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());

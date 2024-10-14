@@ -7,7 +7,6 @@ import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
-import com.univalle.bubackend.exceptions.reservation.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
 import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated;
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;

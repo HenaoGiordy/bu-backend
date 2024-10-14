@@ -1,4 +1,4 @@
-package com.univalle.bubackend.services;
+package com.univalle.bubackend.services.user;
 
 
 import com.univalle.bubackend.DTOs.auth.*;
@@ -16,7 +16,6 @@ import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.security.utils.JwtUtils;
 import com.univalle.bubackend.services.email.EmailServiceImpl;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -89,16 +88,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public VerifyResponse verifyToken(VerifyRequest verifyRequest){
         String validToken = jwtUtils.validateToken(verifyRequest.token()).getToken();
         return new VerifyResponse("Verified", validToken);
-    }
-
-    public RegisterResponse register(RegisterRequest register){
-        String username = register.username();
-        String password = register.password();
-        userEntityRepository.save(UserEntity.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .build());
-        return new RegisterResponse(username, "Usuario creado satisfactoriamente");
     }
 
     public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){

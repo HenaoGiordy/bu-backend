@@ -1,7 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.auth.*;
-import com.univalle.bubackend.services.UserDetailServiceImpl;
+import com.univalle.bubackend.services.user.UserDetailServiceImpl;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -3,8 +3,8 @@ package com.univalle.bubackend.controllers;
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
 import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.models.RoleName;
-import com.univalle.bubackend.services.UserDetailServiceImpl;
-import com.univalle.bubackend.services.student.UserServiceImpl;
+import com.univalle.bubackend.services.user.UserDetailServiceImpl;
+import com.univalle.bubackend.services.user.UserServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -37,8 +37,8 @@ public class UserController {
         return new ResponseEntity<>(userService.createUser(userRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<UserResponse> searchStudentsByCode(@RequestParam("username") String username) {
+    @GetMapping("/search/{username}")
+    public ResponseEntity<UserResponse> searchStudentsByCode(@PathVariable String username) {
         return new ResponseEntity<>(userService.findStudentsByUsername(username), HttpStatus.OK);
     }
 
