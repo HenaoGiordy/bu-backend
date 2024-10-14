@@ -7,7 +7,7 @@ import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
 import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
 import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
-import com.univalle.bubackend.exceptions.reservation.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
 import com.univalle.bubackend.models.Reservation;
 import com.univalle.bubackend.models.Setting;
