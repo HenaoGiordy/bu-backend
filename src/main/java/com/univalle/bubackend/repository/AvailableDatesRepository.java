@@ -20,5 +20,5 @@ public interface AvailableDatesRepository extends JpaRepository<AvailableDates, 
     Optional<List<AvailableDates>> findEventosWithin30Minutes(@Param("fechaInicio") LocalDateTime fechaInicio,
                                             @Param("fechaFin") LocalDateTime fechaFin);
 
-    Optional<List<AvailableDates>> findByTypeAppointment(TypeAppointment typeAppointment);
+    Optional<List<AvailableDates>> findByTypeAppointmentAndAvailableTrue(TypeAppointment typeAppointment);
 }
