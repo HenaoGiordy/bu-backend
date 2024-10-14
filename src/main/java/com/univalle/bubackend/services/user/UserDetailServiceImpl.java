@@ -90,16 +90,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         return new VerifyResponse("Verified", validToken);
     }
 
-    public RegisterResponse register(RegisterRequest register){
-        String username = register.username();
-        String password = register.password();
-        userEntityRepository.save(UserEntity.builder()
-                .username(username)
-                .password(passwordEncoder.encode(password))
-                .build());
-        return new RegisterResponse(username, "Usuario creado satisfactoriamente");
-    }
-
     public SendResetPasswordResponse sendResetPassword(SendResetPasswordRequest sendResetPasswordRequest){
         Optional<UserEntity> userOp = userEntityRepository.findByEmail(sendResetPasswordRequest.email());
         UserEntity usuario = userOp.orElseThrow(() -> new UserNotFound("Usuario no encontrado"));
