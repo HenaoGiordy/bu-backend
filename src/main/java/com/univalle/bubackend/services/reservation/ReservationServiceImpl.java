@@ -141,6 +141,23 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
+    public void addReservationstoReservationResponse(List<ReservationResponse> list, Optional<Reservation> r) {
+        r.ifPresent(reservation -> list.add(
+                new ReservationResponse(
+                        "Reserva encontrada",
+                        reservation.getId(),
+                        reservation.getData(),
+                        reservation.getTime(),
+                        reservation.getPaid(),
+                        reservation.getLunch(),
+                        reservation.getSnack(),
+                        reservation.getUserEntity().getUsername(),
+                        reservation.getUserEntity().getName(),
+                        reservation.getUserEntity().getLastName()
+                )
+        ));
+    }
+
     @Override
     public List<ReservationResponse> getReservationsPerDay(String username){
         LocalDate date = LocalDate.now();
@@ -153,35 +170,8 @@ public class ReservationServiceImpl implements IReservationService {
 
         List<ReservationResponse> reservationResponses = new ArrayList<>();
 
-        lunchReservation.ifPresent(reservation -> reservationResponses.add(
-                new ReservationResponse(
-                        "Reserva de almuerzo encontrada",
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getLunch(),
-                        reservation.getSnack(),
-                        reservation.getUserEntity().getUsername(),
-                        reservation.getUserEntity().getName(),
-                        reservation.getUserEntity().getLastName()
-                )
-        ));
-
-        snackReservation.ifPresent(reservation -> reservationResponses.add(
-                new ReservationResponse(
-                        "Reserva de almuerzo encontrada",
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getLunch(),
-                        reservation.getSnack(),
-                        reservation.getUserEntity().getUsername(),
-                        reservation.getUserEntity().getName(),
-                        reservation.getUserEntity().getLastName()
-                )
-        ));
+        addReservationstoReservationResponse(reservationResponses, lunchReservation);
+        addReservationstoReservationResponse(reservationResponses, snackReservation);
 
         return reservationResponses;
     }
@@ -215,37 +205,6 @@ public class ReservationServiceImpl implements IReservationService {
                 userName,
                 name,
                 lastName
-        );
-    }
-
-    //buscar la reserva con el codigo del usuario
-    @Override
-    public ReservationResponse findReservationByUsername(String username) {
-
-        UserEntity user = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-
-        List<Reservation> reservations = reservationRepository.findByUserEntityAndPaidFalse(user);
-
-        if (reservations.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron reservas pendientes para este usuario.");
-        }
-
-        Reservation latestReservation = reservations.stream()
-                .max(Comparator.comparing(Reservation::getData))
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la reserva más reciente."));
-
-        return new ReservationResponse(
-                "Reserva encontrada.",
-                latestReservation.getId(),
-                latestReservation.getData(),
-                latestReservation.getTime(),
-                latestReservation.getPaid(),
-                latestReservation.getLunch(),
-                latestReservation.getSnack(),
-                user.getUsername(),
-                user.getName(),
-                user.getLastName()
         );
     }
 
