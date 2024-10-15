@@ -330,9 +330,10 @@ public class UserServiceImpl {
                 .roles(user.getRoles())
                 .plan(user.getPlan())
                 .email(user.getEmail())
+                .lastName(user.getLastName())
                 .username(user.getUsername())
                 .isActive(user.getIsActive())
-                .name(user.getName() + " " + user.getLastName())
+                .name(user.getName())
                 .build()
         );
     }

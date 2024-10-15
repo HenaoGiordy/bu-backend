@@ -10,6 +10,7 @@ public record ListUser(
         Integer id,
         String username,
         String name,
+        String lastName,
         String email,
         String plan,
         Boolean isActive,
