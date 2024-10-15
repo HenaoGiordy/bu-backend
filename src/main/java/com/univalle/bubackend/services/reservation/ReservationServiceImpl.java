@@ -107,7 +107,9 @@ public class ReservationServiceImpl implements IReservationService {
                 reservation.getPaid(),
                 reservation.getLunch(),
                 reservation.getSnack(),
-                reservation.getUserEntity().getUsername()
+                reservation.getUserEntity().getUsername(),
+                reservation.getUserEntity().getName(),
+                reservation.getUserEntity().getLastName()
         );
     }
 
@@ -160,20 +162,24 @@ public class ReservationServiceImpl implements IReservationService {
                         reservation.getPaid(),
                         reservation.getLunch(),
                         reservation.getSnack(),
-                        reservation.getUserEntity().getUsername()
+                        reservation.getUserEntity().getUsername(),
+                        reservation.getUserEntity().getName(),
+                        reservation.getUserEntity().getLastName()
                 )
         ));
 
         snackReservation.ifPresent(reservation -> reservationResponses.add(
                 new ReservationResponse(
-                        "Reserva de refrigerio encontrada",
+                        "Reserva de almuerzo encontrada",
                         reservation.getId(),
                         reservation.getData(),
                         reservation.getTime(),
                         reservation.getPaid(),
                         reservation.getLunch(),
                         reservation.getSnack(),
-                        reservation.getUserEntity().getUsername()
+                        reservation.getUserEntity().getUsername(),
+                        reservation.getUserEntity().getName(),
+                        reservation.getUserEntity().getLastName()
                 )
         ));
 
@@ -193,6 +199,8 @@ public class ReservationServiceImpl implements IReservationService {
         Boolean lunch = reservation.getLunch();
         Boolean snack = reservation.getSnack();
         String userName = reservation.getUserEntity().getUsername();
+        String name = reservation.getUserEntity().getName();
+        String lastName = reservation.getUserEntity().getLastName();
 
         reservationRepository.delete(reservation);
 
@@ -204,7 +212,9 @@ public class ReservationServiceImpl implements IReservationService {
                 paid,
                 lunch,
                 snack,
-                userName
+                userName,
+                name,
+                lastName
         );
     }
 
@@ -233,7 +243,9 @@ public class ReservationServiceImpl implements IReservationService {
                 latestReservation.getPaid(),
                 latestReservation.getLunch(),
                 latestReservation.getSnack(),
-                user.getUsername()
+                user.getUsername(),
+                user.getName(),
+                user.getLastName()
         );
     }
 
