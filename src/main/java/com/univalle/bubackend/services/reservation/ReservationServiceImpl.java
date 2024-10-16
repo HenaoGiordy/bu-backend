@@ -243,6 +243,7 @@ public class ReservationServiceImpl implements IReservationService {
             throw new ResourceNotFoundException("Configuración no encontrada");
         }
 
+
         Page<ListReservationResponse> responses = null;
 
             if (now.isBefore(setting.get().getStarBeneficiarySnack())) {
