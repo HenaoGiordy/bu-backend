@@ -13,6 +13,8 @@ public record ListReservationResponse(
         Boolean paid,
         Boolean snack,
         Boolean lunch,
-        String username
+        String username,
+        String name,
+        String lastname
 ) {
 }

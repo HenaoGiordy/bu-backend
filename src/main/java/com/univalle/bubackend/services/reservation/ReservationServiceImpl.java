@@ -255,7 +255,9 @@ public class ReservationServiceImpl implements IReservationService {
                                 reservation.getPaid(),
                                 reservation.getSnack(),
                                 reservation.getLunch(),
-                                reservation.getUserEntity().getUsername()
+                                reservation.getUserEntity().getUsername(),
+                                reservation.getUserEntity().getName(),
+                                reservation.getUserEntity().getLastName()
                         ));
             }
             if (now.isBefore(LocalTime.of(21, 0))){
@@ -267,7 +269,9 @@ public class ReservationServiceImpl implements IReservationService {
                                 reservation.getPaid(),
                                 reservation.getSnack(),
                                 reservation.getLunch(),
-                                reservation.getUserEntity().getUsername()
+                                reservation.getUserEntity().getUsername(),
+                                reservation.getUserEntity().getName(),
+                                reservation.getUserEntity().getLastName()
                         ));
             }
 
