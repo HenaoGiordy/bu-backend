@@ -151,13 +151,11 @@ public class UserController {
             example = "size=10"
     )
     @GetMapping("/list")
-        public ResponseEntity<Page<ListUser>> getAllUsers(
-                @RequestParam(value = "page", defaultValue = "0") int page,
-                @RequestParam(value = "size", defaultValue = "10") int size,
-                @RequestParam(value = "filter", required = true) String filter) {
+        public ResponseEntity<Page<ListUser>> getAllUsers(Pageable page,
+                @RequestParam(value = "filter") String filter) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ListUser> users = userService.listUsers(filter, pageable);
+
+        Page<ListUser> users = userService.listUsers(filter, page);
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }

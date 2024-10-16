@@ -85,7 +85,7 @@ public class UserServiceImpl {
                 .build();
 
         userEntityRepository.save(user);
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getLunchBeneficiary(), user.getSnackBeneficiary(), user.getIsActive());
+        return new UserResponse(user);
     }
 
     public UserResponse findStudentsByUsername(String username) {
@@ -93,7 +93,7 @@ public class UserServiceImpl {
 
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        return new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getLunchBeneficiary(), user.getSnackBeneficiary(), user.getIsActive());
+        return new UserResponse(user);
     }
 
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
@@ -113,7 +113,7 @@ public class UserServiceImpl {
 
         userEntityRepository.save(user);
 
-        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user.getId(), user.getUsername(), user.getName(), user.getEmail(), user.getPlan(), user.getRoles(), user.getIsActive(), user.getLunchBeneficiary(), user.getSnackBeneficiary()));
+        return new EditUserResponse("Usuario editado satisfactoriamente", new UserResponse(user));
     }
 
 
@@ -266,16 +266,7 @@ public class UserServiceImpl {
 
         userEntityRepository.save(newUser);
 
-        return new UserResponse(
-                newUser.getId(),
-                newUser.getUsername(),
-                newUser.getName(),
-                newUser.getEmail(),
-                newUser.getPlan(),
-                newUser.getRoles(),
-                newUser.getLunchBeneficiary(),
-                newUser.getSnackBeneficiary(),
-                newUser.getIsActive());
+        return new UserResponse(newUser);
     }
 
     private String generatePassword(String name, String username,
