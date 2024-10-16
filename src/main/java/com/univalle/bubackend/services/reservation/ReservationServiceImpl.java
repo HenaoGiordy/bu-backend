@@ -208,13 +208,57 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
+    //buscar la reserva con el codigo del usuario
+    @Override
+    public ReservationResponse findReservationByUsername(String username) {
+        LocalTime now = LocalTime.now();
+        List<Reservation> reservations = new ArrayList<>();
+
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
+        if (setting.isEmpty()) {
+            throw new ResourceNotFoundException("Configuración no encontrada");
+        }
+
+        UserEntity user = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+            reservations = reservationRepository.findByUserEntityLunchPaidFalse(user);
+        }
+        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+            reservations = reservationRepository.findByUserEntitySnackPaidFalse(user);
+        }
+
+        if (reservations.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron reservas pendientes para este usuario.");
+        }
+
+        Reservation latestReservation = reservations.stream()
+                .max(Comparator.comparing(Reservation::getData))
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la reserva más reciente."));
+
+        return new ReservationResponse(
+                "Reserva encontrada.",
+                latestReservation.getId(),
+                latestReservation.getData(),
+                latestReservation.getTime(),
+                latestReservation.getPaid(),
+                latestReservation.getLunch(),
+                latestReservation.getSnack(),
+                user.getUsername(),
+                user.getName(),
+                user.getLastName()
+        );
+    }
+
     //registrar pago
     @Override
     public ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest) {
         UserEntity user = userEntityRepository.findByUsername(paymentRequest.username())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        List<Reservation> reservations = reservationRepository.findByUserEntityAndPaidFalse(user);
+        List<Reservation> reservations = reservationRepository.findByUserEntityLunchPaidFalse(user);
 
         if (reservations.isEmpty()) {
             throw new ResourceNotFoundException("No se encontraron reservas pendientes para este usuario.");
@@ -229,7 +273,6 @@ public class ReservationServiceImpl implements IReservationService {
 
         return new ReservationPaymentResponse("Pago registrado con éxito.", lastReservation.getId());
     }
-
 
     //tabla
     @Override
@@ -246,7 +289,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         Page<ListReservationResponse> responses = null;
 
-            if (now.isBefore(setting.get().getStarBeneficiarySnack())) {
+            if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
                 responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
                         .map(reservation -> new ListReservationResponse(
                                 reservation.getId(),
@@ -260,7 +303,7 @@ public class ReservationServiceImpl implements IReservationService {
                                 reservation.getUserEntity().getLastName()
                         ));
             }
-            if (now.isBefore(LocalTime.of(21, 0))){
+            if (now.isAfter(setting.get().getStarBeneficiarySnack())){
                 responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
                         .map(reservation -> new ListReservationResponse(
                                 reservation.getId(),
