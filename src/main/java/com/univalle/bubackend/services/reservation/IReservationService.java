@@ -15,6 +15,7 @@ public interface IReservationService {
     AvailabilityResponse getAvailability();
     List<ReservationResponse> getReservationsPerDay(String username);
     ReservationResponse cancelReservation(Integer reservationId);
+    ReservationResponse findReservationByUsername(String username);
     ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest);
     Page<ListReservationResponse> getActiveReservations(Pageable pageable);
 }
