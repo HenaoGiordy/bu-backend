@@ -235,16 +235,42 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
         LocalDate date = LocalDate.now();
-        return reservationRepository.findAllByPaidFalse(pageable, date)
-                .map(reservation -> new ListReservationResponse(
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getSnack(),
-                        reservation.getLunch(),
-                        reservation.getUserEntity().getUsername()
-                ));
+        LocalTime now = LocalTime.now();
+
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
+        if (setting.isEmpty()) {
+            throw new ResourceNotFoundException("Configuración no encontrada");
+        }
+
+        Page<ListReservationResponse> responses = null;
+
+            if (now.isBefore(setting.get().getStarBeneficiarySnack())) {
+                responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
+                        .map(reservation -> new ListReservationResponse(
+                                reservation.getId(),
+                                reservation.getData(),
+                                reservation.getTime(),
+                                reservation.getPaid(),
+                                reservation.getSnack(),
+                                reservation.getLunch(),
+                                reservation.getUserEntity().getUsername()
+                        ));
+            }
+            if (now.isBefore(LocalTime.of(21, 0))){
+                responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
+                        .map(reservation -> new ListReservationResponse(
+                                reservation.getId(),
+                                reservation.getData(),
+                                reservation.getTime(),
+                                reservation.getPaid(),
+                                reservation.getSnack(),
+                                reservation.getLunch(),
+                                reservation.getUserEntity().getUsername()
+                        ));
+            }
+
+            return responses;
     }
 
 }

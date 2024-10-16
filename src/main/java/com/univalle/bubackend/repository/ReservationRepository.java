@@ -30,8 +30,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date AND r.lunch = true")
     Optional<Reservation> findLunchReservationPerDay(UserEntity userEntity, LocalDate date);
 
-    @Query("SELECT r FROM Reservation r WHERE r.paid = false AND DATE(r.data) = :date")
-    Page<Reservation> findAllByPaidFalse(Pageable pageable, LocalDate date);
+    @Query("SELECT r FROM Reservation r WHERE r.paid = false AND DATE(r.data) = :date AND r.lunch = true")
+    Page<Reservation> findAllLunchByPaidFalse(Pageable pageable, LocalDate date);
 
-
+    @Query("SELECT r FROM Reservation r WHERE r.paid = false AND DATE(r.data) = :date AND r.snack = true")
+    Page<Reservation> findAllSnackByPaidFalse(Pageable pageable, LocalDate date);
 }
