@@ -4,13 +4,16 @@ import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.InvalidFilter;
+import com.univalle.bubackend.exceptions.SettingNotFound;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
+import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.models.Reservation;
 import com.univalle.bubackend.repository.ReportRepository;
+import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -37,6 +40,7 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl {
     private final UserEntityRepository userEntityRepository;
     private final ReportRepository reportRepository;
+    private final SettingRepository settingRepository;
 
     public Report generateReport(ReportRequest reportRequest) {
         LocalDate today = LocalDate.now();
@@ -45,44 +49,61 @@ public class ReportServiceImpl {
 
         List<UserEntity> filterUsers;
 
+        // Filtrar usuarios según la beca
         if ("almuerzo".equalsIgnoreCase(reportRequest.beca())) {
             filterUsers = userEntityRepository.findUserLunchPaid(startOfDay, endOfDay);
         } else if ("refrigerio".equalsIgnoreCase(reportRequest.beca())) {
             filterUsers = userEntityRepository.findUserSnackPaid(startOfDay, endOfDay);
         } else {
-            throw new BecaInvalid("Tipo de beca no valida");
+            throw new BecaInvalid("Tipo de beca no válida");
         }
 
+        // Inicializar el reporte
         Report report = new Report();
         report.setDate(today);
         report.setBeca(reportRequest.beca());
-        report.setSemester(reportRequest.semester());
+        report.setSemester(reportRequest.semester()); // Si es null, será un reporte diario
         report.setUserEntities(new HashSet<>(filterUsers));
 
         Map<Integer, Integer> countReports = new HashMap<>();
-        for (UserEntity user : filterUsers) {
 
-            long count = user.getReports().stream()
-                    .filter(r -> r.getBeca().equalsIgnoreCase("almuerzo") && reportRequest.beca().equalsIgnoreCase("almuerzo"))
-                    .count() + user.getReports().stream()
-                    .filter(r -> r.getBeca().equalsIgnoreCase("refrigerio") && reportRequest.beca().equalsIgnoreCase("refrigerio"))
-                    .count();
+        // Si el semestre no es null, estamos generando un reporte semestral
+        if (reportRequest.semester() != null) {
+            // Obtener la configuración del semestre (fechas de inicio y fin)
+            Setting setting = settingRepository.findTopByOrderByIdAsc()
+                    .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
 
-            countReports.put(user.getId(), (int) count);
+            LocalDate startSemester = setting.getStartSemester();
+            LocalDate endSemester = setting.getEndSemester();
 
+            // Filtrar y contar cuántas veces cada usuario apareció en reportes diarios dentro del semestre actual
+            for (UserEntity user : filterUsers) {
+                long count = user.getReports().stream()
+                        .filter(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()) &&  // Tipo de beca coincide
+                                r.getSemester() == null &&                               // Solo reportes diarios (semestre null)
+                                !r.getDate().isBefore(startSemester) &&                  // Reporte dentro del rango del semestre
+                                !r.getDate().isAfter(endSemester))                       // Reporte dentro del rango del semestre
+                        .count();
+
+                // Almacenamos el conteo en el mapa solo para este semestre
+                countReports.put(user.getId(), (int) count);
+            }
         }
+
+        // Guardar el conteo de reportes en el reporte semestral
         report.setUserReportCount(countReports);
+        report = reportRepository.save(report);  // Guardar el reporte en la base de datos
 
-        report = reportRepository.save(report);
-
-        for (UserEntity user: filterUsers) {
+        // Guardar el reporte en la lista de reportes del usuario
+        for (UserEntity user : filterUsers) {
             user.getReports().add(report);
             userEntityRepository.save(user);
         }
 
         return report;
-
     }
+
+
 
     public void deleteReport(Integer id) {
         if (!reportRepository.existsById(id)) {
@@ -103,6 +124,10 @@ public class ReportServiceImpl {
             headerRow.createCell(1).setCellValue(report.getDate().toString());
             headerRow.createCell(2).setCellValue("Tipo de beca");
             headerRow.createCell(3).setCellValue(report.getBeca());
+
+            if (report.getSemester() != null) {
+                headerRow.createCell(4).setCellValue("Semestre: " + report.getSemester());
+            }
 
             Row userHeader = sheet.createRow(2);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
