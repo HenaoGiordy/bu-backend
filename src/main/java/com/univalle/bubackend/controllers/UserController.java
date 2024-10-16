@@ -20,6 +20,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -151,7 +152,7 @@ public class UserController {
             example = "size=10"
     )
     @GetMapping("/list")
-        public ResponseEntity<Page<ListUser>> getAllUsers(Pageable page,
+        public ResponseEntity<Page<ListUser>> getAllUsers(@PageableDefault(size = 10, page = 0) Pageable page,
                 @RequestParam(value = "filter") String filter) {
 
 
