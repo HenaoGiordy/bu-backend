@@ -49,6 +49,7 @@ public class ReportServiceImpl {
 
         List<UserEntity> filterUsers;
 
+        // Filtrar usuarios según la beca
         if ("almuerzo".equalsIgnoreCase(reportRequest.beca())) {
             filterUsers = userEntityRepository.findUserLunchPaid(startOfDay, endOfDay);
         } else if ("refrigerio".equalsIgnoreCase(reportRequest.beca())) {
@@ -66,25 +67,25 @@ public class ReportServiceImpl {
 
         Map<Integer, Integer> countReports = new HashMap<>();
 
-        // Si el semestre no es null, significa que es un reporte semestral
+        // Si el semestre no es null, estamos generando un reporte semestral
         if (reportRequest.semester() != null) {
             // Obtener la configuración del semestre (fechas de inicio y fin)
             Setting setting = settingRepository.findTopByOrderByIdAsc()
-                    .orElseThrow(() -> new SettingNotFound("Ajuste no encontrada"));
+                    .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
 
             LocalDate startSemester = setting.getStartSemester();
             LocalDate endSemester = setting.getEndSemester();
 
-            // Filtrar y contar cuántas veces cada usuario apareció en reportes diarios dentro del semestre
+            // Filtrar y contar cuántas veces cada usuario apareció en reportes diarios dentro del semestre actual
             for (UserEntity user : filterUsers) {
                 long count = user.getReports().stream()
-                        .filter(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()) && // Tipo de beca coincide
-                                r.getSemester() == null &&                          // Solo reportes diarios
-                                !r.getDate().isBefore(startSemester) &&             // Fecha dentro del rango del semestre
-                                !r.getDate().isAfter(endSemester))                  // Fecha dentro del rango del semestre
+                        .filter(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()) &&  // Tipo de beca coincide
+                                r.getSemester() == null &&                               // Solo reportes diarios (semestre null)
+                                !r.getDate().isBefore(startSemester) &&                  // Reporte dentro del rango del semestre
+                                !r.getDate().isAfter(endSemester))                       // Reporte dentro del rango del semestre
                         .count();
 
-                // Guardar el conteo en el mapa de reportes
+                // Almacenamos el conteo en el mapa solo para este semestre
                 countReports.put(user.getId(), (int) count);
             }
         }
@@ -101,6 +102,7 @@ public class ReportServiceImpl {
 
         return report;
     }
+
 
 
     public void deleteReport(Integer id) {
@@ -122,6 +124,10 @@ public class ReportServiceImpl {
             headerRow.createCell(1).setCellValue(report.getDate().toString());
             headerRow.createCell(2).setCellValue("Tipo de beca");
             headerRow.createCell(3).setCellValue(report.getBeca());
+
+            if (report.getSemester() != null) {
+                headerRow.createCell(4).setCellValue("Semestre: " + report.getSemester());
+            }
 
             Row userHeader = sheet.createRow(2);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
