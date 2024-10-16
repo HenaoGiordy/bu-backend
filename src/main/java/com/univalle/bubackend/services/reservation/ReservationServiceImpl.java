@@ -107,7 +107,9 @@ public class ReservationServiceImpl implements IReservationService {
                 reservation.getPaid(),
                 reservation.getLunch(),
                 reservation.getSnack(),
-                reservation.getUserEntity().getUsername()
+                reservation.getUserEntity().getUsername(),
+                reservation.getUserEntity().getName(),
+                reservation.getUserEntity().getLastName()
         );
     }
 
@@ -139,6 +141,23 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
+    public void addReservationstoReservationResponse(List<ReservationResponse> list, Optional<Reservation> r) {
+        r.ifPresent(reservation -> list.add(
+                new ReservationResponse(
+                        "Reserva encontrada",
+                        reservation.getId(),
+                        reservation.getData(),
+                        reservation.getTime(),
+                        reservation.getPaid(),
+                        reservation.getLunch(),
+                        reservation.getSnack(),
+                        reservation.getUserEntity().getUsername(),
+                        reservation.getUserEntity().getName(),
+                        reservation.getUserEntity().getLastName()
+                )
+        ));
+    }
+
     @Override
     public List<ReservationResponse> getReservationsPerDay(String username){
         LocalDate date = LocalDate.now();
@@ -151,31 +170,8 @@ public class ReservationServiceImpl implements IReservationService {
 
         List<ReservationResponse> reservationResponses = new ArrayList<>();
 
-        lunchReservation.ifPresent(reservation -> reservationResponses.add(
-                new ReservationResponse(
-                        "Reserva de almuerzo encontrada",
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getLunch(),
-                        reservation.getSnack(),
-                        reservation.getUserEntity().getUsername()
-                )
-        ));
-
-        snackReservation.ifPresent(reservation -> reservationResponses.add(
-                new ReservationResponse(
-                        "Reserva de refrigerio encontrada",
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getLunch(),
-                        reservation.getSnack(),
-                        reservation.getUserEntity().getUsername()
-                )
-        ));
+        addReservationstoReservationResponse(reservationResponses, lunchReservation);
+        addReservationstoReservationResponse(reservationResponses, snackReservation);
 
         return reservationResponses;
     }
@@ -193,6 +189,8 @@ public class ReservationServiceImpl implements IReservationService {
         Boolean lunch = reservation.getLunch();
         Boolean snack = reservation.getSnack();
         String userName = reservation.getUserEntity().getUsername();
+        String name = reservation.getUserEntity().getName();
+        String lastName = reservation.getUserEntity().getLastName();
 
         reservationRepository.delete(reservation);
 
@@ -204,36 +202,9 @@ public class ReservationServiceImpl implements IReservationService {
                 paid,
                 lunch,
                 snack,
-                userName
-        );
-    }
-
-    //buscar la reserva con el codigo del usuario
-    @Override
-    public ReservationResponse findReservationByUsername(String username) {
-
-        UserEntity user = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-
-        List<Reservation> reservations = reservationRepository.findByUserEntityAndPaidFalse(user);
-
-        if (reservations.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron reservas pendientes para este usuario.");
-        }
-
-        Reservation latestReservation = reservations.stream()
-                .max(Comparator.comparing(Reservation::getData))
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró la reserva más reciente."));
-
-        return new ReservationResponse(
-                "Reserva encontrada.",
-                latestReservation.getId(),
-                latestReservation.getData(),
-                latestReservation.getTime(),
-                latestReservation.getPaid(),
-                latestReservation.getLunch(),
-                latestReservation.getSnack(),
-                user.getUsername()
+                userName,
+                name,
+                lastName
         );
     }
 
@@ -264,16 +235,42 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public Page<ListReservationResponse> getActiveReservations(Pageable pageable) {
         LocalDate date = LocalDate.now();
-        return reservationRepository.findAllByPaidFalse(pageable, date)
-                .map(reservation -> new ListReservationResponse(
-                        reservation.getId(),
-                        reservation.getData(),
-                        reservation.getTime(),
-                        reservation.getPaid(),
-                        reservation.getSnack(),
-                        reservation.getLunch(),
-                        reservation.getUserEntity().getUsername()
-                ));
+        LocalTime now = LocalTime.now();
+
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
+        if (setting.isEmpty()) {
+            throw new ResourceNotFoundException("Configuración no encontrada");
+        }
+
+        Page<ListReservationResponse> responses = null;
+
+            if (now.isBefore(setting.get().getStarBeneficiarySnack())) {
+                responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
+                        .map(reservation -> new ListReservationResponse(
+                                reservation.getId(),
+                                reservation.getData(),
+                                reservation.getTime(),
+                                reservation.getPaid(),
+                                reservation.getSnack(),
+                                reservation.getLunch(),
+                                reservation.getUserEntity().getUsername()
+                        ));
+            }
+            if (now.isBefore(LocalTime.of(21, 0))){
+                responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
+                        .map(reservation -> new ListReservationResponse(
+                                reservation.getId(),
+                                reservation.getData(),
+                                reservation.getTime(),
+                                reservation.getPaid(),
+                                reservation.getSnack(),
+                                reservation.getLunch(),
+                                reservation.getUserEntity().getUsername()
+                        ));
+            }
+
+            return responses;
     }
 
 }

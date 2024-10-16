@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -48,12 +46,6 @@ public class ReservationController {
     public ResponseEntity<ReservationPaymentResponse> registerPayment(@RequestBody ReservationPaymentRequest paymentRequest) {
         ReservationPaymentResponse response = reservationService.registerPayment(paymentRequest);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/by-username/{username}")
-    public ResponseEntity<List<ReservationResponse>> findReservationByUsername(@PathVariable String username) {
-        List<ReservationResponse> responses = Collections.singletonList(reservationService.findReservationByUsername(username));
-        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/all")
