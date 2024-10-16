@@ -18,6 +18,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -191,13 +192,10 @@ public class ReportController {
             example = "size=10"
     )
     @GetMapping("/list")
-    public ResponseEntity<Page<ReportResponse>> getReports(
-            @RequestParam(value = "filter", required = true) String filter,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<Page<ReportResponse>> getReports(@PageableDefault(size = 10, page = 0) Pageable page,
+            @RequestParam(value = "filter", required = true) String filter) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ReportResponse> reports = reportService.listReports(filter, pageable);
+        Page<ReportResponse> reports = reportService.listReports(filter, page);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
