@@ -92,10 +92,10 @@ public class ReservationServiceImpl implements IReservationService {
             throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
-        if (lunchReservation.isEmpty() && now.isBefore(setting.getStarBeneficiaryLunch()) && now.isAfter(setting.getEndLunch())) {
+        if (!lunchReservation.isEmpty() && now.isBefore(setting.getStarBeneficiaryLunch()) && now.isAfter(setting.getEndLunch())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
-        if (snackReservation.isEmpty() && now.isBefore(setting.getStarBeneficiarySnack()) && now.isAfter(setting.getEndSnack())) {
+        if (!snackReservation.isEmpty() && now.isBefore(setting.getStarBeneficiarySnack()) && now.isAfter(setting.getEndSnack())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
 
@@ -191,8 +191,10 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public ReservationResponse cancelReservation(Integer reservationId) {
 
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        LocalDate today = LocalDate.now();
+
+        Reservation reservation = reservationRepository.findReservationByUserCancel(reservationId, today)
+                .orElseThrow(() -> new ResourceNotFoundException("El usuario no tieen una reserva para cancelar el día de hoy"));
 
         Integer id = reservation.getId();
         LocalDateTime date = reservation.getData();

@@ -27,6 +27,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND r.snack = true AND DATE(r.data) = :date")
     List<Reservation> findSnackReservationByUser(UserEntity userEntity, LocalDate date);
 
+    @Query("SELECT r FROM Reservation r Where r.id = :id AND r.lunch = true AND DATE(r.data) = :date AND r.paid = false")
+    Optional<Reservation> findReservationByUserCancel(Integer id, LocalDate date);
+
     @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false AND r.lunch = true AND DATE(r.data) = :date")
     List<Reservation> findByUserEntityLunchPaidFalse(UserEntity userEntity, LocalDate date);
 
