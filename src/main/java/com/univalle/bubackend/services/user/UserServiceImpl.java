@@ -19,7 +19,9 @@ import com.univalle.bubackend.repository.RoleRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -300,15 +302,18 @@ public class UserServiceImpl {
     public Page<ListUser> listUsers(String filter, Pageable pageable){
         Page<UserEntity> users;
 
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+
         switch (filter.toLowerCase()) {
             case "beneficiarios":
-                users = userEntityRepository.findBeneficiaries(pageable);
+                users = userEntityRepository.findBeneficiaries(sortedPageable);
                 break;
             case "funcionarios":
-                users = userEntityRepository.findAllNonStudents(pageable);
+                users = userEntityRepository.findAllNonStudents(sortedPageable);
                 break;
             case "estudiantes":
-                users = userEntityRepository.findAllStudents(pageable);
+                users = userEntityRepository.findAllStudents(sortedPageable);
                 break;
             default:
                 throw new InvalidFilter("Filtro no válido");

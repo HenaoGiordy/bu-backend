@@ -18,7 +18,9 @@ import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -201,12 +203,15 @@ public class ReportServiceImpl {
     public Page<ReportResponse> listReports(String filter, Pageable pageable) {
         Page<Report> reports;
 
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+
         switch (filter.toLowerCase()) {
             case "diario":
-                reports = reportRepository.findDailyReports(pageable);
+                reports = reportRepository.findDailyReports(sortedPageable);
                 break;
             case "semester":
-                reports = reportRepository.findSemesterReports(pageable);
+                reports = reportRepository.findSemesterReports(sortedPageable);
                 break;
             default:
                 throw new InvalidFilter("Filtro no válido");
