@@ -271,13 +271,31 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest) {
         LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
         UserEntity user = userEntityRepository.findByUsername(paymentRequest.username())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        List<Reservation> reservations = reservationRepository.findByUserEntityLunchPaidFalse(user, today);
+        Optional<Setting> setting = settingRepository.findSettingById(1);
 
-        if (reservations.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron reservas pendientes para este usuario.");
+        List<Reservation> reservations = new ArrayList<>();
+        List<Reservation> lunchReservations = reservationRepository.findByUserEntityLunchPaidFalse(user, today);
+        List<Reservation> snackReservations = reservationRepository.findByUserEntitySnackPaidFalse(user, today);
+
+        if (setting.isPresent() && lunchReservations.isEmpty() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+            throw new ResourceNotFoundException("No se encontraron reservas de almuerzo pendientes para este usuario.");
+        }
+
+        if (setting.isPresent() && snackReservations.isEmpty() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
+            throw new ResourceNotFoundException("No se encontraron reservas de refrigerio pendientes para este usuario.");
+        }
+
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+            reservations = lunchReservations;
+        }
+
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
+            reservations = snackReservations;
         }
 
         Reservation lastReservation = reservations.stream()
@@ -299,10 +317,10 @@ public class ReservationServiceImpl implements IReservationService {
         Setting setting = settingRepository.findSettingById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
-        Page<ListReservationResponse> responses;
+        Page<ListReservationResponse> responses = Page.empty(pageable);
 
         // Verificar en qué rango de tiempo estamos, según los ajustes en "setting"
-        if (now.isBefore(setting.getStarBeneficiarySnack()) && now.isAfter(setting.getStarBeneficiaryLunch())) {
+        if (now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getStarBeneficiarySnack())) {
             // Caso para reservas de almuerzo no pagadas
             responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(
@@ -316,7 +334,9 @@ public class ReservationServiceImpl implements IReservationService {
                             reservation.getUserEntity().getName(),
                             reservation.getUserEntity().getLastName()
                     ));
-        } else if (now.isAfter(setting.getStarBeneficiarySnack())) {
+        }
+
+        if (now.isAfter(setting.getStarBeneficiarySnack())) {
             // Caso para reservas de refrigerio no pagadas
             responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(
@@ -330,9 +350,6 @@ public class ReservationServiceImpl implements IReservationService {
                             reservation.getUserEntity().getName(),
                             reservation.getUserEntity().getLastName()
                     ));
-        } else {
-            // Si no estamos en ninguna de las dos franjas horarias, devolvemos una página vacía
-            responses = Page.empty(pageable);
         }
 
         return responses;
