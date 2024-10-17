@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,15 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         Optional<AvailableDates> availableDatesOptional = availableDatesRepository.findById(requestAppointmentReservation.availableDateId());
         AvailableDates availableDates = availableDatesOptional.orElseThrow(()-> new NoAvailableDateFound("No se encontró la fecha disponible"));
+
+        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
+            throw new DateNotAvailable("Ya pasó la fecha de reserva");
+        }
+
+        // Validar si falta menos de 1 hora para la cita
+        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
+            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
+        }
 
         if(userEntity.getRoles().stream().anyMatch((x)-> x.getName() == RoleName.EXTERNO)){
             throw new IsExterno("Los externos no pueden pedir cita para poder reservar una cita");
