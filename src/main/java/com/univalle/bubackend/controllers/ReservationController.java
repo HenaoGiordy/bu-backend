@@ -10,7 +10,7 @@ import com.univalle.bubackend.services.reservation.IReservationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,10 +58,8 @@ public class ReservationController {
 
     @GetMapping("/all")
     public ResponseEntity<Page<ListReservationResponse>> getAllReservations(
-        @RequestParam(value = "page", defaultValue = "0") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size) {
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, size);
         Page<ListReservationResponse> reservations = reservationService.getActiveReservations(pageable);
         return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
