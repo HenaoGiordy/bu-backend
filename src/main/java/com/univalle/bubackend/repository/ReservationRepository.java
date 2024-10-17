@@ -21,11 +21,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.snack = true AND DATE(r.data) = :date")
     int countSnackReservationsForDay(LocalDate date);
 
-    @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false AND r.lunch = true")
-    List<Reservation> findByUserEntityLunchPaidFalse(UserEntity userEntity);
+    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND r.lunch = true AND DATE(r.data) = :date")
+    List<Reservation> findLunchReservationByUser(UserEntity userEntity, LocalDate date);
 
-    @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false AND r.snack = true")
-    List<Reservation> findByUserEntitySnackPaidFalse(UserEntity userEntity);
+    @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND r.snack = true AND DATE(r.data) = :date")
+    List<Reservation> findSnackReservationByUser(UserEntity userEntity, LocalDate date);
+
+    @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false AND r.lunch = true AND DATE(r.data) = :date")
+    List<Reservation> findByUserEntityLunchPaidFalse(UserEntity userEntity, LocalDate date);
+
+    @Query("SELECT r FROM Reservation r WHERE r.userEntity = :userEntity AND r.paid = false AND r.snack = true AND DATE(r.data) = :date")
+    List<Reservation> findByUserEntitySnackPaidFalse(UserEntity userEntity, LocalDate date);
 
     @Query("SELECT r FROM Reservation r Where r.userEntity = :userEntity AND DATE(r.data) = :date AND r.snack = true")
     Optional<Reservation> findSnackReservationPerDay(UserEntity userEntity, LocalDate date);
