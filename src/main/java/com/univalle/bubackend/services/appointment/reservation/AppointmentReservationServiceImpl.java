@@ -49,7 +49,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         }
 
         if(userEntity.getRoles().stream().anyMatch((x)-> x.getName() == RoleName.EXTERNO)){
-            throw new IsExterno("Los externos no pueden pedir cita para poder reservar una cita");
+            throw new IsExterno("Los externos no pueden una cita");
         }
 
         if(!availableDates.getAvailable()){
@@ -63,6 +63,16 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         availableDates.setAvailable(false);
 
+        if(requestAppointmentReservation.phone() != null) {
+            userEntity.setPhone(requestAppointmentReservation.phone());
+        }
+        if(requestAppointmentReservation.eps() != null){
+            userEntity.setEps(requestAppointmentReservation.eps());
+        }
+        if(requestAppointmentReservation.semester() != null){
+            userEntity.setSemester(requestAppointmentReservation.semester());
+        }
+        userEntityRepository.save(userEntity);
         availableDatesRepository.save(availableDates);
         appointmentReservationRepository.save(appointmentReservation);
 
