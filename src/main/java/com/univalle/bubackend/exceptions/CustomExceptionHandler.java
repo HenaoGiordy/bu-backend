@@ -271,7 +271,7 @@ public class CustomExceptionHandler {
                 .body("Error: Tipo de contenido no soportado. Por favor envíe multipart/form-data.");
     }
 
-    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    @ExceptionHandler(HaveAnAppoinmentPending.class)
     public ResponseEntity<String> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
         String errorMessage = e.getMessage();
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
