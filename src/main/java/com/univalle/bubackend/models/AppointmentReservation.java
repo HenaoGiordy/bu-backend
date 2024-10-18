@@ -22,4 +22,7 @@ public class AppointmentReservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estudiante_id")
     private UserEntity estudiante;
+
+    @Builder.Default
+    private Boolean assistant = null;
 }
