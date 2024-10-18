@@ -7,5 +7,5 @@ public record RequestAppointmentReservation(
         @NotNull(message = "Debes ingresar el Id de un estudiante") Integer pacientId,
         String eps,
         String semester,
-        Integer phone) {
+        Long phone) {
 }

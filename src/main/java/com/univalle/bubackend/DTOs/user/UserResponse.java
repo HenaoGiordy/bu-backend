@@ -12,7 +12,7 @@ public record UserResponse(
         String email,
         String eps,
         String semester,
-        Integer phone,
+        Long phone,
         String plan,
         Set<Role>roles,
         boolean lunchBeneficiary,

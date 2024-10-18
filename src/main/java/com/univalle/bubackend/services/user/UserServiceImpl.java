@@ -106,6 +106,9 @@ public class UserServiceImpl {
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
         user.setPlan(editUserRequest.plan());
+        user.setEps(editUserRequest.eps());
+        user.setSemester(editUserRequest.semester());
+        user.setPhone(editUserRequest.phone());
         user.setRoles(editUserRequest.roles());
         user.setIsActive(editUserRequest.isActive());
         user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());

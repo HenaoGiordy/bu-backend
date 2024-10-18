@@ -57,7 +57,7 @@ public class UserEntity {
     private String semester;
 
     @Positive
-    private Integer phone;
+    private Long phone;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
