@@ -277,4 +277,9 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
     }
 
+    @ExceptionHandler(CantReserveMoreAppointments.class)
+    public ResponseEntity<ExceptionDTO> handleCantReserveMoreAppointments(CantReserveMoreAppointments ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
 }
