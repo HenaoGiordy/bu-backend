@@ -2,6 +2,7 @@ package com.univalle.bubackend.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.scheduling.TaskScheduler;
 
 @Entity
 @Getter
@@ -25,4 +26,7 @@ public class AppointmentReservation {
 
     @Builder.Default
     private Boolean assistant = null;
+
+    @Builder.Default
+    private Boolean pendingAppointment = true;
 }

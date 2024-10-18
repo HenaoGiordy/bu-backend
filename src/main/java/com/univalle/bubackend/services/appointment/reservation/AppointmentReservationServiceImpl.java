@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.appointment.reservation;
 
 import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.exceptions.appointment.HaveAnAppoinmentPending;
 import com.univalle.bubackend.exceptions.appointment.DateNotAvailable;
 import com.univalle.bubackend.exceptions.appointment.IsExterno;
 import com.univalle.bubackend.exceptions.appointment.NoAvailableDateFound;
@@ -16,9 +17,12 @@ import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     private UserEntityRepository userEntityRepository;
     private AppointmentReservationRepository appointmentReservationRepository;
     private AvailableDatesRepository availableDatesRepository;
+    private TaskScheduler taskScheduler;
 
 
     @Override
@@ -39,14 +44,21 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         Optional<AvailableDates> availableDatesOptional = availableDatesRepository.findById(requestAppointmentReservation.availableDateId());
         AvailableDates availableDates = availableDatesOptional.orElseThrow(()-> new NoAvailableDateFound("No se encontró la fecha disponible"));
 
-        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
-            throw new DateNotAvailable("Ya pasó la fecha de reserva");
+        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findByEstudiante_IdAndPendingAppointmentTrue(userEntity.getId());
+
+        if(appointmentReservationOpt.isPresent()) {
+            AppointmentReservation appointmentReservation = appointmentReservationOpt.get();
+            throw new HaveAnAppoinmentPending("Tienes una cita pendiente de " + appointmentReservation.getAvailableDates().getTypeAppointment().toString());
         }
 
-        // Validar si falta menos de 1 hora para la cita
-        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
-            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
-        }
+//        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
+//            throw new DateNotAvailable("Ya pasó la fecha de reserva");
+//        }
+//
+//        // Validar si falta menos de 1 hora para la cita
+//        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
+//            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
+//        }
 
         if(userEntity.getRoles().stream().anyMatch((x)-> x.getName() == RoleName.EXTERNO)){
             throw new IsExterno("Los externos no pueden una cita");
@@ -74,9 +86,19 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         }
         userEntityRepository.save(userEntity);
         availableDatesRepository.save(availableDates);
-        appointmentReservationRepository.save(appointmentReservation);
+        AppointmentReservation appointmentReservation1= appointmentReservationRepository.save(appointmentReservation);
+
+        taskScheduler.schedule(()->{
+            appointmentReservation1.setPendingAppointment(false);
+            appointmentReservationRepository.save(appointmentReservation1);
+            }, convertToInstant(appointmentReservation1.getAvailableDates().getDateTime()));
 
         return new ResponseAppointmentReservation("Cita reservada con éxito", new AvailableDateDTO(availableDates), new UserResponse(userEntity));
+    }
+
+    private Instant convertToInstant(LocalDateTime localDateTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        return localDateTime.atZone(zoneId).toInstant();
     }
 
     @Override
