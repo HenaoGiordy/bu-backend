@@ -13,6 +13,7 @@ import java.util.List;
 public interface IReservationService {
     ReservationResponse createReservation(ReservationRequest reservationRequest);
     AvailabilityResponse getAvailability();
+    int getAvailabilityPerHour();
     List<ReservationResponse> getReservationsPerDay(String username);
     ReservationResponse cancelReservation(Integer reservationId);
     ReservationResponse findReservationByUsername(String username);
