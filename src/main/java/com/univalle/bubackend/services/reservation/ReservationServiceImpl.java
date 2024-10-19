@@ -355,13 +355,13 @@ public class ReservationServiceImpl implements IReservationService {
         LocalDate date = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        Setting setting = settingRepository.findSettingById(1)
-                .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
 
         Page<ListReservationResponse> responses = Page.empty();
 
-        // Verificar en qué rango de tiempo estamos, según los ajustes en "setting"
-        if (now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getStarBeneficiarySnack())) {
+        // Verifcar en qué rango de tiempo estamos, según los ajustes en "setting"
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
             // Caso para reservas de almuerzo no pagadas
             responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(
@@ -377,7 +377,7 @@ public class ReservationServiceImpl implements IReservationService {
                     ));
         }
 
-        if (now.isAfter(setting.getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
             // Caso para reservas de refrigerio no pagadas
             responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(
