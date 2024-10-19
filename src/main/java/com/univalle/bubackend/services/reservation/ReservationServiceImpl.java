@@ -192,9 +192,23 @@ public class ReservationServiceImpl implements IReservationService {
     public ReservationResponse cancelReservation(Integer reservationId) {
 
         LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+        Optional<Setting> setting = settingRepository.findSettingById(1);
 
-        Reservation reservation = reservationRepository.findReservationByUserCancel(reservationId, today)
-                .orElseThrow(() -> new ResourceNotFoundException("El usuario no tieen una reserva para cancelar el día de hoy"));
+        Reservation reservation = new Reservation();
+
+        if (setting.isEmpty()) {
+            throw new ResourceNotFoundException("Configuración no encontrada");
+        }
+
+        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+            reservation = reservationRepository.findLunchReservationById(reservationId, today)
+                    .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de almuerzo para cancelar el día de hoy"));
+        }
+        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+            reservation = reservationRepository.findSnackReservationById(reservationId, today)
+                    .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de refrigerio para cancelar el día de hoy"));
+        }
 
         Integer id = reservation.getId();
         LocalDateTime date = reservation.getData();
