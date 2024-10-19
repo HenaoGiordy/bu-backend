@@ -12,11 +12,14 @@ import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.appointment.validations.AppointmentDateCreationValidation;
 import com.univalle.bubackend.services.appointment.validations.DateTimeValidation;
-import com.univalle.bubackend.services.appointment.validations.IsValidDateTime;
 import com.univalle.bubackend.services.appointment.validations.IsValidTypeAppointment;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +32,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
     private AvailableDatesRepository availableDatesRepository;
     private UserEntityRepository userEntityRepository;
     private AppointmentDateCreationValidation appointmentDateCreationValidations;
+    private TaskScheduler taskScheduler;
     private IsValidTypeAppointment isValidTypeAppointment;
     private DateTimeValidation isValidDateTime;
 
@@ -57,11 +61,22 @@ public class AppointmentServiceImpl implements IAppointmentService {
                                         .build())
                                         .toList();
 
+        dates.forEach(x ->{
+            taskScheduler.schedule(()->{
+                x.setAvailable(false);
+                availableDatesRepository.save(x);
+            }, convertToInstant(x.getDateTime()));
+        });
+
         availableDatesRepository.saveAll(dates);
 
         List<AvailableDateDTO> dateDTOS = dates.stream().map(AvailableDateDTO::new).toList();
 
         return new ResponseAvailableDate("Se crearon las citas", professional.getId(), dateDTOS);
+    }
+    private Instant convertToInstant(LocalDateTime localDateTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        return localDateTime.atZone(zoneId).toInstant();
     }
 
     @Override
