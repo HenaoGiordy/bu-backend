@@ -66,15 +66,14 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
 
         availableDatesRepository.saveAll(dates);
-        dates.forEach(x ->{
-            taskScheduler.schedule(()->{
+        dates.forEach(x -> taskScheduler.schedule(()->{
                 Instant scheduledInstant = convertToInstant(x.getDateTime());
                 log.info("Scheduled task for: {} Current time: {}", scheduledInstant, Instant.now());
                 if(x.getAvailable()){
                     availableDatesRepository.delete(x);
                 }
-            }, convertToInstant(x.getDateTime()));
-        });
+            }, convertToInstant(x.getDateTime()))
+        );
         List<AvailableDateDTO> dateDTOS = dates.stream().map(AvailableDateDTO::new).toList();
 
         return new ResponseAvailableDate("Se crearon las citas", professional.getId(), dateDTOS);
