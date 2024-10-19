@@ -14,6 +14,7 @@ import com.univalle.bubackend.services.appointment.validations.AppointmentDateCr
 import com.univalle.bubackend.services.appointment.validations.DateTimeValidation;
 import com.univalle.bubackend.services.appointment.validations.IsValidTypeAppointment;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AppointmentServiceImpl implements IAppointmentService {
 
     private AvailableDatesRepository availableDatesRepository;
@@ -61,19 +63,23 @@ public class AppointmentServiceImpl implements IAppointmentService {
                                         .build())
                                         .toList();
 
-        dates.forEach(x ->{
-            taskScheduler.schedule(()->{
-                x.setAvailable(false);
-                availableDatesRepository.save(x);
-            }, convertToInstant(x.getDateTime()));
-        });
+
 
         availableDatesRepository.saveAll(dates);
-
+        dates.forEach(x ->{
+            taskScheduler.schedule(()->{
+                Instant scheduledInstant = convertToInstant(x.getDateTime());
+                log.info("Scheduled task for: {} Current time: {}", scheduledInstant, Instant.now());
+                if(x.getAvailable()){
+                    availableDatesRepository.delete(x);
+                }
+            }, convertToInstant(x.getDateTime()));
+        });
         List<AvailableDateDTO> dateDTOS = dates.stream().map(AvailableDateDTO::new).toList();
 
         return new ResponseAvailableDate("Se crearon las citas", professional.getId(), dateDTOS);
     }
+
     private Instant convertToInstant(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
         return localDateTime.atZone(zoneId).toInstant();
