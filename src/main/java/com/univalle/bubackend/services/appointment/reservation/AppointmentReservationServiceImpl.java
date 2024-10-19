@@ -68,14 +68,14 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
             throw new HaveAnAppoinmentPending("Tienes una cita pendiente de " + appointmentReservation.getAvailableDates().getTypeAppointment().toString());
         }
 
-//        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
-//            throw new DateNotAvailable("Ya pasó la fecha de reserva");
-//        }
-//
-//        // Validar si falta menos de 1 hora para la cita
-//        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
-//            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
-//        }
+        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
+            throw new DateNotAvailable("Ya pasó la fecha de reserva");
+        }
+
+        // Validar si falta menos de 1 hora para la cita
+        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
+            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
+        }
 
         if(userEntity.getRoles().stream().anyMatch((x)-> x.getName() == RoleName.EXTERNO)){
             throw new IsExterno("Los externos no pueden una cita");
