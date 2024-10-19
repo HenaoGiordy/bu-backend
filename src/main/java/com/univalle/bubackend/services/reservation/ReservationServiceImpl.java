@@ -153,6 +153,33 @@ public class ReservationServiceImpl implements IReservationService {
         );
     }
 
+    @Override
+    public int getAvailabilityPerHour() {
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+        int availability = 0;
+
+        Optional<Setting> setting = settingRepository.findSettingById(1);
+
+        if (setting.isEmpty()) {
+            throw new ResourceNotFoundException("Configuración no encontrada");
+        }
+
+        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+            int maxLunchSlots = setting.get().getNumLunch();
+            int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
+            availability = maxLunchSlots - currentLunchReservations;
+        }
+        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+            int maxSnackSlots = setting.get().getNumSnack();
+            int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
+            availability = maxSnackSlots - currentSnackReservations;
+        }
+
+        return availability;
+    }
+
     public void addReservationstoReservationResponse(List<ReservationResponse> list, Optional<Reservation> r) {
         r.ifPresent(reservation -> list.add(
                 new ReservationResponse(
@@ -331,7 +358,7 @@ public class ReservationServiceImpl implements IReservationService {
         Setting setting = settingRepository.findSettingById(1)
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
-        Page<ListReservationResponse> responses = Page.empty(pageable);
+        Page<ListReservationResponse> responses = Page.empty();
 
         // Verificar en qué rango de tiempo estamos, según los ajustes en "setting"
         if (now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getStarBeneficiarySnack())) {

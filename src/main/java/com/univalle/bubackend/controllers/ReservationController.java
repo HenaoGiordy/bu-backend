@@ -70,4 +70,9 @@ public class ReservationController {
         return ResponseEntity.ok(responses);
     }
 
+    @GetMapping("/availability-per-hour")
+    public int getAvailabilityPerHour() {
+        return reservationService.getAvailabilityPerHour();
+    }
+
 }
