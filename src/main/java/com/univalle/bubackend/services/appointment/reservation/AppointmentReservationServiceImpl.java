@@ -12,7 +12,6 @@ import com.univalle.bubackend.exceptions.appointment.ReservationNotFoud;
 import com.univalle.bubackend.models.*;
 import com.univalle.bubackend.repository.AppointmentReservationRepository;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
-import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,6 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     private AppointmentReservationRepository appointmentReservationRepository;
     private AvailableDatesRepository availableDatesRepository;
     private TaskScheduler taskScheduler;
-    private SettingRepository settingRepository;
 
 
     @Override
