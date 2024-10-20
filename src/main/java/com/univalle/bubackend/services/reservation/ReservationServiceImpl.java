@@ -158,6 +158,7 @@ public class ReservationServiceImpl implements IReservationService {
         int availability = 0;
         LocalTime start = LocalTime.MIN;
         LocalTime end = LocalTime.MAX;
+        String type = "";
 
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
@@ -167,6 +168,7 @@ public class ReservationServiceImpl implements IReservationService {
             availability = maxSlots - currentReservations;
             start = setting.get().getStarBeneficiaryLunch();
             end = setting.get().getStarBeneficiarySnack();
+            type = "Almuerzo";
 
         }
         if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())){
@@ -175,12 +177,14 @@ public class ReservationServiceImpl implements IReservationService {
             availability = maxSlots - currentReservations;
             start = setting.get().getStarBeneficiarySnack();
             end = setting.get().getStarBeneficiaryLunch();
+            type = "Refrigerio";
         }
 
         return new AvailabilityPerHourResponse(
                 availability,
                 start,
-                end
+                end,
+                type
         );
     }
 
