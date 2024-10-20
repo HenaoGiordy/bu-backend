@@ -2,10 +2,7 @@ package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
-import com.univalle.bubackend.DTOs.reservation.AvailabilityResponse;
-import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
-import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
-import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
+import com.univalle.bubackend.DTOs.reservation.*;
 import com.univalle.bubackend.services.reservation.IReservationService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -71,7 +68,7 @@ public class ReservationController {
     }
 
     @GetMapping("/availability-per-hour")
-    public int getAvailabilityPerHour() {
+    public AvailabilityPerHourResponse getAvailabilityPerHour() {
         return reservationService.getAvailabilityPerHour();
     }
 

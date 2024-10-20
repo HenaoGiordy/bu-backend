@@ -2,10 +2,7 @@ package com.univalle.bubackend.services.reservation;
 
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
-import com.univalle.bubackend.DTOs.reservation.AvailabilityResponse;
-import com.univalle.bubackend.DTOs.reservation.ListReservationResponse;
-import com.univalle.bubackend.DTOs.reservation.ReservationRequest;
-import com.univalle.bubackend.DTOs.reservation.ReservationResponse;
+import com.univalle.bubackend.DTOs.reservation.*;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
@@ -154,30 +151,37 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     @Override
-    public int getAvailabilityPerHour() {
+    public AvailabilityPerHourResponse getAvailabilityPerHour() {
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
         int availability = 0;
+        LocalTime start = LocalTime.MIN;
+        LocalTime end = LocalTime.MAX;
 
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
-        if (setting.isEmpty()) {
-            throw new ResourceNotFoundException("Configuración no encontrada");
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+            int maxSlots = setting.get().getNumLunch();
+            int currentReservations = reservationRepository.countLunchReservationsForDay(today);
+            availability = maxSlots - currentReservations;
+            start = setting.get().getStarBeneficiaryLunch();
+            end = setting.get().getStarBeneficiarySnack();
+
+        }
+        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())){
+            int maxSlots = setting.get().getNumSnack();
+            int currentReservations = reservationRepository.countSnackReservationsForDay(today);
+            availability = maxSlots - currentReservations;
+            start = setting.get().getStarBeneficiarySnack();
+            end = setting.get().getStarBeneficiaryLunch();
         }
 
-        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
-            int maxLunchSlots = setting.get().getNumLunch();
-            int currentLunchReservations = reservationRepository.countLunchReservationsForDay(today);
-            availability = maxLunchSlots - currentLunchReservations;
-        }
-        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
-            int maxSnackSlots = setting.get().getNumSnack();
-            int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
-            availability = maxSnackSlots - currentSnackReservations;
-        }
-
-        return availability;
+        return new AvailabilityPerHourResponse(
+                availability,
+                start,
+                end
+        );
     }
 
     public void addReservationstoReservationResponse(List<ReservationResponse> list, Optional<Reservation> r) {
