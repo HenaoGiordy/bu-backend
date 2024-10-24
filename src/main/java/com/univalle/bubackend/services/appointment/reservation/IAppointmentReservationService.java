@@ -10,4 +10,6 @@ public interface IAppointmentReservationService {
     ResponseAppointmentReservationStudent allAppointmentEstudiante(Integer estudianteId);
 
     ResponseAppointmentCancel cancelReservation(Integer id);
+
+    ResponseAssistanceAppointment assistance(RequestAssistance requestAssistance);
 }

@@ -107,4 +107,9 @@ public class AppointmentReservationController {
     public ResponseEntity<ResponseAppointmentCancel> cancelAppointment(@PathVariable Integer id) {
         return new ResponseEntity<>(appointmentReservationService.cancelReservation(id), HttpStatus.OK);
     }
+
+    @PostMapping("/asistencia")
+    public ResponseEntity<ResponseAssistanceAppointment> assitance(@RequestBody RequestAssistance requestAssistance){
+        return new ResponseEntity<>(appointmentReservationService.assistance(requestAssistance), HttpStatus.ACCEPTED);
+    }
 }

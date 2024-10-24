@@ -156,4 +156,15 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         appointmentReservationRepository.delete(appointmentReservation);
         return new ResponseAppointmentCancel("Se cancelado la reserva", appointmentReservation.getAvailableDates());
     }
+
+    @Override
+    public ResponseAssistanceAppointment assistance(RequestAssistance requestAssistance) {
+        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findById(requestAssistance.appointmentId());
+        AppointmentReservation appointmentReservation = appointmentReservationOpt.orElseThrow(()-> new ReservationNotFoud("No se encontró la reservasión"));
+
+        appointmentReservation.setAssistant(requestAssistance.status());
+        appointmentReservationRepository.save(appointmentReservation);
+
+        return new ResponseAssistanceAppointment("Se ha cambiado el estado de la asistencia", requestAssistance.status());
+    }
 }
