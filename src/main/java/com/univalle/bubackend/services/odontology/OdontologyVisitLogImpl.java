@@ -1,6 +1,6 @@
 package com.univalle.bubackend.services.odontology;
 
-import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
+import com.univalle.bubackend.DTOs.odontology.UserResponse;
 import com.univalle.bubackend.DTOs.odontology.VisitLogRequest;
 import com.univalle.bubackend.DTOs.odontology.VisitLogResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +23,13 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
     private UserEntityRepository userEntityRepository;
     private OdontologyVisitRepository odontologyVisitRepository;
+
+    @Override
+    public UserResponse findStudentsByUsername(String username) {
+        Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        return new UserResponse(user);
+    }
 
     @Override
     public VisitLogResponse registerVisit(VisitLogRequest request) {
@@ -43,7 +51,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
                 visitOdontologyLog.getId(),
                 visitOdontologyLog.getDate().toLocalDate(),
                 user.getUsername(),
-                user.getName(),
+                user.getName() + " " + user.getLastName(),
                 user.getPlan(),
                 visitOdontologyLog.getReason(),
                 visitOdontologyLog.getDescription()
