@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public record ActivityLogRequest(
         @NotNull LocalDate date,
         @NotBlank String username,
-        @NotBlank @Positive Integer phone,
+        @NotNull @Positive Integer phone,
         @NotBlank String semester,
         @NotNull Gender gender,
         @NotNull Diagnostic diagnostic,
