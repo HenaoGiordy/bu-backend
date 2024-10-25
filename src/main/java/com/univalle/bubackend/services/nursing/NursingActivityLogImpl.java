@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.ActivityLogRequest;
 import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
+import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.UserEntity;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -21,6 +23,13 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
     private UserEntityRepository userEntityRepository;
     private NursingActivityRepository nursingActivityLogRepository;
+
+    @Override
+    public UserResponse findStudentsByUsername(String username) {
+        Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        return new UserResponse(user);
+    }
 
     @Override
     public ActivityLogResponse registerActivity(ActivityLogRequest request) {
@@ -47,7 +56,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
                 nursingActivityLog.getId(),
                 nursingActivityLog.getDate().toLocalDate(),
                 user.getUsername(),
-                user.getName(),
+                user.getName() + " " + user.getLastName(),
                 user.getPhone(),
                 user.getPlan(),
                 user.getSemester(),
