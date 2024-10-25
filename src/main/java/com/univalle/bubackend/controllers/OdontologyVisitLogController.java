@@ -17,6 +17,11 @@ public class OdontologyVisitLogController {
 
     private OdontologyVisitLogImpl odontologyVisitLog;
 
+    @GetMapping("/search/{username}")
+    public ResponseEntity<UserResponse> searchStudentsByCode(@PathVariable String username) {
+        UserResponse response = odontologyVisitLog.findStudentsByUsername(username);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
         
     @PostMapping("/register")
     public ResponseEntity<VisitLogResponse> registerActivity(@RequestBody VisitLogRequest request) {
