@@ -37,7 +37,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         UserEntity user = userEntityRepository.findByUsername(request.username())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        user.setPhone(request.phone());
+        user.setPhone(Long.valueOf(request.phone()));
         user.setSemester(request.semester());
         user.setGender(request.gender());
         userEntityRepository.save(user);

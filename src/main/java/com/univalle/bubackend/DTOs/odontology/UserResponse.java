@@ -2,6 +2,7 @@ package com.univalle.bubackend.DTOs.odontology;
 
 import com.univalle.bubackend.models.Role;
 import com.univalle.bubackend.models.UserEntity;
+import jakarta.validation.constraints.Positive;
 
 import java.util.Set;
 
@@ -12,7 +13,7 @@ public record UserResponse(
         String email,
         String eps,
         String semester,
-        Integer phone,
+        @Positive Integer phone,
         String plan,
         Set<Role>roles,
         boolean lunchBeneficiary,
@@ -27,7 +28,7 @@ public record UserResponse(
                 userEntity.getEmail(),
                 userEntity.getEps(),
                 userEntity.getSemester(),
-                userEntity.getPhone(),
+                Math.toIntExact(userEntity.getPhone()),
                 userEntity.getPlan(),
                 userEntity.getRoles(),
                 userEntity.getLunchBeneficiary(),

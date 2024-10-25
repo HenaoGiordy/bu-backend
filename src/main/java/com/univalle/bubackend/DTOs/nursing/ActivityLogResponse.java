@@ -9,7 +9,7 @@ public record ActivityLogResponse(
         LocalDate date,
         String username,
         String name,
-        Integer phone,
+        @jakarta.validation.constraints.Positive Long phone,
         String plan,
         String semester,
         Gender gender,

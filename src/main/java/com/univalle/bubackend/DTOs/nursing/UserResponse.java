@@ -16,7 +16,7 @@ public record UserResponse(
         this(
                 userEntity.getUsername(),
                 userEntity.getName() + " " + userEntity.getEmail(),
-                userEntity.getPhone(),
+                Math.toIntExact(userEntity.getPhone()),
                 userEntity.getPlan(),
                 userEntity.getSemester(),
                 userEntity.getGender()
