@@ -7,7 +7,7 @@ import com.univalle.bubackend.models.UserEntity;
 public record UserResponse(
         String username,
         String name,
-        Integer phone,
+        Long phone,
         String plan,
         String semester,
         Gender gender
@@ -15,8 +15,8 @@ public record UserResponse(
     public UserResponse(UserEntity userEntity) {
         this(
                 userEntity.getUsername(),
-                userEntity.getName() + " " + userEntity.getEmail(),
-                Math.toIntExact(userEntity.getPhone()),
+                userEntity.getName() + " " + userEntity.getLastName(),
+                userEntity.getPhone(),
                 userEntity.getPlan(),
                 userEntity.getSemester(),
                 userEntity.getGender()
