@@ -1,10 +1,7 @@
 package com.univalle.bubackend.controllers;
 
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
-import com.univalle.bubackend.DTOs.report.ReportRequest;
-import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.user.*;
-import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.services.user.UserDetailServiceImpl;
 import com.univalle.bubackend.services.user.UserServiceImpl;
@@ -16,9 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;

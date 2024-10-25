@@ -51,13 +51,18 @@ public class UserEntity {
     @Builder.Default
     private Boolean snackBeneficiary = false;
 
+    @Builder.Default
+    private String eps = null;
 
-    private String eps;
-
-    private String semester;
+    @Builder.Default
+    private String semester = null;
 
     @Positive
     private Long phone;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Gender gender = null;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
