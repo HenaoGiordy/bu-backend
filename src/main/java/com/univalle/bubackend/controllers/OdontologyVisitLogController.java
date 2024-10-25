@@ -22,7 +22,7 @@ public class OdontologyVisitLogController {
         UserResponse response = odontologyVisitLog.findStudentsByUsername(username);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+        
     @PostMapping("/register")
     public ResponseEntity<VisitLogResponse> registerActivity(@RequestBody VisitLogRequest request) {
         VisitLogResponse response = odontologyVisitLog.registerVisit(request);
