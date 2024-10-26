@@ -1,17 +1,15 @@
-package com.univalle.bubackend.services.report;
+package com.univalle.bubackend.services.report.allowance;
 
 import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.InvalidFilter;
 import com.univalle.bubackend.exceptions.SettingNotFound;
-import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
 import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.models.UserEntity;
-import com.univalle.bubackend.models.Reservation;
 import com.univalle.bubackend.repository.ReportRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;

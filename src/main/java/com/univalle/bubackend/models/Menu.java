@@ -1,8 +1,7 @@
 package com.univalle.bubackend.models;
 
-import com.univalle.bubackend.DTOs.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.menu.CreateMenuRequest;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity

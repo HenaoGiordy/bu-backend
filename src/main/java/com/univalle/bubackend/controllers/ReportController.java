@@ -4,7 +4,7 @@ import com.univalle.bubackend.DTOs.report.DeleteResponse;
 import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.models.Report;
-import com.univalle.bubackend.services.report.ReportServiceImpl;
+import com.univalle.bubackend.services.report.allowance.ReportServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
