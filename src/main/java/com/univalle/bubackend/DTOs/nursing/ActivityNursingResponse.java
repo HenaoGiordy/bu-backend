@@ -6,7 +6,7 @@ import com.univalle.bubackend.models.NursingActivityLog;
 import java.time.LocalDate;
 
 public record ActivityNursingResponse(
-        Long id,
+        Integer id,
         LocalDate date,
         UserResponse user,
         Diagnostic diagnostic,

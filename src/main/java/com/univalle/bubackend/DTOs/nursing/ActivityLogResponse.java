@@ -6,7 +6,7 @@ import com.univalle.bubackend.models.Diagnostic;
 import jakarta.validation.constraints.Positive;
 
 public record ActivityLogResponse(
-        Long id,
+        Integer id,
         LocalDate date,
         String username,
         String name,
