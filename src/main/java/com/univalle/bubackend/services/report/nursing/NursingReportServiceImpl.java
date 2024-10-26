@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.report.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
+import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.NursingReport;
@@ -49,5 +50,23 @@ public class NursingReportServiceImpl implements INursingReportService {
         int totalActivities = activitiesTrimester.size();
 
         return new NursingReportResponse(report, totalActivities);
+    }
+
+    @Override
+    public NursingReportResponse getNursingReport(Integer id) {
+
+        NursingReport report = reportNursingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Informe de enfermeria no encontrado"));
+
+        Map<Diagnostic, Integer> diagnosticCounts = report.getDiagnosticCounts();
+
+        return new NursingReportResponse(
+                report.getId(),
+                report.getYear(),
+                report.getTrimester(),
+                report.getDate(),
+                diagnosticCounts,
+                report.getActivities().size()
+        );
     }
 }
