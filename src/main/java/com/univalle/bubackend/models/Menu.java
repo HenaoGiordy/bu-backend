@@ -30,11 +30,14 @@ public class Menu {
 
     private String note;
 
+    private String link;
+
     public Menu(CreateMenuRequest createMenuRequest) {
         this.mainDish = createMenuRequest.mainDish();
         this.drink = createMenuRequest.drink();
         this.dessert = createMenuRequest.dessert();
         this.price = createMenuRequest.price();
         this.note = createMenuRequest.note();
+        this.link = createMenuRequest.link();
     }
 }
