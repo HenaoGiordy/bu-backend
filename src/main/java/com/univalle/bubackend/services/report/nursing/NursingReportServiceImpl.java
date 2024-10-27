@@ -12,6 +12,10 @@ import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -126,6 +130,23 @@ public class NursingReportServiceImpl implements INursingReportService {
             throw new RuntimeException("Error al generar el archivo Excel", e);
         }
 
+    }
+
+    @Override
+    public Page<NursingReportResponse> listNursingReports(Pageable pageable) {
+
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<NursingReport> nursingReports = reportNursingRepository.findAll(sortedPageable);
+
+        return nursingReports.map(nursingReport -> NursingReportResponse.builder()
+                .date(nursingReport.getDate())
+                .year(nursingReport.getYear())
+                .trimester(nursingReport.getTrimester())
+                .id(nursingReport.getId())
+                .build()
+        );
     }
 
 }

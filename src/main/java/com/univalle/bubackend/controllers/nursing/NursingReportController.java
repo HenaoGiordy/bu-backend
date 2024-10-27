@@ -7,6 +7,9 @@ import com.univalle.bubackend.models.NursingReport;
 import com.univalle.bubackend.services.report.nursing.NursingReportServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,6 +59,12 @@ public class NursingReportController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(excelStream));
 
+    }
+
+    @GetMapping("list")
+    public ResponseEntity<Page<NursingReportResponse>> listNursingReports(@PageableDefault(size = 10, page = 0) Pageable pageable) {
+        Page<NursingReportResponse> reports = nursingReportService.listNursingReports(pageable);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
 }
