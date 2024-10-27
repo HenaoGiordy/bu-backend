@@ -1,6 +1,7 @@
 package com.univalle.bubackend.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class NursingReport {
 
     private int trimester;
 
+    @Positive
     private int year;
 
     @ElementCollection
