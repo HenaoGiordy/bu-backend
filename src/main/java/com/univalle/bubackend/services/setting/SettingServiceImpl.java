@@ -2,7 +2,7 @@ package com.univalle.bubackend.services.setting;
 
 import com.univalle.bubackend.DTOs.setting.SettingRequest;
 import com.univalle.bubackend.DTOs.setting.SettingResponse;
-import com.univalle.bubackend.exceptions.SettingNotFound;
+import com.univalle.bubackend.exceptions.report.SettingNotFound;
 import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.repository.SettingRepository;
 import lombok.AllArgsConstructor;

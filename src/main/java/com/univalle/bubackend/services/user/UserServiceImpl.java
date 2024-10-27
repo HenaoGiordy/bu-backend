@@ -2,10 +2,10 @@ package com.univalle.bubackend.services.user;
 
 import com.univalle.bubackend.DTOs.user.*;
 
-import com.univalle.bubackend.exceptions.CSVFieldException;
+import com.univalle.bubackend.exceptions.report.CSVFieldException;
 
 
-import com.univalle.bubackend.exceptions.InvalidFilter;
+import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.users.RoleNotFound;

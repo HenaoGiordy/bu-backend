@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.report.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
+import com.univalle.bubackend.exceptions.report.InvalidDateFormat;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
@@ -36,6 +37,12 @@ public class NursingReportServiceImpl implements INursingReportService {
 
     @Override
     public NursingReportResponse generateNursingReport(NursingReportRequest request) {
+
+        int trimester = request.trimester();
+        if (trimester < 1 || trimester > 4 ) {
+            throw new InvalidDateFormat("El trimestre debe ser un número entero entre 1 y 4");
+        }
+
         // Calcular las fechas de inicio y fin del trimestre basado en el año y trimestre proporcionados
         LocalDate startDate = LocalDate.of(request.year(), (request.trimester() - 1) * 3 + 1, 1);
         LocalDate endDate = startDate.plusMonths(3).minusDays(1);
