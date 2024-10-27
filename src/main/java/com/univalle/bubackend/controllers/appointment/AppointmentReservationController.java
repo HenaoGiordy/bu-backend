@@ -112,4 +112,9 @@ public class AppointmentReservationController {
     public ResponseEntity<ResponseAssistanceAppointment> assitance(@RequestBody RequestAssistance requestAssistance){
         return new ResponseEntity<>(appointmentReservationService.assistance(requestAssistance), HttpStatus.ACCEPTED);
     }
+
+    @PostMapping("/follow-up")
+    public ResponseEntity<ResponseAppointmentFollowUp> followUp(@RequestBody RequestAppointmentFollowUp responseAppointmentFollowUp){
+        return new ResponseEntity<>(appointmentReservationService.followUp(responseAppointmentFollowUp), HttpStatus.CREATED);
+    }
 }

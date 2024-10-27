@@ -12,4 +12,6 @@ public interface IAppointmentReservationService {
     ResponseAppointmentCancel cancelReservation(Integer id);
 
     ResponseAssistanceAppointment assistance(RequestAssistance requestAssistance);
+
+    ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp);
 }
