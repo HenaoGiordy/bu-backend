@@ -1,4 +1,4 @@
-package com.univalle.bubackend.controllers;
+package com.univalle.bubackend.controllers.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.ActivityLogRequest;
 import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;

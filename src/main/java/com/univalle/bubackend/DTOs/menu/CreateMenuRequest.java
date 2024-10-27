@@ -1,4 +1,4 @@
-package com.univalle.bubackend.DTOs;
+package com.univalle.bubackend.DTOs.menu;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

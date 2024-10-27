@@ -1,6 +1,6 @@
 package com.univalle.bubackend.services.menu;
 
-import com.univalle.bubackend.DTOs.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.menu.CreateMenuRequest;
 import com.univalle.bubackend.exceptions.menu.MenuNotFound;
 import com.univalle.bubackend.models.Menu;
 import com.univalle.bubackend.repository.MenuRepository;
