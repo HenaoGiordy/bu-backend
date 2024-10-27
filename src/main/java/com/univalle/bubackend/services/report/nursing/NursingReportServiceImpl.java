@@ -3,6 +3,7 @@ package com.univalle.bubackend.services.report.nursing;
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.NursingReport;
@@ -56,7 +57,7 @@ public class NursingReportServiceImpl implements INursingReportService {
     public NursingReportResponse getNursingReport(Integer id) {
 
         NursingReport report = reportNursingRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Informe de enfermeria no encontrado"));
+                .orElseThrow(() -> new ReportNotFound("Informe de enfermeria no encontrado"));
 
         Map<Diagnostic, Integer> diagnosticCounts = report.getDiagnosticCounts();
 
@@ -68,5 +69,13 @@ public class NursingReportServiceImpl implements INursingReportService {
                 diagnosticCounts,
                 report.getActivities().size()
         );
+    }
+
+    @Override
+    public void deleteNursingReport(Integer id) {
+        if (!reportNursingRepository.existsById(id)){
+            throw new ReportNotFound("Informe de enfermeria no encontrado");
+        }
+        reportNursingRepository.deleteById(id);
     }
 }
