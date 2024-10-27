@@ -6,10 +6,14 @@ import com.univalle.bubackend.DTOs.report.DeleteResponse;
 import com.univalle.bubackend.models.NursingReport;
 import com.univalle.bubackend.services.report.nursing.NursingReportServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController
@@ -40,5 +44,18 @@ public class NursingReportController {
         return new ResponseEntity<>(nursingReportService.findNursingReports(year, trimester), HttpStatus.OK);
     }
 
+    @GetMapping("/download/{id}")
+    public ResponseEntity<InputStreamResource> downloadNursingReport(@PathVariable int id) {
+        ByteArrayInputStream excelStream = nursingReportService.downloadNursingReport(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_nursing_" + id + ".xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(excelStream));
+
+    }
 
 }

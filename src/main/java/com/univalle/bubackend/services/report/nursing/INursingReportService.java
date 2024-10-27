@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
 import com.univalle.bubackend.models.NursingReport;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public interface INursingReportService {
@@ -11,4 +12,5 @@ public interface INursingReportService {
     NursingReportResponse getNursingReport(Integer id);
     void deleteNursingReport(Integer id);
     List<NursingReport> findNursingReports(Integer year, Integer trimester);
+    ByteArrayInputStream downloadNursingReport(Integer id);
 }

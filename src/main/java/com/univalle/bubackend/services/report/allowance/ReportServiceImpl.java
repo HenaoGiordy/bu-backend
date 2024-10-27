@@ -117,7 +117,7 @@ public class ReportServiceImpl {
                 .orElseThrow(() -> new ReportNotFound("Informe no encontrado"));
 
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = workbook.createSheet("Reporte");
+            XSSFSheet sheet = workbook.createSheet("Informe");
 
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Fecha");

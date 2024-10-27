@@ -9,8 +9,14 @@ import com.univalle.bubackend.models.NursingReport;
 import com.univalle.bubackend.repository.NursingActivityRepository;
 import com.univalle.bubackend.repository.ReportNursingRepository;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -81,6 +87,45 @@ public class NursingReportServiceImpl implements INursingReportService {
     @Override
     public List<NursingReport> findNursingReports(Integer year, Integer trimester) {
         return reportNursingRepository.findByYearAndTrimester(year, trimester);
+    }
+
+    @Override
+    public ByteArrayInputStream downloadNursingReport(Integer id) {
+        NursingReport nursingReport = reportNursingRepository.findById(id)
+                .orElseThrow(() -> new ReportNotFound("Informe de enfermeria no encontrado"));
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Informe de enfermeria");
+
+            // informacion del informe
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Fecha");
+            headerRow.createCell(1).setCellValue(nursingReport.getDate().toString());
+            headerRow.createCell(2).setCellValue("Informe");
+            headerRow.createCell(3).setCellValue(nursingReport.getYear() + "-" + nursingReport.getTrimester());
+
+            // informacion de las actividades de enfermeria
+            Row reportHeader = sheet.createRow(2);
+            reportHeader.createCell(0).setCellValue("Motivo");
+            reportHeader.createCell(1).setCellValue("Cantidad");
+
+            Map<Diagnostic, Integer> diagnosticCounts = nursingReport.getDiagnosticCounts();
+
+            int rowNum = 3;
+            for (Map.Entry<Diagnostic, Integer> entry : diagnosticCounts.entrySet()) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(entry.getKey().toString());
+                row.createCell(1).setCellValue(entry.getValue());
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error al generar el archivo Excel", e);
+        }
+
     }
 
 }
