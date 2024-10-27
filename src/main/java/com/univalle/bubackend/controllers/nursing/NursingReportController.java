@@ -3,11 +3,14 @@ package com.univalle.bubackend.controllers.nursing;
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
 import com.univalle.bubackend.DTOs.report.DeleteResponse;
+import com.univalle.bubackend.models.NursingReport;
 import com.univalle.bubackend.services.report.nursing.NursingReportServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/nursing-report")
@@ -30,6 +33,11 @@ public class NursingReportController {
     public ResponseEntity<DeleteResponse> deleteNursingReport(@PathVariable int id) {
         nursingReportService.deleteNursingReport(id);
         return new ResponseEntity<>(new DeleteResponse("Informe de enfermeria eliminado correctamente"), HttpStatus.OK);
+    }
+
+    @GetMapping("/{year}/{trimester}")
+    public ResponseEntity<List<NursingReport>> findNursingReports(@PathVariable int year, @PathVariable int trimester) {
+        return new ResponseEntity<>(nursingReportService.findNursingReports(year, trimester), HttpStatus.OK);
     }
 
 

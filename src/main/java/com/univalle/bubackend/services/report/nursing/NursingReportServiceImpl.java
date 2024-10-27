@@ -2,7 +2,6 @@ package com.univalle.bubackend.services.report.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
-import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
@@ -78,4 +77,10 @@ public class NursingReportServiceImpl implements INursingReportService {
         }
         reportNursingRepository.deleteById(id);
     }
+
+    @Override
+    public List<NursingReport> findNursingReports(Integer year, Integer trimester) {
+        return reportNursingRepository.findByYearAndTrimester(year, trimester);
+    }
+
 }
