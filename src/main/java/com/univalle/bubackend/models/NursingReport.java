@@ -29,6 +29,8 @@ public class NursingReport {
     @Positive
     private int year;
 
+    private int totalActivities;
+
     @OneToMany(mappedBy = "nursingReport", cascade = CascadeType.ALL)
     private List<NursingReportDetail> diagnosticCount = new ArrayList<>();
 

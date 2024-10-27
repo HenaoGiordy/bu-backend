@@ -51,16 +51,19 @@ public class NursingReportServiceImpl implements INursingReportService {
         List<NursingActivityLog> activitiesTrimester = nursingActivityRepository
                 .findAllByDateBetween(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
-        // Contar el número de ocurrencias de cada diagnóstico
-        Map<Diagnostic, Integer> diagnosticCountMap = new HashMap<>();
-        for (NursingActivityLog activity : activitiesTrimester) {
-            diagnosticCountMap.merge(activity.getDiagnostic(), 1, Integer::sum);
-        }
+        int totalActivities = activitiesTrimester.size();
 
         NursingReport report = new NursingReport();
         report.setDate(LocalDate.now());
         report.setYear(request.year());
         report.setTrimester(trimester);
+        report.setTotalActivities(totalActivities);
+
+        // Contar el número de ocurrencias de cada diagnóstico
+        Map<Diagnostic, Integer> diagnosticCountMap = new HashMap<>();
+        for (NursingActivityLog activity : activitiesTrimester) {
+            diagnosticCountMap.merge(activity.getDiagnostic(), 1, Integer::sum);
+        }
 
         // Convertir el Map en una lista de NursingReportDetail y asignarla al informe
         List<NursingReportDetail> details = diagnosticCountMap.entrySet().stream()
@@ -78,8 +81,6 @@ public class NursingReportServiceImpl implements INursingReportService {
 
         // Guardar el informe con sus detalles
         reportNursingRepository.save(report);
-
-        int totalActivities = activitiesTrimester.size();
 
         // Convertir los detalles a un Map para el DTO
         Map<Diagnostic, Integer> diagnosticCountMapForResponse = details.stream()
@@ -100,14 +101,7 @@ public class NursingReportServiceImpl implements INursingReportService {
         Map<Diagnostic, Integer> diagnosticCounts = report.getDiagnosticCount().stream()
                 .collect(Collectors.toMap(NursingReportDetail::getDiagnostic, NursingReportDetail::getCount));
 
-        return new NursingReportResponse(
-                report.getId(),
-                report.getYear(),
-                report.getTrimester(),
-                report.getDate(),
-                diagnosticCounts,
-                report.getActivities().size()
-        );
+        return new NursingReportResponse(report, diagnosticCounts, report.getTotalActivities());
     }
 
     @Override
