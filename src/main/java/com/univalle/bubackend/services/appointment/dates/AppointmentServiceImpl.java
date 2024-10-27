@@ -48,8 +48,9 @@ public class AppointmentServiceImpl implements IAppointmentService {
         appointmentDateCreationValidations.validateIsProfessional(professional);
 
         requestAvailableDate.availableDates().forEach(
-                x -> {isValidTypeAppointment.validateTypeAppointment(x.typeAppointment().toUpperCase());
-                    isValidDateTime.validateDateTime(x.dateTime().toString());
+                x -> {
+                    isValidTypeAppointment.validateTypeAppointment(x.typeAppointment().toUpperCase());
+                    isValidDateTime.validateDateTime(x.dateTime().toString(), x.professionalId());
 
     });
 

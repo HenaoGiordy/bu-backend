@@ -1,11 +1,8 @@
 package com.univalle.bubackend.services.appointment.validations;
 
-import com.univalle.bubackend.DTOs.appointment.AvailableDateDTO;
 import com.univalle.bubackend.exceptions.appointment.NotProfessional;
 import com.univalle.bubackend.models.RoleName;
 import com.univalle.bubackend.models.UserEntity;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumSet;

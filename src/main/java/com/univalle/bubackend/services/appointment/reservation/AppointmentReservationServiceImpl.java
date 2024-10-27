@@ -13,6 +13,7 @@ import com.univalle.bubackend.models.*;
 import com.univalle.bubackend.repository.AppointmentReservationRepository;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
+import com.univalle.bubackend.services.appointment.validations.AppointmentDateCreationValidation;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
@@ -31,6 +32,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
     private UserEntityRepository userEntityRepository;
     private AppointmentReservationRepository appointmentReservationRepository;
+    private AppointmentDateCreationValidation appointmentDateCreationValidations;
     private AvailableDatesRepository availableDatesRepository;
     private TaskScheduler taskScheduler;
 
@@ -167,4 +169,26 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         return new ResponseAssistanceAppointment("Se ha cambiado el estado de la asistencia", requestAssistance.status());
     }
+
+    @Override
+    public ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp) {
+        Optional<UserEntity> userEntityOptional = userEntityRepository.findById(requestAppointmentFollowUp.pacientId());
+        UserEntity userEntity = userEntityOptional.orElseThrow(() -> new UserNotFound("No se encontró el paciente"));
+
+        Optional<UserEntity> professionalOpt = userEntityRepository.findById(requestAppointmentFollowUp.professionalId());
+        UserEntity professional = userEntityOptional.orElseThrow(() -> new UserNotFound("No se encontró el professional"));
+
+        appointmentDateCreationValidations.validateIsProfessional(professional);
+
+        AvailableDates availableDates = AvailableDates.builder()
+                .professional(professional)
+                .dateTime(requestAppointmentFollowUp.dateTime())
+                .build();
+
+
+
+        return null;
+    }
+
+
 }

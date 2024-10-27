@@ -16,9 +16,11 @@ import java.util.Optional;
 public interface AvailableDatesRepository extends JpaRepository<AvailableDates, Integer> {
     Optional<List<AvailableDates>> findByProfessionalId(Integer professionalId);
 
-    @Query("SELECT e FROM AvailableDates e WHERE e.dateTime BETWEEN :fechaInicio AND :fechaFin")
-    Optional<List<AvailableDates>> findEventosWithin30Minutes(@Param("fechaInicio") LocalDateTime fechaInicio,
-                                            @Param("fechaFin") LocalDateTime fechaFin);
+    @Query("SELECT e FROM AvailableDates e WHERE e.dateTime BETWEEN :fechaInicio AND :fechaFin AND e.professional.id = :professionalId")
+    Optional<List<AvailableDates>> findEventosWithin30Minutes(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            @Param("professionalId") Integer professionalId);
 
     Optional<List<AvailableDates>> findByTypeAppointmentAndAvailableTrue(TypeAppointment typeAppointment);
 }
