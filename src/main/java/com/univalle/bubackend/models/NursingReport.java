@@ -29,11 +29,10 @@ public class NursingReport {
     @Positive
     private int year;
 
-    @ElementCollection
-    @CollectionTable(name = "diagnostic_count", joinColumns = @JoinColumn(name = "nursing_report_id"))
-    @MapKeyColumn(name = "diagnostic")
-    @Column(name = "count")
-    private Map<Diagnostic, Integer> diagnosticCounts = new HashMap<>();
+    private int totalActivities;
+
+    @OneToMany(mappedBy = "nursingReport", cascade = CascadeType.ALL)
+    private List<NursingReportDetail> diagnosticCount = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "nursing_report_id")

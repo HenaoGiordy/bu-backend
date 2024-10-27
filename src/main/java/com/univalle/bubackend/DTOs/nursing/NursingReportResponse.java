@@ -13,17 +13,18 @@ public record NursingReportResponse(
         int year,
         int trimester,
         LocalDate date,
-        Map<Diagnostic, Integer> diagnosticCounts,
+        Map<Diagnostic, Integer> diagnosticCount,
         int totalActivities
 ) {
-    public NursingReportResponse(NursingReport report, int totalActivities) {
+    public NursingReportResponse(NursingReport report, Map<Diagnostic, Integer> diagnosticCount, int totalActivities) {
         this(
                 report.getId(),
                 report.getYear(),
                 report.getTrimester(),
                 report.getDate(),
-                report.getDiagnosticCounts(),
+                diagnosticCount,
                 totalActivities
         );
     }
 }
+

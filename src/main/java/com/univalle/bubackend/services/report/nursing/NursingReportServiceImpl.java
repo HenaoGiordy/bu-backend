@@ -7,6 +7,7 @@ import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.NursingReport;
+import com.univalle.bubackend.models.NursingReportDetail;
 import com.univalle.bubackend.repository.NursingActivityRepository;
 import com.univalle.bubackend.repository.ReportNursingRepository;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -39,35 +41,55 @@ public class NursingReportServiceImpl implements INursingReportService {
     public NursingReportResponse generateNursingReport(NursingReportRequest request) {
 
         int trimester = request.trimester();
-        if (trimester < 1 || trimester > 4 ) {
+        if (trimester < 1 || trimester > 4) {
             throw new InvalidDateFormat("El trimestre debe ser un número entero entre 1 y 4");
         }
 
-        // Calcular las fechas de inicio y fin del trimestre basado en el año y trimestre proporcionados
-        LocalDate startDate = LocalDate.of(request.year(), (request.trimester() - 1) * 3 + 1, 1);
+        LocalDate startDate = LocalDate.of(request.year(), (trimester - 1) * 3 + 1, 1);
         LocalDate endDate = startDate.plusMonths(3).minusDays(1);
 
-        List<NursingActivityLog> activitiesTrimester = nursingActivityRepository.
-                findAllByDateBetween(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        List<NursingActivityLog> activitiesTrimester = nursingActivityRepository
+                .findAllByDateBetween(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
-        Map<Diagnostic, Integer> diagnosticCount = new HashMap<>();
-        for (NursingActivityLog activity : activitiesTrimester) {
-            diagnosticCount.merge(activity.getDiagnostic(), 1, Integer::sum);
-        }
+        int totalActivities = activitiesTrimester.size();
 
         NursingReport report = new NursingReport();
         report.setDate(LocalDate.now());
         report.setYear(request.year());
-        report.setTrimester(request.trimester());
-        report.setDiagnosticCounts(diagnosticCount);
+        report.setTrimester(trimester);
+        report.setTotalActivities(totalActivities);
+
+        // Contar el número de ocurrencias de cada diagnóstico
+        Map<Diagnostic, Integer> diagnosticCountMap = new HashMap<>();
+        for (NursingActivityLog activity : activitiesTrimester) {
+            diagnosticCountMap.merge(activity.getDiagnostic(), 1, Integer::sum);
+        }
+
+        // Convertir el Map en una lista de NursingReportDetail y asignarla al informe
+        List<NursingReportDetail> details = diagnosticCountMap.entrySet().stream()
+                .map(entry -> {
+                    NursingReportDetail detail = new NursingReportDetail();
+                    detail.setDiagnostic(entry.getKey());
+                    detail.setCount(entry.getValue());
+                    detail.setNursingReport(report); // Relacionar con el informe actual
+                    return detail;
+                })
+                .collect(Collectors.toList());
+
+        report.setDiagnosticCount(details);
         report.setActivities(activitiesTrimester);
 
+        // Guardar el informe con sus detalles
         reportNursingRepository.save(report);
 
-        int totalActivities = activitiesTrimester.size();
+        // Convertir los detalles a un Map para el DTO
+        Map<Diagnostic, Integer> diagnosticCountMapForResponse = details.stream()
+                .collect(Collectors.toMap(NursingReportDetail::getDiagnostic, NursingReportDetail::getCount));
 
-        return new NursingReportResponse(report, totalActivities);
+        return new NursingReportResponse(report, diagnosticCountMapForResponse, totalActivities);
     }
+
+
 
     @Override
     public NursingReportResponse getNursingReport(Integer id) {
@@ -75,16 +97,11 @@ public class NursingReportServiceImpl implements INursingReportService {
         NursingReport report = reportNursingRepository.findById(id)
                 .orElseThrow(() -> new ReportNotFound("Informe de enfermeria no encontrado"));
 
-        Map<Diagnostic, Integer> diagnosticCounts = report.getDiagnosticCounts();
+        // Convertir la lista de NursingReportDetail a un Map<Diagnostic, Integer>
+        Map<Diagnostic, Integer> diagnosticCounts = report.getDiagnosticCount().stream()
+                .collect(Collectors.toMap(NursingReportDetail::getDiagnostic, NursingReportDetail::getCount));
 
-        return new NursingReportResponse(
-                report.getId(),
-                report.getYear(),
-                report.getTrimester(),
-                report.getDate(),
-                diagnosticCounts,
-                report.getActivities().size()
-        );
+        return new NursingReportResponse(report, diagnosticCounts, report.getTotalActivities());
     }
 
     @Override
@@ -120,13 +137,11 @@ public class NursingReportServiceImpl implements INursingReportService {
             reportHeader.createCell(0).setCellValue("Motivo");
             reportHeader.createCell(1).setCellValue("Cantidad");
 
-            Map<Diagnostic, Integer> diagnosticCounts = nursingReport.getDiagnosticCounts();
-
             int rowNum = 3;
-            for (Map.Entry<Diagnostic, Integer> entry : diagnosticCounts.entrySet()) {
+            for (NursingReportDetail detail : nursingReport.getDiagnosticCount()) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entry.getKey().toString());
-                row.createCell(1).setCellValue(entry.getValue());
+                row.createCell(0).setCellValue(detail.getDiagnostic().toString());
+                row.createCell(1).setCellValue(detail.getCount());
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
