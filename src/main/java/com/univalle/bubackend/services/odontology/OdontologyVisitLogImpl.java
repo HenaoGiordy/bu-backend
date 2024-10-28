@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -39,8 +37,8 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
         VisitOdontologyLog visitOdontologyLog = VisitOdontologyLog.builder()
                 .user(user)
-                .date(LocalDateTime.now())
-                .time(LocalTime.now())
+                .date(request.date())
+                .time(request.time())
                 .reason(request.reason())
                 .description(request.description())
                 .build();
@@ -49,7 +47,8 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
         return new VisitLogResponse(
                 visitOdontologyLog.getId(),
-                visitOdontologyLog.getDate().toLocalDate(),
+                visitOdontologyLog.getDate(),
+                visitOdontologyLog.getTime(),
                 user.getUsername(),
                 user.getName() + " " + user.getLastName(),
                 user.getPlan(),

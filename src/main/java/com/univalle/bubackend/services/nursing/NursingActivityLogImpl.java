@@ -13,11 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,8 +43,8 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
         NursingActivityLog nursingActivityLog = NursingActivityLog.builder()
                 .user(user)
-                .date(LocalDateTime.now())
-                .time(LocalTime.now())
+                .date(request.date())
+                .time(request.time())
                 .diagnostic(request.diagnostic())
                 .conduct(request.conduct())
                 .build();
@@ -57,7 +53,8 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
         return new ActivityLogResponse(
                 nursingActivityLog.getId(),
-                nursingActivityLog.getDate().toLocalDate(),
+                nursingActivityLog.getDate(),
+                nursingActivityLog.getTime(),
                 user.getUsername(),
                 user.getName() + " " + user.getLastName(),
                 user.getPhone(),
