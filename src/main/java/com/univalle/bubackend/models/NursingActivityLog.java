@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
@@ -24,7 +24,7 @@ public class NursingActivityLog {
     UserEntity user;
 
     @NotNull
-    private LocalDateTime date;
+    private LocalDate date;
 
     @NotNull
     private LocalTime time;
