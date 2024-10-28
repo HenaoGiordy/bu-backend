@@ -18,14 +18,14 @@ public class IsValidDateTime implements DateTimeValidation{
   private AvailableDatesRepository availableDatesRepository;
 
     @Override
-    public void validateDateTime(String dateTime) {
+    public void validateDateTime(String dateTime, Integer professionaId) {
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
         LocalDateTime fechaReferencia = LocalDateTime.parse(dateTime, formatter);
           LocalDateTime fechaInicio = fechaReferencia.minusMinutes(30);
           LocalDateTime fechaFin = fechaReferencia.plusMinutes(30);
 
-          Optional<List<AvailableDates>> eventosOp = availableDatesRepository.findEventosWithin30Minutes(fechaInicio, fechaFin);
+          Optional<List<AvailableDates>> eventosOp = availableDatesRepository.findEventosWithin30Minutes(fechaInicio, fechaFin, professionaId);
           List<AvailableDates> eventos = eventosOp.orElseGet(ArrayList::new);
 
           if(!eventos.isEmpty()) {

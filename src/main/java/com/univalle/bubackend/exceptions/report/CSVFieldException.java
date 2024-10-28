@@ -1,4 +1,4 @@
-package com.univalle.bubackend.exceptions;
+package com.univalle.bubackend.exceptions.report;
 
 public class CSVFieldException extends RuntimeException {
     public CSVFieldException(String message) {

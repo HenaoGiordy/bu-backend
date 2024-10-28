@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.nursing;
 
 import com.univalle.bubackend.DTOs.nursing.ActivityLogRequest;
 import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
+import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.models.NursingActivityLog;
@@ -63,5 +64,30 @@ public class NursingActivityLogImpl implements INursingActivityLog {
                 nursingActivityLog.getDiagnostic(),
                 nursingActivityLog.getConduct()
         );
+    }
+
+    @Override
+    public List<ActivityNursingResponse> activitiesNursing(String username) {
+        UserEntity user = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        List<NursingActivityLog> activities = nursingActivityLogRepository.findAllByUserUsername(username);
+
+        return activities.stream()
+                .map(activity -> new ActivityNursingResponse(
+                        activity.getId(),
+                        activity.getDate().toLocalDate(),
+                        new UserResponse(user),
+                        activity.getDiagnostic(),
+                        activity.getConduct()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ActivityNursingResponse getActivityNursing(Long id) {
+        NursingActivityLog activity = nursingActivityLogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermeria no encontrada"));
+        return new ActivityNursingResponse(activity);
     }
 }

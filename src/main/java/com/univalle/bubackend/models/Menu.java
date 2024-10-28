@@ -1,8 +1,7 @@
 package com.univalle.bubackend.models;
 
-import com.univalle.bubackend.DTOs.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.menu.CreateMenuRequest;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
@@ -30,11 +29,14 @@ public class Menu {
 
     private String note;
 
+    private String link;
+
     public Menu(CreateMenuRequest createMenuRequest) {
         this.mainDish = createMenuRequest.mainDish();
         this.drink = createMenuRequest.drink();
         this.dessert = createMenuRequest.dessert();
         this.price = createMenuRequest.price();
         this.note = createMenuRequest.note();
+        this.link = createMenuRequest.link();
     }
 }

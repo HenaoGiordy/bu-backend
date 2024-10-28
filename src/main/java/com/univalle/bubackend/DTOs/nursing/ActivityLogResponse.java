@@ -5,9 +5,10 @@ import java.time.LocalTime;
 import jakarta.validation.constraints.Positive;
 import com.univalle.bubackend.models.Gender;
 import com.univalle.bubackend.models.Diagnostic;
+import jakarta.validation.constraints.Positive;
 
 public record ActivityLogResponse(
-        Long id,
+        Integer id,
         LocalDate date,
         LocalTime time,
         String username,

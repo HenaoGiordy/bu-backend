@@ -56,11 +56,21 @@ public class InitDatabase {
             UserEntity profesionalUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
-                    .username("enfermero")
+                    .username("enfermero1")
                     .email("henaogiordy@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(enfermero))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("enfermero"))
+                    .build();
+
+            UserEntity enfermero2 = UserEntity.builder()
+                    .name("admin")
+                    .lastName("Bienestar")
+                    .username("enfermero2")
+                    .email("henaogiordy@gmail.com")
+                    .plan("Bienestar Universitario")
+                    .roles(Set.of(enfermero))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("enfermero2"))
                     .build();
 
             UserEntity estudiantelUser = UserEntity.builder()
@@ -85,7 +95,7 @@ public class InitDatabase {
 
 
 
-            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser));
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser, enfermero2));
         };
     }
 }

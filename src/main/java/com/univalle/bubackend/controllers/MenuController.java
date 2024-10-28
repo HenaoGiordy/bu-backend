@@ -1,10 +1,6 @@
 package com.univalle.bubackend.controllers;
 
-import com.univalle.bubackend.DTOs.CreateMenuRequest;
-import com.univalle.bubackend.DTOs.report.ReportRequest;
-import com.univalle.bubackend.DTOs.setting.SettingRequest;
-import com.univalle.bubackend.DTOs.setting.SettingResponse;
-import com.univalle.bubackend.models.Report;
+import com.univalle.bubackend.DTOs.menu.CreateMenuRequest;
 import com.univalle.bubackend.services.menu.IMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
