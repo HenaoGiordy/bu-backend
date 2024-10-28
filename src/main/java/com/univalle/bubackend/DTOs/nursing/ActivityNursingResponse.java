@@ -15,7 +15,7 @@ public record ActivityNursingResponse(
     public ActivityNursingResponse(NursingActivityLog activity) {
         this(
                 activity.getId(),
-                activity.getDate().toLocalDate(),
+                activity.getDate(),
                 new UserResponse(activity.getUser()),
                 activity.getDiagnostic(),
                 activity.getConduct()

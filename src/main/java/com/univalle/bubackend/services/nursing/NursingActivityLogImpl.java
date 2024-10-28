@@ -13,7 +13,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -76,7 +78,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         return activities.stream()
                 .map(activity -> new ActivityNursingResponse(
                         activity.getId(),
-                        activity.getDate().toLocalDate(),
+                        activity.getDate(),
                         new UserResponse(user),
                         activity.getDiagnostic(),
                         activity.getConduct()
