@@ -38,7 +38,6 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
         VisitOdontologyLog visitOdontologyLog = VisitOdontologyLog.builder()
                 .user(user)
                 .date(request.date())
-                .time(request.time())
                 .reason(request.reason())
                 .description(request.description())
                 .build();
@@ -47,8 +46,8 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
         return new VisitLogResponse(
                 visitOdontologyLog.getId(),
-                visitOdontologyLog.getDate(),
-                visitOdontologyLog.getTime(),
+                visitOdontologyLog.getDate().toLocalDate(),
+                visitOdontologyLog.getDate().toLocalTime(),
                 user.getUsername(),
                 user.getName() + " " + user.getLastName(),
                 user.getPlan(),

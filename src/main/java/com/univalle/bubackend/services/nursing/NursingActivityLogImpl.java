@@ -46,7 +46,6 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         NursingActivityLog nursingActivityLog = NursingActivityLog.builder()
                 .user(user)
                 .date(request.date())
-                .time(request.time())
                 .diagnostic(request.diagnostic())
                 .conduct(request.conduct())
                 .build();
@@ -55,8 +54,8 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
         return new ActivityLogResponse(
                 nursingActivityLog.getId(),
-                nursingActivityLog.getDate(),
-                nursingActivityLog.getTime(),
+                nursingActivityLog.getDate().toLocalDate(),
+                nursingActivityLog.getDate().toLocalTime(),
                 user.getUsername(),
                 user.getName() + " " + user.getLastName(),
                 user.getPhone(),
@@ -78,7 +77,8 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         return activities.stream()
                 .map(activity -> new ActivityNursingResponse(
                         activity.getId(),
-                        activity.getDate(),
+                        activity.getDate().toLocalDate(),
+                        activity.getDate().toLocalTime(),
                         new UserResponse(user),
                         activity.getDiagnostic(),
                         activity.getConduct()
