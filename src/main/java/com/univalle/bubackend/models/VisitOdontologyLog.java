@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,10 +22,8 @@ public class VisitOdontologyLog {
     UserEntity user;
 
     @NotNull
-    private LocalDate date;
+    private LocalDateTime date;
 
-    @NotNull
-    private LocalTime time;
 
     private OdontologyReason reason;
 

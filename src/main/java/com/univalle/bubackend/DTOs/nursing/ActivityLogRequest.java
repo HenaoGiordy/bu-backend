@@ -6,12 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public record ActivityLogRequest(
-        @NotNull LocalDate date,
-        @NotNull LocalTime time,
+        @NotNull LocalDateTime date,
         @NotBlank String username,
         @NotNull @Positive Integer phone,
         @NotBlank String semester,

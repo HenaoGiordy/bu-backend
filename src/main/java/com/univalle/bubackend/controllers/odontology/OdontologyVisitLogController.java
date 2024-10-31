@@ -1,4 +1,4 @@
-package com.univalle.bubackend.controllers;
+package com.univalle.bubackend.controllers.odontology;
 
 
 import com.univalle.bubackend.DTOs.odontology.UserResponse;
