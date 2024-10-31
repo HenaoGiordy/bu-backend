@@ -1,6 +1,7 @@
 package com.univalle.bubackend.DTOs.user;
 
-import com.univalle.bubackend.models.Role;
+
+import com.univalle.bubackend.models.RoleName;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,6 +21,6 @@ public record EditUserRequest(@NotNull(message = "Debes proporcionar un Id") Int
                               @NotNull(message = "Debes proporcionar el si el usuario está activo") Boolean isActive,
                               @NotNull(message = "Debes indicar si el usuario es beneficiario de lunchBeneficiary") Boolean lunchBeneficiary,
                               @NotNull(message = "Debes indicar si el usuario es beneficiario de lunchBeneficiary") Boolean snackBeneficiary,
-                              @NotEmpty(message = "Debe tener por lo menos un rol") Set<Role> roles
+                              @NotEmpty(message = "Debe tener por lo menos un rol") Set<RoleName> roles
                               ) {
 }

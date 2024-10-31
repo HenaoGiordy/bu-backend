@@ -102,6 +102,11 @@ public class UserServiceImpl {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
+        Set<Role> roles = editUserRequest.roles().stream()
+                .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest.name()))
+                        .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
+                .collect(Collectors.toSet());
+
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
@@ -109,12 +114,10 @@ public class UserServiceImpl {
         user.setEps(editUserRequest.eps());
         user.setSemester(editUserRequest.semester());
         user.setPhone(editUserRequest.phone());
-        user.setRoles(editUserRequest.roles());
+        user.setRoles(roles);
         user.setIsActive(editUserRequest.isActive());
         user.setLunchBeneficiary(editUserRequest.lunchBeneficiary());
         user.setSnackBeneficiary(editUserRequest.snackBeneficiary());
-        user.setRoles(editUserRequest.roles());
-
 
         userEntityRepository.save(user);
 
