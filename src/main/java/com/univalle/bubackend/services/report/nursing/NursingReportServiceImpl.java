@@ -113,9 +113,29 @@ public class NursingReportServiceImpl implements INursingReportService {
     }
 
     @Override
-    public List<NursingReport> findNursingReports(Integer year, Integer trimester) {
-        return reportNursingRepository.findByYearAndTrimester(year, trimester);
+    public List<NursingReportResponse> findNursingReports(Integer year, Integer trimester) {
+        List<NursingReport> reports;
+
+        if (year != null && trimester != null) {
+            // Buscar por año y trimestre específico
+            reports = reportNursingRepository.findByYearAndTrimester(year, trimester);
+        } else if (year != null) {
+            // Buscar solo por año
+            reports = reportNursingRepository.findByYear(year);
+        } else {
+            // Si no se especifica ningún parámetro, devuelve todos los informes
+            reports = reportNursingRepository.findAll();
+        }
+
+        // Convierte a NursingReportResponse
+        return reports.stream()
+                .map(report -> new NursingReportResponse(report,
+                        report.getDiagnosticCount().stream()
+                                .collect(Collectors.toMap(NursingReportDetail::getDiagnostic, NursingReportDetail::getCount)),
+                        report.getActivities().size()))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public ByteArrayInputStream downloadNursingReport(Integer id) {

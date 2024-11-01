@@ -42,10 +42,15 @@ public class NursingReportController {
         return new ResponseEntity<>(new DeleteResponse("Informe de enfermeria eliminado correctamente"), HttpStatus.OK);
     }
 
-    @GetMapping("/{year}/{trimester}")
-    public ResponseEntity<List<NursingReport>> findNursingReports(@PathVariable int year, @PathVariable int trimester) {
-        return new ResponseEntity<>(nursingReportService.findNursingReports(year, trimester), HttpStatus.OK);
+    @GetMapping("/search")
+    public ResponseEntity<List<NursingReportResponse>> findNursingReports(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer trimester) {
+
+        List<NursingReportResponse> reports = nursingReportService.findNursingReports(year, trimester);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
     }
+
 
     @GetMapping("/download/{id}")
     public ResponseEntity<InputStreamResource> downloadNursingReport(@PathVariable int id) {

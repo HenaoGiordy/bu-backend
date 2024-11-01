@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ReportNursingRepository extends JpaRepository<NursingReport, Integer> {
     Optional<NursingReport> findById(Integer id);
     List<NursingReport> findByYearAndTrimester(Integer year, Integer trimester);
+    List<NursingReport> findByYear(Integer year);
 }
