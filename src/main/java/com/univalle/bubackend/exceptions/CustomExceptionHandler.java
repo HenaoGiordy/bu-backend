@@ -290,4 +290,11 @@ public class CustomExceptionHandler {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
+
+    @ExceptionHandler(ReportAlreadyExistsException.class)
+    public ResponseEntity<ExceptionDTO> handleReportAlreadyExistsException(ReportAlreadyExistsException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage));
+    }
+
 }
