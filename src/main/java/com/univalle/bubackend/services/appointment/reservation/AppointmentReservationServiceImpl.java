@@ -2,6 +2,7 @@ package com.univalle.bubackend.services.appointment.reservation;
 
 import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.appointment.CantReserveMoreAppointments;
 import com.univalle.bubackend.exceptions.appointment.HaveAnAppoinmentPending;
 import com.univalle.bubackend.exceptions.appointment.DateNotAvailable;
@@ -18,13 +19,12 @@ import com.univalle.bubackend.services.appointment.validations.DateTimeValidatio
 import com.univalle.bubackend.services.appointment.validations.DefineTypeOfAppointment;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -206,5 +206,41 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         return new ResponseAppointmentFollowUp("Se ha reservado la cita con exito", userEntity.getName(), professional.getName());
     }
 
+    @Override
+    public UserResponse findStudentsByUsername(RequestUser requestUser) {
+        Optional<UserEntity> optionalUser;
+            if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
+                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 6, 1, 0, 0); // 1 de junio
+                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59);//31 de Diciembre
+                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(requestUser.username(), requestUser.usernameProfesional(), startDate, endDate);
+
+            }else{
+                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0); // 1 de enero
+                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 5, 31, 23, 59); // 30 de junio
+                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(requestUser.username(), requestUser.usernameProfesional(), startDate, endDate);
+            }
+
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        return new UserResponse(user);
+
+    }
+
+    @Override
+    public Page<ListReservationResponse> getReservations(Pageable pageable) {
+
+
+        Page<ListReservationResponse> responses = Page.empty();
+
+        responses = appointmentReservationRepository.findAll(pageable)
+                .map(reservation -> new ListReservationResponse(
+                        reservation.getId(),
+                        reservation.getAvailableDates().getDateTime(),
+                        reservation.getEstudiante().getUsername(),
+                        reservation.getAvailableDates().getProfessional().getName() + reservation.getAvailableDates().getProfessional().getLastName(),
+                        reservation.getAssistant()
+                ));
+
+        return responses;
+    }
 
 }
