@@ -22,22 +22,7 @@ public class SettingServiceImpl implements ISettingService {
     @Override
     public SettingResponse createSetting(SettingRequest settingRequest) {
 
-        if (settingRequest.starBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.starBeneficiarySnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de inicio de la merienda para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
-        }
-        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.endBeneficiarySnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de fin de la merienda para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
-        }
-        if (settingRequest.starSnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.starSnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de inicio de la merienda debe ser posterior a la hora de fin de almuerzo.");
-        }
-        if (settingRequest.endSnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.endSnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de fin de la merienda debe ser posterior a la hora de fin de almuerzo.");
-        }
+        exception(settingRequest);
 
         Setting setting = Setting.builder()
                 .startSemester(settingRequest.startSemester())
@@ -56,6 +41,42 @@ public class SettingServiceImpl implements ISettingService {
 
         settingRepository.save(setting);
         return new SettingResponse(setting.getId(), "Ajustes creados exitosamente", settingRequest);
+    }
+
+    private void exception(SettingRequest settingRequest) {
+        if (settingRequest.endBeneficiaryLunch().isBefore(settingRequest.starBeneficiaryLunch())) {
+            throw new InvalidTimeException("La hora de fin de almuerzos para beneficiarios debe ser posterior a la hora de inicio de almuerzo");
+        }
+
+        if (settingRequest.endLunch().isBefore(settingRequest.starLunch())) {
+            throw new InvalidTimeException("La hora de fin de almuerzo debe ser posterior a la hora de inicio de almuerzo");
+        }
+
+        if (settingRequest.starBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.starBeneficiarySnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de inicio de la refrigerio para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
+        }
+        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.endBeneficiarySnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de fin de la refrigerio para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
+        }
+
+        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.starBeneficiarySnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio para beneficiarios debe ser posterior a la hora de inicio de refrigerio");
+        }
+
+        if (settingRequest.starSnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.starSnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de inicio de la refrigerio debe ser posterior a la hora de fin de almuerzo.");
+        }
+        if (settingRequest.endSnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.endSnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de fin de la refrigerio debe ser posterior a la hora de fin de almuerzo.");
+        }
+
+        if (settingRequest.endSnack().isBefore(settingRequest.starSnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterios a la hora de inicio");
+        }
     }
 
     @Override
@@ -91,7 +112,9 @@ public class SettingServiceImpl implements ISettingService {
         Setting setting = settingRepository.findTopByOrderByIdAsc()
                 .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
 
-            setting.setStartSemester(settingRequest.startSemester());
+        exception(settingRequest);
+
+        setting.setStartSemester(settingRequest.startSemester());
             setting.setEndSemester(settingRequest.endSemester());
             setting.setNumLunch(settingRequest.numLunch());
             setting.setNumSnack(settingRequest.numSnack());
