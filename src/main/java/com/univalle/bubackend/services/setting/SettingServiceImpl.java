@@ -2,7 +2,8 @@ package com.univalle.bubackend.services.setting;
 
 import com.univalle.bubackend.DTOs.setting.SettingRequest;
 import com.univalle.bubackend.DTOs.setting.SettingResponse;
-import com.univalle.bubackend.exceptions.report.SettingNotFound;
+import com.univalle.bubackend.exceptions.setting.InvalidTimeException;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.repository.SettingRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,24 @@ public class SettingServiceImpl implements ISettingService {
 
     @Override
     public SettingResponse createSetting(SettingRequest settingRequest) {
+
+        if (settingRequest.starBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.starBeneficiarySnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de inicio de la merienda para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
+        }
+        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.endBeneficiarySnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de fin de la merienda para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
+        }
+        if (settingRequest.starSnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.starSnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de inicio de la merienda debe ser posterior a la hora de fin de almuerzo.");
+        }
+        if (settingRequest.endSnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.endSnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de fin de la merienda debe ser posterior a la hora de fin de almuerzo.");
+        }
+
         Setting setting = Setting.builder()
                 .startSemester(settingRequest.startSemester())
                 .endBeneficiaryLunch(settingRequest.endBeneficiaryLunch())
