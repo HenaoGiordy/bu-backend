@@ -113,7 +113,7 @@ public class ReportController {
         ByteArrayInputStream excelStream = reportService.generateExcelReport(id);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_" + id + ".xlsx");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=informe_beca" + ".xlsx");
 
         return ResponseEntity.ok()
                 .headers(headers)

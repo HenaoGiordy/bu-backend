@@ -57,7 +57,7 @@ public class NursingReportController {
         ByteArrayInputStream excelStream = nursingReportService.downloadNursingReport(id);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report_nursing_" + id + ".xlsx");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=informe_enfermeria" + ".xlsx");
 
         return ResponseEntity.ok()
                 .headers(headers)
