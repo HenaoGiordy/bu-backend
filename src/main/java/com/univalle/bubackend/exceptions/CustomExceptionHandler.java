@@ -11,6 +11,8 @@ import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
 import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
+import com.univalle.bubackend.exceptions.setting.InvalidTimeException;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.users.RoleNotFound;
 import com.univalle.bubackend.exceptions.users.UserNameAlreadyExist;
@@ -219,6 +221,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleInvalidDateFormat(InvalidDateFormat ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(InvalidTimeException.class)
+    public ResponseEntity<ExceptionDTO> handleInvalidTimeException(InvalidTimeException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage));
     }
 
     @ExceptionHandler(InvalidFilter.class)

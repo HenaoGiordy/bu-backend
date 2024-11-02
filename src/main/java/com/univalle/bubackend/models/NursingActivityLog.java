@@ -27,6 +27,7 @@ public class NursingActivityLog {
 
     private Diagnostic diagnostic;
 
+    @Lob
     private String conduct;
 
 }

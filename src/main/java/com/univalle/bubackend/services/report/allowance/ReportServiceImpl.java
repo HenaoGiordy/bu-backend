@@ -4,7 +4,7 @@ import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
-import com.univalle.bubackend.exceptions.report.SettingNotFound;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;

@@ -1,4 +1,4 @@
-package com.univalle.bubackend.exceptions.report;
+package com.univalle.bubackend.exceptions.setting;
 
 public class SettingNotFound extends RuntimeException {
     public SettingNotFound(String message) {
