@@ -6,5 +6,6 @@ import com.univalle.bubackend.DTOs.odontology.VisitLogResponse;
 
 public interface IOdontologyVisitLog {
     UserResponse findStudentsByUsername(String username);
+
     VisitLogResponse registerVisit(VisitLogRequest request);
 }

@@ -9,11 +9,18 @@ import java.util.List;
 
 public interface IReservationService {
     ReservationResponse createReservation(ReservationRequest reservationRequest);
+
     AvailabilityResponse getAvailability();
+
     AvailabilityPerHourResponse getAvailabilityPerHour();
+
     List<ReservationResponse> getReservationsPerDay(String username);
+
     ReservationResponse cancelReservation(Integer reservationId);
+
     ReservationResponse findReservationByUsername(String username);
+
     ReservationPaymentResponse registerPayment(ReservationPaymentRequest paymentRequest);
+
     Page<ListReservationResponse> getActiveReservations(Pageable pageable);
 }

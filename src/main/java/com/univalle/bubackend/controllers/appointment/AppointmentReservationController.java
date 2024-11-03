@@ -1,6 +1,7 @@
 package com.univalle.bubackend.controllers.appointment;
 
 import com.univalle.bubackend.DTOs.appointment.*;
+import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.services.appointment.reservation.IAppointmentReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,10 +11,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -116,5 +123,18 @@ public class AppointmentReservationController {
     @PostMapping("/follow-up")
     public ResponseEntity<ResponseAppointmentFollowUp> followUp(@RequestBody RequestAppointmentFollowUp responseAppointmentFollowUp){
         return new ResponseEntity<>(appointmentReservationService.followUp(responseAppointmentFollowUp), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/by-username")
+    public ResponseEntity<List<UserResponse>> findReservationByUsername(@RequestBody RequestUser requestUser) {
+        List<UserResponse> responses = Collections.singletonList(appointmentReservationService.findReservationsByUsername(requestUser));
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<ListReservationResponse>> getAllReservations(
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        Page<ListReservationResponse> reservations = appointmentReservationService.getReservations(pageable);
+        return new ResponseEntity<>(reservations, HttpStatus.OK);
     }
 }

@@ -38,6 +38,7 @@ public class InitDatabase {
             // Recuperar los roles persistidos desde la base de datos
             Role adminRole = roleRepository.findByName(RoleName.ADMINISTRADOR).orElseThrow();
             Role enfermero = roleRepository.findByName(RoleName.ENFERMERO).orElseThrow();
+            Role psicologo = roleRepository.findByName(RoleName.PSICOLOGO).orElseThrow();
             Role estudiante = roleRepository.findByName(RoleName.ESTUDIANTE).orElseThrow();
             Role monitor = roleRepository.findByName(RoleName.MONITOR).orElseThrow();
 
@@ -73,6 +74,16 @@ public class InitDatabase {
                     .password(passwordEncoder.encode("enfermero2"))
                     .build();
 
+            UserEntity psicologo2 = UserEntity.builder()
+                    .name("psicologo_nombre")
+                    .lastName("psicologo_apellido")
+                    .username("psicologo")
+                    .email("henaogiordy@gmail.com")
+                    .plan("psicología")
+                    .roles(Set.of(psicologo))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("psicologo"))
+                    .build();
+
             UserEntity estudiantelUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
@@ -95,7 +106,7 @@ public class InitDatabase {
 
 
 
-            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser, enfermero2));
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser, enfermero2, psicologo2));
         };
     }
 }
