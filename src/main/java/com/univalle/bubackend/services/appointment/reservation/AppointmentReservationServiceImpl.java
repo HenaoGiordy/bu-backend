@@ -207,7 +207,11 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     }
 
     @Override
-    public UserResponse findStudentsByUsername(RequestUser requestUser) {
+    public UserResponse findReservationsByUsername(RequestUser requestUser) {
+
+        UserEntity userTest = userEntityRepository.findByUsername(requestUser.username()).orElseThrow(() ->
+                new ReservationNotFoud("No se encontró un usuario con ese codigo"));
+
         Optional<UserEntity> optionalUser;
             if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
                 LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 6, 1, 0, 0); // 1 de junio
@@ -220,7 +224,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(requestUser.username(), requestUser.usernameProfesional(), startDate, endDate);
             }
 
-        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("E usuario no ha realizado una reserva"));
         return new UserResponse(user);
 
     }

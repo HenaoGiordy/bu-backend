@@ -127,7 +127,7 @@ public class AppointmentReservationController {
 
     @GetMapping("/by-username")
     public ResponseEntity<List<UserResponse>> findReservationByUsername(@RequestBody RequestUser requestUser) {
-        List<UserResponse> responses = Collections.singletonList(appointmentReservationService.findStudentsByUsername(requestUser));
+        List<UserResponse> responses = Collections.singletonList(appointmentReservationService.findReservationsByUsername(requestUser));
         return ResponseEntity.ok(responses);
     }
 

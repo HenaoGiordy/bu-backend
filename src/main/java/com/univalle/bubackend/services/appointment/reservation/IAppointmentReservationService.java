@@ -19,7 +19,7 @@ public interface IAppointmentReservationService {
 
     ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp);
 
-    UserResponse findStudentsByUsername(RequestUser requestUser);
+    UserResponse findReservationsByUsername(RequestUser requestUser);
 
     Page<ListReservationResponse> getReservations(Pageable pageable);
 }
