@@ -1,11 +1,11 @@
 package com.univalle.bubackend.controllers.odontology;
 
 
-import com.univalle.bubackend.DTOs.odontology.UserResponse;
-import com.univalle.bubackend.DTOs.odontology.VisitLogRequest;
-import com.univalle.bubackend.DTOs.odontology.VisitLogResponse;
+import com.univalle.bubackend.DTOs.odontology.*;
 import com.univalle.bubackend.services.odontology.OdontologyVisitLogImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +27,17 @@ public class OdontologyVisitLogController {
     public ResponseEntity<VisitLogResponse> registerActivity(@RequestBody VisitLogRequest request) {
         VisitLogResponse response = odontologyVisitLog.registerVisit(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<VisitOdontologyResponse> getVisitLog(
+            @PageableDefault(size = 10, page = 0) Pageable pageable,
+            @PathVariable String username) {
+        return new ResponseEntity<>(odontologyVisitLog.visitsOdonotology(username, pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/visit/{id}")
+    public ResponseEntity<VisitResponse> getVisit(@PathVariable Long id) {
+        return new ResponseEntity<>(odontologyVisitLog.getOdontologyVisit(id), HttpStatus.OK);
     }
 }

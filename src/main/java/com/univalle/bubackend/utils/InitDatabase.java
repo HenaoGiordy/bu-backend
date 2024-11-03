@@ -41,6 +41,7 @@ public class InitDatabase {
             Role psicologo = roleRepository.findByName(RoleName.PSICOLOGO).orElseThrow();
             Role estudiante = roleRepository.findByName(RoleName.ESTUDIANTE).orElseThrow();
             Role monitor = roleRepository.findByName(RoleName.MONITOR).orElseThrow();
+            Role odontologo = roleRepository.findByName(RoleName.ODONTOLOGO).orElseThrow();
 
 
             // Crear usuarios asignando los roles gestionados por JPA
@@ -84,6 +85,16 @@ public class InitDatabase {
                     .password(passwordEncoder.encode("psicologo"))
                     .build();
 
+            UserEntity odontologo2 = UserEntity.builder()
+                    .name("odontologo_nombre")
+                    .lastName("odontologo_apellido")
+                    .username("odontologo")
+                    .email("henaogiordy@gmail.com")
+                    .plan("odontólogia")
+                    .roles(Set.of(odontologo))  // Usar el role recuperado y gestionado
+                    .password(passwordEncoder.encode("odontologo"))
+                    .build();
+
             UserEntity estudiantelUser = UserEntity.builder()
                     .name("admin")
                     .lastName("Bienestar")
@@ -106,7 +117,7 @@ public class InitDatabase {
 
 
 
-            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser, enfermero2, psicologo2));
+            userEntityRepository.saveAll(List.of(adminUser, profesionalUser, estudiantelUser, monitorUser, enfermero2, psicologo2, odontologo2));
         };
     }
 }

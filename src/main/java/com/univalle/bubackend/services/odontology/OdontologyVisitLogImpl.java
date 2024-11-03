@@ -1,14 +1,14 @@
 package com.univalle.bubackend.services.odontology;
 
-import com.univalle.bubackend.DTOs.odontology.UserResponse;
-import com.univalle.bubackend.DTOs.odontology.VisitLogRequest;
-import com.univalle.bubackend.DTOs.odontology.VisitLogResponse;
+import com.univalle.bubackend.DTOs.odontology.*;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.models.VisitOdontologyLog;
 import com.univalle.bubackend.repository.OdontologyVisitRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +19,8 @@ import java.util.Optional;
 @Transactional
 public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
-    private UserEntityRepository userEntityRepository;
-    private OdontologyVisitRepository odontologyVisitRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final OdontologyVisitRepository odontologyVisitRepository;
 
     @Override
     public UserResponse findStudentsByUsername(String username) {
@@ -31,7 +31,6 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
     @Override
     public VisitLogResponse registerVisit(VisitLogRequest request) {
-
         UserEntity user = userEntityRepository.findByUsername(request.username())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
@@ -55,4 +54,35 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
                 visitOdontologyLog.getDescription()
         );
     }
+
+    @Override
+    public VisitOdontologyResponse visitsOdonotology(String username, Pageable pageable) {
+        UserEntity usr = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        UserResponse user = new UserResponse(usr);
+
+        Page<VisitResponse> list = Page.empty();
+
+        list = odontologyVisitRepository.findAllByUserUsername(username, pageable)
+                .map(visit -> new VisitResponse(
+                        visit.date(),
+                        visit.reason(),
+                        visit.description()
+                ));
+
+        return new VisitOdontologyResponse(list, user);
+    }
+
+    @Override
+    public VisitResponse getOdontologyVisit(Long id) {
+        VisitOdontologyLog visit = odontologyVisitRepository.findById(id);
+        UserResponse user = new UserResponse(visit.getUser());
+        return new VisitResponse(
+                visit.getDate(),
+                visit.getReason(),
+                visit.getDescription()
+        );
+    }
+
 }
