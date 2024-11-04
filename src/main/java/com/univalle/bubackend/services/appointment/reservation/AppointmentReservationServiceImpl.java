@@ -67,7 +67,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
 
 
-        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findByEstudiante_IdAndPendingAppointmentTrue(userEntity.getId());
+        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(userEntity.getId(), availableDates.getTypeAppointment());
 
         if(appointmentReservationOpt.isPresent()) {
             AppointmentReservation appointmentReservation = appointmentReservationOpt.get();

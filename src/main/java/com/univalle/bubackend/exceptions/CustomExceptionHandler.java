@@ -280,9 +280,9 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(HaveAnAppoinmentPending.class)
-    public ResponseEntity<String> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+    public ResponseEntity<ExceptionDTO> handleHttpMediaTypeNotAcceptableException(HaveAnAppoinmentPending e) {
         String errorMessage = e.getMessage();
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new ExceptionDTO(errorMessage) );
     }
 
     @ExceptionHandler(CantReserveMoreAppointments.class)
