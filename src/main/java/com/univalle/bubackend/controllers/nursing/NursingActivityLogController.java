@@ -36,7 +36,7 @@ public class NursingActivityLogController {
     }
 
     @GetMapping("/activity/{id}")
-    public ResponseEntity<ActivityNursingResponse> getActivity(@PathVariable Long id) {
+    public ResponseEntity<ActivityNursingResponse> getActivity(@PathVariable Integer id) {
         return new ResponseEntity<>(nursingActivityLog.getActivityNursing(id), HttpStatus.OK);
     }
 
