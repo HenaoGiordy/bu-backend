@@ -10,7 +10,6 @@ import java.time.LocalTime;
 public record ListReservationResponse(
         Integer id,
         LocalDateTime dateTime,
-        String username,
         String namePycho,
         boolean assistant
 ) {
