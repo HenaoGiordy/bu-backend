@@ -32,14 +32,16 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
             "JOIN AppointmentReservation ar ON ar.estudiante = u " +
             "JOIN ar.availableDates ad " +
             "WHERE u.username = :username " +
-            "AND ad.professional.username = :usernameProfesional AND ar.availableDates.dateTime BETWEEN :startDate AND :endDate")
+            "AND ad.typeAppointment = :typeAppointment " +
+            "AND ar.availableDates.dateTime BETWEEN :startDate AND :endDate")
     Optional<UserEntity> findByUsernameWithPsychoReservation(
             @Param("username") String username,
-            @Param("usernameProfesional") String usernameProfesional,
+            @Param("typeAppointment") TypeAppointment typeAppointment,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
-            );
+    );
 
-    @Query("SELECT a FROM AppointmentReservation  a")
-    Page<AppointmentReservation> getAllAppointmentReservation(Pageable pageable);
+
+    @Query("SELECT a FROM AppointmentReservation a Where a.estudiante.username = :username")
+    Page<AppointmentReservation> getAllAppointmentReservationByUsername(Pageable pageable, String username);
 }

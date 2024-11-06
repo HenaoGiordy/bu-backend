@@ -1,7 +1,6 @@
 package com.univalle.bubackend.services.appointment.reservation;
 
 import com.univalle.bubackend.DTOs.appointment.*;
-import com.univalle.bubackend.DTOs.user.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,7 +18,7 @@ public interface IAppointmentReservationService {
 
     ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp);
 
-    UserResponse findReservationsByUsername(RequestUser requestUser);
+    UserResponseAppointment findReservationsByUsername(String username, Pageable pageable);
 
-    Page<ListReservationResponse> getReservations(Pageable pageable);
+    Page<ListReservationResponse> getReservations(Pageable pageable, String username);
 }

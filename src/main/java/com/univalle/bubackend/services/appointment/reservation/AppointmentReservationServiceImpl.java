@@ -207,39 +207,41 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     }
 
     @Override
-    public UserResponse findReservationsByUsername(RequestUser requestUser) {
+    public UserResponseAppointment findReservationsByUsername(String username, Pageable pageable) {
 
-        UserEntity userTest = userEntityRepository.findByUsername(requestUser.username()).orElseThrow(() ->
+        UserEntity userTest = userEntityRepository.findByUsername(username).orElseThrow(() ->
                 new ReservationNotFoud("No se encontró un usuario con ese codigo"));
 
         Optional<UserEntity> optionalUser;
             if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
                 LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 6, 1, 0, 0); // 1 de junio
                 LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59);//31 de Diciembre
-                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(requestUser.username(), requestUser.usernameProfesional(), startDate, endDate);
+                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(username, TypeAppointment.PSICOLOGIA, startDate, endDate);
 
             }else{
                 LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0); // 1 de enero
                 LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 5, 31, 23, 59); // 30 de junio
-                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(requestUser.username(), requestUser.usernameProfesional(), startDate, endDate);
+                optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(username, TypeAppointment.PSICOLOGIA, startDate, endDate);
             }
 
+        Page<ListReservationResponse> listReservationResponses = getReservations(pageable, username);
+
+
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("E usuario no ha realizado una reserva"));
-        return new UserResponse(user);
+        return new UserResponseAppointment(user, listReservationResponses);
 
     }
 
     @Override
-    public Page<ListReservationResponse> getReservations(Pageable pageable) {
+    public Page<ListReservationResponse> getReservations(Pageable pageable, String username) {
 
 
         Page<ListReservationResponse> responses = Page.empty();
 
-        responses = appointmentReservationRepository.findAll(pageable)
+        responses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getAvailableDates().getDateTime(),
-                        reservation.getEstudiante().getUsername(),
                         reservation.getAvailableDates().getProfessional().getName() + reservation.getAvailableDates().getProfessional().getLastName(),
                         reservation.getAssistant()
                 ));
