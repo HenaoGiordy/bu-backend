@@ -44,39 +44,43 @@ public class SettingServiceImpl implements ISettingService {
     }
 
     private void exception(SettingRequest settingRequest) {
-        if (settingRequest.endBeneficiaryLunch().isBefore(settingRequest.starBeneficiaryLunch())) {
-            throw new InvalidTimeException("La hora de fin de almuerzos para beneficiarios debe ser posterior a la hora de inicio de almuerzo");
-        }
 
-        if (settingRequest.endLunch().isBefore(settingRequest.starLunch())) {
+        // ALMUERZOS
+        if (settingRequest.endBeneficiaryLunch().isBefore(settingRequest.starBeneficiaryLunch()) ||
+                settingRequest.endLunch().isBefore(settingRequest.starLunch())) {
             throw new InvalidTimeException("La hora de fin de almuerzo debe ser posterior a la hora de inicio de almuerzo");
         }
 
+        if (settingRequest.starLunch().isBefore(settingRequest.starBeneficiaryLunch())) {
+            throw new InvalidTimeException("La hora de inicio de almuerzo debe ser posterior a la hora de inicio para beneficiarios");
+        }
+
+        if (settingRequest.endLunch().isBefore(settingRequest.endBeneficiaryLunch())) {
+            throw new InvalidTimeException("La hora de fin de almuerzo debe ser posterior a la hora de fin para beneficiarios");
+        }
+
+        // REFRIGERIOS
+
+        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.starBeneficiarySnack()) ||
+                settingRequest.endSnack().isBefore(settingRequest.starSnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterior a la hora de inicio de refrigerio");
+        }
+
+        if (settingRequest.starSnack().isBefore(settingRequest.starBeneficiarySnack())) {
+            throw new InvalidTimeException("La hora de inicio de refrigerio debe ser posterior a la hora de inicio para beneficiarios");
+        }
+
+        if (settingRequest.endSnack().isBefore(settingRequest.endBeneficiarySnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterior a la hora de fin para beneficiarios");
+        }
+
+        // REFRIGERIO CON ALMUERZO
+
         if (settingRequest.starBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
                 settingRequest.starBeneficiarySnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de inicio de la refrigerio para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
-        }
-        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.endBeneficiarySnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de fin de la refrigerio para beneficiarios debe ser posterior a la hora de fin de almuerzo.");
+            throw new InvalidTimeException("La hora de inicio de refrigerio debe ser posterior a la hora de fin de almuerzo.");
         }
 
-        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.starBeneficiarySnack())) {
-            throw new InvalidTimeException("La hora de fin de refrigerio para beneficiarios debe ser posterior a la hora de inicio de refrigerio");
-        }
-
-        if (settingRequest.starSnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.starSnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de inicio de la refrigerio debe ser posterior a la hora de fin de almuerzo.");
-        }
-        if (settingRequest.endSnack().isBefore(settingRequest.endLunch()) ||
-                settingRequest.endSnack().equals(settingRequest.endLunch())) {
-            throw new InvalidTimeException("La hora de fin de la refrigerio debe ser posterior a la hora de fin de almuerzo.");
-        }
-
-        if (settingRequest.endSnack().isBefore(settingRequest.starSnack())) {
-            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterios a la hora de inicio");
-        }
     }
 
     @Override
