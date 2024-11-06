@@ -45,7 +45,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
         NursingActivityLog nursingActivityLog = NursingActivityLog.builder()
                 .user(user)
-                .date(request.date())
+                .date(request.date().atStartOfDay())
                 .diagnostic(request.diagnostic())
                 .conduct(request.conduct())
                 .build();
