@@ -11,6 +11,6 @@ public interface INursingActivityLog {
     UserResponse findStudentsByUsername(String username);
     ActivityLogResponse registerActivity(ActivityLogRequest request);
     List<ActivityNursingResponse> activitiesNursing(String username);
-    ActivityNursingResponse getActivityNursing(Long id);
+    ActivityNursingResponse getActivityNursing(Integer id);
 
 }

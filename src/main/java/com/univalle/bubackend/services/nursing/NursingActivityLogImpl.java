@@ -72,7 +72,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         UserEntity user = userEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        List<NursingActivityLog> activities = nursingActivityLogRepository.findAllByUserUsername(username);
+        List<NursingActivityLog> activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
 
         return activities.stream()
                 .map(activity -> new ActivityNursingResponse(
@@ -87,7 +87,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
     }
 
     @Override
-    public ActivityNursingResponse getActivityNursing(Long id) {
+    public ActivityNursingResponse getActivityNursing(Integer id) {
         NursingActivityLog activity = nursingActivityLogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermeria no encontrada"));
         return new ActivityNursingResponse(activity);
