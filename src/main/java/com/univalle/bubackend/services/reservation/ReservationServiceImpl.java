@@ -147,11 +147,11 @@ public class ReservationServiceImpl implements IReservationService {
 
         Set<String> roles = Set.of("EXTERNO");
 
-        Optional<UserEntity> user = userEntityRepository.findByUsernameWithRole(reservationRequest.userName(), RoleName.EXTERNO);
+        Optional<UserEntity> user = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.EXTERNO);
 
         if (user.isEmpty()) {
             UserRequest userRequest = new UserRequest(
-                    reservationRequest.userName(),
+                    reservationRequest.username(),
                     reservationRequest.name(),
                     reservationRequest.lastname(),
                     reservationRequest.email(),
@@ -164,7 +164,7 @@ public class ReservationServiceImpl implements IReservationService {
             userService.createUser(userRequest);
         }
 
-        UserEntity userEntity = userEntityRepository.findByUsernameWithRole(reservationRequest.userName(), RoleName.EXTERNO)
+        UserEntity userEntity = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.EXTERNO)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         ReservationUserResponse reservationUserResponse = createReservation(userEntity, reservationRequest.lunch(), reservationRequest.snack());
