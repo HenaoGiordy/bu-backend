@@ -24,9 +24,21 @@ public class ReservationController {
     private final IReservationService reservationService;
 
     @PostMapping("/create")
-    public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody ReservationRequest request) {
-        ReservationResponse response = reservationService.createReservation(request);
+    public ResponseEntity<ReservationResponse> createStudentReservation(@Valid @RequestBody ReservationStudentRequest request) {
+        ReservationResponse response = reservationService.createStudentReservation(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create-extern")
+    public ResponseEntity<ReservationResponse> createExternReservation(@Valid @RequestBody ReservationExternRequest request) {
+        ReservationResponse response = reservationService.createExternReservation(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/extern/{username}")
+    public ResponseEntity<ExternResponse> findExternUsername(@PathVariable String username) {
+        ExternResponse responses = reservationService.getExtern(username);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/per-day/{username}")
