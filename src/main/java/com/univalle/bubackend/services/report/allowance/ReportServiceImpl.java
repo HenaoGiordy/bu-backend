@@ -3,8 +3,9 @@ package com.univalle.bubackend.services.report.allowance;
 import com.univalle.bubackend.DTOs.report.ReportRequest;
 import com.univalle.bubackend.DTOs.report.ReportResponse;
 import com.univalle.bubackend.DTOs.report.UserDTO;
+import com.univalle.bubackend.exceptions.report.ReportAlreadyExistsException;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
-import com.univalle.bubackend.exceptions.report.SettingNotFound;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.exceptions.report.BecaInvalid;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Report;
@@ -46,6 +47,22 @@ public class ReportServiceImpl {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+        // Verificar si ya existe un reporte diario del mismo tipo para hoy
+        if (reportRequest.semester() == null) {
+            boolean dailyReportExists = reportRepository.findAllByDate(today).stream()
+                    .anyMatch(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()) && r.getSemester() == null);
+            if (dailyReportExists) {
+                throw new ReportAlreadyExistsException("Ya existe un informe de " + reportRequest.beca() + " para la fecha de hoy");
+            }
+        } else {
+            // Verificar si ya existe un reporte semestral del mismo tipo para el semestre especificado
+            boolean semesterReportExists = reportRepository.findBySemester(reportRequest.semester()).stream()
+                    .anyMatch(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()));
+            if (semesterReportExists) {
+                throw new ReportAlreadyExistsException("Ya existe el informe semestral de " + reportRequest.beca());
+            }
+        }
 
         List<UserEntity> filterUsers;
 

@@ -8,7 +8,7 @@ import lombok.Builder;
 public record CreateMenuRequest(Integer id,
                                 @NotBlank String mainDish,
                                 @NotBlank String drink,
-                                @NotBlank String dessert,
+                                String dessert,
                                 @NotNull Integer price,
                                 String note,
                                 String link) {

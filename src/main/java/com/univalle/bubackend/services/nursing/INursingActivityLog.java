@@ -5,6 +5,7 @@ import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
 import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface INursingActivityLog {

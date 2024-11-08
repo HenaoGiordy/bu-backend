@@ -2,7 +2,8 @@ package com.univalle.bubackend.services.setting;
 
 import com.univalle.bubackend.DTOs.setting.SettingRequest;
 import com.univalle.bubackend.DTOs.setting.SettingResponse;
-import com.univalle.bubackend.exceptions.report.SettingNotFound;
+import com.univalle.bubackend.exceptions.setting.InvalidTimeException;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.repository.SettingRepository;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ public class SettingServiceImpl implements ISettingService {
 
     @Override
     public SettingResponse createSetting(SettingRequest settingRequest) {
+
+        exception(settingRequest);
+
         Setting setting = Setting.builder()
                 .startSemester(settingRequest.startSemester())
                 .endBeneficiaryLunch(settingRequest.endBeneficiaryLunch())
@@ -37,6 +41,46 @@ public class SettingServiceImpl implements ISettingService {
 
         settingRepository.save(setting);
         return new SettingResponse(setting.getId(), "Ajustes creados exitosamente", settingRequest);
+    }
+
+    private void exception(SettingRequest settingRequest) {
+
+        // ALMUERZOS
+        if (settingRequest.endBeneficiaryLunch().isBefore(settingRequest.starBeneficiaryLunch()) ||
+                settingRequest.endLunch().isBefore(settingRequest.starLunch())) {
+            throw new InvalidTimeException("La hora de fin de almuerzo debe ser posterior a la hora de inicio de almuerzo");
+        }
+
+        if (settingRequest.starLunch().isBefore(settingRequest.starBeneficiaryLunch())) {
+            throw new InvalidTimeException("La hora de inicio de almuerzo debe ser posterior a la hora de inicio para beneficiarios");
+        }
+
+        if (settingRequest.endLunch().isBefore(settingRequest.endBeneficiaryLunch())) {
+            throw new InvalidTimeException("La hora de fin de almuerzo debe ser posterior a la hora de fin para beneficiarios");
+        }
+
+        // REFRIGERIOS
+
+        if (settingRequest.endBeneficiarySnack().isBefore(settingRequest.starBeneficiarySnack()) ||
+                settingRequest.endSnack().isBefore(settingRequest.starSnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterior a la hora de inicio de refrigerio");
+        }
+
+        if (settingRequest.starSnack().isBefore(settingRequest.starBeneficiarySnack())) {
+            throw new InvalidTimeException("La hora de inicio de refrigerio debe ser posterior a la hora de inicio para beneficiarios");
+        }
+
+        if (settingRequest.endSnack().isBefore(settingRequest.endBeneficiarySnack())) {
+            throw new InvalidTimeException("La hora de fin de refrigerio debe ser posterior a la hora de fin para beneficiarios");
+        }
+
+        // REFRIGERIO CON ALMUERZO
+
+        if (settingRequest.starBeneficiarySnack().isBefore(settingRequest.endLunch()) ||
+                settingRequest.starBeneficiarySnack().equals(settingRequest.endLunch())) {
+            throw new InvalidTimeException("La hora de inicio de refrigerio debe ser posterior a la hora de fin de almuerzo.");
+        }
+
     }
 
     @Override
@@ -72,7 +116,9 @@ public class SettingServiceImpl implements ISettingService {
         Setting setting = settingRepository.findTopByOrderByIdAsc()
                 .orElseThrow(() -> new SettingNotFound("Ajuste no encontrado"));
 
-            setting.setStartSemester(settingRequest.startSemester());
+        exception(settingRequest);
+
+        setting.setStartSemester(settingRequest.startSemester());
             setting.setEndSemester(settingRequest.endSemester());
             setting.setNumLunch(settingRequest.numLunch());
             setting.setNumSnack(settingRequest.numSnack());

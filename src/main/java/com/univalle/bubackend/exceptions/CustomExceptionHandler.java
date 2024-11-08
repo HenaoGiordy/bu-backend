@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.univalle.bubackend.exceptions.appointment.*;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.exceptions.nursing.FieldException;
 import com.univalle.bubackend.exceptions.report.*;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
 import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
@@ -11,6 +12,8 @@ import com.univalle.bubackend.exceptions.resetpassword.AlreadyLinkHasBeenCreated
 import com.univalle.bubackend.exceptions.resetpassword.PasswordDoesNotMatch;
 import com.univalle.bubackend.exceptions.resetpassword.TokenExpired;
 import com.univalle.bubackend.exceptions.resetpassword.TokenNotFound;
+import com.univalle.bubackend.exceptions.setting.InvalidTimeException;
+import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.users.RoleNotFound;
 import com.univalle.bubackend.exceptions.users.UserNameAlreadyExist;
@@ -221,6 +224,12 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage) );
     }
 
+    @ExceptionHandler(InvalidTimeException.class)
+    public ResponseEntity<ExceptionDTO> handleInvalidTimeException(InvalidTimeException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage));
+    }
+
     @ExceptionHandler(InvalidFilter.class)
     public ResponseEntity<ExceptionDTO> handleInvalidFilter(InvalidFilter ex) {
         String errorMessage = ex.getMessage();
@@ -272,9 +281,9 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(HaveAnAppoinmentPending.class)
-    public ResponseEntity<String> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+    public ResponseEntity<ExceptionDTO> handleHttpMediaTypeNotAcceptableException(HaveAnAppoinmentPending e) {
         String errorMessage = e.getMessage();
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(errorMessage);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new ExceptionDTO(errorMessage) );
     }
 
     @ExceptionHandler(CantReserveMoreAppointments.class)
@@ -282,4 +291,17 @@ public class CustomExceptionHandler {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
+
+    @ExceptionHandler(ReportAlreadyExistsException.class)
+    public ResponseEntity<ExceptionDTO> handleReportAlreadyExistsException(ReportAlreadyExistsException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage));
+    }
+
+    @ExceptionHandler(FieldException.class)
+    public ResponseEntity<ExceptionDTO> handleFieldException(FieldException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage));
+    }
+
 }

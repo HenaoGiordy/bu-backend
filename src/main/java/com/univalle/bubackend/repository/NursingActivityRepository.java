@@ -10,8 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface NursingActivityRepository extends JpaRepository<NursingActivityLog, Integer> {
-    List<NursingActivityLog> findAllByUserUsername(String username);
-    Optional<NursingActivityLog> findById(Long id);
+    List<NursingActivityLog> findAllByUserUsernameOrderByIdDesc(String username);
+    Optional<NursingActivityLog> findById(Integer id);
     List<NursingActivityLog> findAllByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<NursingActivityLog> findAllByDateBetweenOrderByIdDesc(LocalDateTime startDate, LocalDateTime endDate);
+    List<NursingActivityLog> findAllByUserUsernameAndDateBetweenOrderByIdDesc(String username, LocalDateTime startDate, LocalDateTime endDate);
 
 }

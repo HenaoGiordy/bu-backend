@@ -292,6 +292,10 @@ public class UserServiceImpl {
             throw new PasswordError("La contraseña actual es incorrecta");
         }
 
+        if (passwordEncoder.matches(passwordRequest.newPassword(), user.getPassword())) {
+            throw new PasswordError("La nueva contraseña no puede ser igual a la contraseña actual");
+        }
+
         if (!passwordRequest.newPassword().equals(passwordRequest.confirmPassword())) {
             throw new PasswordDoesNotMatch("Las contraseñas no coinciden");
         }

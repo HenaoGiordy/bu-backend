@@ -19,7 +19,7 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
     Optional<List<AppointmentReservation>> findByAvailableDates_ProfessionalId(Integer id);
     Optional<List<AppointmentReservation>> findByEstudiante_Id(Integer id);
 
-    Optional<AppointmentReservation> findByEstudiante_IdAndPendingAppointmentTrue(Integer id);
+    Optional<AppointmentReservation> findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(Integer id, TypeAppointment type);
 
     @Query("SELECT COUNT(a) FROM AppointmentReservation a " +
             "WHERE a.estudiante = :id AND " +
