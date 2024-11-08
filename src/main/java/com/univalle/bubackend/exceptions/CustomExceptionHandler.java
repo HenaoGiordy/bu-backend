@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.univalle.bubackend.exceptions.appointment.*;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.exceptions.nursing.FieldException;
 import com.univalle.bubackend.exceptions.report.*;
 import com.univalle.bubackend.exceptions.reservation.NoSlotsAvailableException;
 import com.univalle.bubackend.exceptions.reservation.UnauthorizedException;
@@ -295,6 +296,12 @@ public class CustomExceptionHandler {
     public ResponseEntity<ExceptionDTO> handleReportAlreadyExistsException(ReportAlreadyExistsException ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage));
+    }
+
+    @ExceptionHandler(FieldException.class)
+    public ResponseEntity<ExceptionDTO> handleFieldException(FieldException ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDTO(errorMessage));
     }
 
 }

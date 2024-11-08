@@ -5,6 +5,8 @@ import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
 import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.nursing.FieldException;
+import com.univalle.bubackend.exceptions.report.CSVFieldException;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.NursingActivityRepository;
@@ -12,7 +14,10 @@ import com.univalle.bubackend.repository.UserEntityRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.ErrorResponseException;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,23 +73,41 @@ public class NursingActivityLogImpl implements INursingActivityLog {
     }
 
     @Override
-    public List<ActivityNursingResponse> activitiesNursing(String username) {
-        UserEntity user = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+    public List<ActivityNursingResponse> activitiesNursing(String username, LocalDate startDate, LocalDate endDate) {
 
-        List<NursingActivityLog> activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
+        if (username == null && (startDate == null || endDate == null)) {
+            throw new FieldException("Debe suministrar el nombre de usuario o el rango de fechas para realizar la búsqueda");
+        }
+
+        List<NursingActivityLog> activities;
+
+        // Si ambos están presentes, filtrar por username y fecha
+        if (username != null && startDate != null && endDate != null) {
+            activities = nursingActivityLogRepository.findAllByUserUsernameAndDateBetweenOrderByIdDesc(
+                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+
+            // Solo por username
+        } else if (username != null) {
+            activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
+
+            // Solo por rango de fechas
+        } else {
+            activities = nursingActivityLogRepository.findAllByDateBetweenOrderByIdDesc(
+                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        }
 
         return activities.stream()
                 .map(activity -> new ActivityNursingResponse(
                         activity.getId(),
                         activity.getDate().toLocalDate(),
                         activity.getDate().toLocalTime(),
-                        new UserResponse(user),
+                        new UserResponse(activity.getUser()),
                         activity.getDiagnostic(),
                         activity.getConduct()
                 ))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public ActivityNursingResponse getActivityNursing(Integer id) {
