@@ -6,10 +6,12 @@ import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.services.nursing.NursingActivityLogImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -30,10 +32,16 @@ public class NursingActivityLogController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<List<ActivityNursingResponse>> getActivities(@PathVariable String username) {
-        return new ResponseEntity<>(nursingActivityLog.activitiesNursing(username), HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<List<ActivityNursingResponse>> getActivities(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        List<ActivityNursingResponse> responses = nursingActivityLog.activitiesNursing(username, startDate, endDate);
+        return new ResponseEntity<>(responses, HttpStatus.OK);
     }
+
 
     @GetMapping("/activity/{id}")
     public ResponseEntity<ActivityNursingResponse> getActivity(@PathVariable Integer id) {

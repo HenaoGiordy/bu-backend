@@ -13,5 +13,7 @@ public interface NursingActivityRepository extends JpaRepository<NursingActivity
     List<NursingActivityLog> findAllByUserUsernameOrderByIdDesc(String username);
     Optional<NursingActivityLog> findById(Integer id);
     List<NursingActivityLog> findAllByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<NursingActivityLog> findAllByDateBetweenOrderByIdDesc(LocalDateTime startDate, LocalDateTime endDate);
+    List<NursingActivityLog> findAllByUserUsernameAndDateBetweenOrderByIdDesc(String username, LocalDateTime startDate, LocalDateTime endDate);
 
 }
