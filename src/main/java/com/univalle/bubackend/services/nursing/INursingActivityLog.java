@@ -14,8 +14,8 @@ public interface INursingActivityLog {
 
     ActivityLogResponse registerActivity(ActivityLogRequest request);
 
-    List<ActivityNursingResponse> activitiesNursing(String username);
+    List<ActivityNursingResponse> activitiesNursing(String username, LocalDate startDate, LocalDate endDate);
 
-    ActivityNursingResponse getActivityNursing(Long id);
+    ActivityNursingResponse getActivityNursing(Integer id);
 
 }
