@@ -11,6 +11,7 @@ public record VisitLogResponse(
         LocalTime time,
         String username,
         String name,
+        String lastname,
         String plan,
         OdontologyReason reason,
         String description

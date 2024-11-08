@@ -13,6 +13,7 @@ public record ActivityLogResponse(
         LocalTime time,
         String username,
         String name,
+        String lastname,
         @Positive Long phone,
         String plan,
         String semester,

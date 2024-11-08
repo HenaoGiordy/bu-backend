@@ -8,9 +8,13 @@ import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import java.util.List;
 
 public interface INursingActivityLog {
-    UserResponse findStudentsByUsername(String username);
+
+    UserResponse findUserByUsername(String username);
+
     ActivityLogResponse registerActivity(ActivityLogRequest request);
+
     List<ActivityNursingResponse> activitiesNursing(String username);
+
     ActivityNursingResponse getActivityNursing(Long id);
 
 }

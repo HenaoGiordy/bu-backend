@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 
 public record VisitResponse(
         LocalDateTime date,
+        String name,
+        String username,
+        String plan,
         OdontologyReason reason,
         String description
         ) {
