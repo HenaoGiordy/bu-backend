@@ -23,7 +23,7 @@ public class NursingActivityLogController {
 
     @GetMapping("/search/{username}")
     public ResponseEntity<UserResponse> searchStudentsByCode(@PathVariable String username) {
-        UserResponse response = nursingActivityLog.findStudentsByUsername(username);
+        UserResponse response = nursingActivityLog.findUserByUsername(username);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/register")

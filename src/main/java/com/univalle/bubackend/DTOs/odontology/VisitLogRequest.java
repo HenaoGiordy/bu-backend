@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 public record VisitLogRequest(
         @NotNull LocalDateTime date,
         @NotBlank String username,
+        @NotNull String name,
+        @NotNull String lastname,
+        @NotNull String plan,
         @NotNull OdontologyReason reason,
         @NotBlank String description) {
 }

@@ -9,9 +9,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface INursingActivityLog {
-    UserResponse findStudentsByUsername(String username);
+
+    UserResponse findUserByUsername(String username);
+
     ActivityLogResponse registerActivity(ActivityLogRequest request);
-    List<ActivityNursingResponse> activitiesNursing(String username, LocalDate startDate, LocalDate endDate);
-    ActivityNursingResponse getActivityNursing(Integer id);
+
+    List<ActivityNursingResponse> activitiesNursing(String username);
+
+    ActivityNursingResponse getActivityNursing(Long id);
 
 }

@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.nursing.ActivityLogRequest;
 import com.univalle.bubackend.DTOs.nursing.ActivityLogResponse;
 import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
+import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.nursing.FieldException;
 import com.univalle.bubackend.exceptions.report.CSVFieldException;
@@ -11,6 +12,7 @@ import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.NursingActivityRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
+import com.univalle.bubackend.services.user.UserServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,11 +30,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class NursingActivityLogImpl implements INursingActivityLog {
 
-    private UserEntityRepository userEntityRepository;
-    private NursingActivityRepository nursingActivityLogRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final NursingActivityRepository nursingActivityLogRepository;
+    private final UserServiceImpl userService;
 
     @Override
-    public UserResponse findStudentsByUsername(String username) {
+    public UserResponse findUserByUsername(String username) {
         Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return new UserResponse(user);
@@ -39,6 +43,24 @@ public class NursingActivityLogImpl implements INursingActivityLog {
 
     @Override
     public ActivityLogResponse registerActivity(ActivityLogRequest request) {
+
+        Optional<UserEntity> userCondition = userEntityRepository.findByUsername(request.username());
+
+        if (userCondition.isEmpty()) {
+            Set<String> roles = Set.of("EXTERNO");
+            UserRequest userRequest = new UserRequest(
+                    request.username(),
+                    request.name(),
+                    request.lastname(),
+                    null,
+                    null,
+                    request.plan(),
+                    roles,
+                    null
+            );
+            userService.createUser(userRequest);
+
+        }
 
         UserEntity user = userEntityRepository.findByUsername(request.username())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
@@ -62,7 +84,8 @@ public class NursingActivityLogImpl implements INursingActivityLog {
                 nursingActivityLog.getDate().toLocalDate(),
                 nursingActivityLog.getDate().toLocalTime(),
                 user.getUsername(),
-                user.getName() + " " + user.getLastName(),
+                user.getName() ,
+                user.getLastName(),
                 user.getPhone(),
                 user.getPlan(),
                 user.getSemester(),
