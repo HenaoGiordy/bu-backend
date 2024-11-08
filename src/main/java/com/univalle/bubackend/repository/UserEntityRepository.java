@@ -1,6 +1,7 @@
 package com.univalle.bubackend.repository;
 
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.models.RoleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,9 @@ import java.util.Optional;
 public interface UserEntityRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findByUsername(String username);
     Optional<UserEntity> findByEmail(String email);
+
+    @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE u.username = :username AND r.name = :role")
+    Optional<UserEntity> findByUsernameWithRole(@Param("username") String username, @Param("role") RoleName role);
 
     @Query("SELECT u FROM UserEntity u JOIN u.reservations r WHERE r.lunch = true AND r.paid = true AND r.data BETWEEN :startOfDay AND :endOfDay")
     List<UserEntity> findUserLunchPaid(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
