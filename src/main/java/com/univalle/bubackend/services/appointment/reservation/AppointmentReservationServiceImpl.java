@@ -227,7 +227,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         Page<ListReservationResponse> listReservationResponses = getReservations(pageable, username);
 
 
-        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("E usuario no ha realizado una reserva"));
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("El usuario no ha tenido citas con el servicio de psicología"));
         return new UserResponseAppointment(user, listReservationResponses);
 
     }
@@ -242,7 +242,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getAvailableDates().getDateTime(),
-                        reservation.getAvailableDates().getProfessional().getName() + reservation.getAvailableDates().getProfessional().getLastName(),
+                        reservation.getAvailableDates().getProfessional().getName() + " " + reservation.getAvailableDates().getProfessional().getLastName(),
                         reservation.getAssistant()
                 ));
 

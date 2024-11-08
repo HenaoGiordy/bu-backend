@@ -16,8 +16,6 @@ public record UserResponseAppointment(
         Long phone,
         String plan,
         Set<Role>roles,
-        boolean lunchBeneficiary,
-        boolean snackBeneficiary,
         boolean isActive,
         Page<ListReservationResponse> listReservation
 
@@ -33,8 +31,6 @@ public record UserResponseAppointment(
                 userEntity.getPhone(),
                 userEntity.getPlan(),
                 userEntity.getRoles(),
-                userEntity.getLunchBeneficiary(),
-                userEntity.getSnackBeneficiary(),
                 userEntity.getIsActive(),
                 listReservation
         );

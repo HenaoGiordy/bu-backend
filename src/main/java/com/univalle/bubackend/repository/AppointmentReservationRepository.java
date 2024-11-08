@@ -21,12 +21,17 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
 
     Optional<AppointmentReservation> findByEstudiante_IdAndPendingAppointmentTrue(Integer id);
 
-    @Query("SELECT COUNT(a) FROM AppointmentReservation a WHERE a.estudiante = :id AND a.availableDates.typeAppointment = :typeAppointmern AND a.availableDates.dateTime BETWEEN :startDate AND :endDate")
+    @Query("SELECT COUNT(a) FROM AppointmentReservation a " +
+            "WHERE a.estudiante = :id AND " +
+            "a.availableDates.typeAppointment = :typeAppointment AND " +
+            "a.assistant = false AND " +
+            "a.availableDates.dateTime BETWEEN :startDate AND :endDate")
     Integer countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(
             @Param("id") UserEntity id,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate,
-            @Param("typeAppointmern") TypeAppointment typeAppointmern);
+            @Param("typeAppointment") TypeAppointment typeAppointment);
+
 
     @Query("SELECT u FROM UserEntity u " +
             "JOIN AppointmentReservation ar ON ar.estudiante = u " +
