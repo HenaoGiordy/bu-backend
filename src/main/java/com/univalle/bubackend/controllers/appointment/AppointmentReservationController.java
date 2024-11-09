@@ -12,12 +12,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
@@ -82,13 +86,27 @@ public class AppointmentReservationController {
     }
 
     @GetMapping("/professional/pending/{id}")
-    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentByIdPending( @PathVariable Integer id) {
-        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalPending(id), HttpStatus.OK);
+    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentByIdPending( @PathVariable Integer id,
+                                                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                                                 @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalPending(id, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/professional/attended/{id}")
-    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentAttended( @PathVariable Integer id) {
-        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalAttended(id), HttpStatus.OK);
+    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentAttended( @PathVariable Integer id,
+                                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                                              @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalAttended(id, pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/professional/attended/search/{id}")
+    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentAttendedSearch(@PathVariable Integer id, @RequestParam("fecha") String fecha,
+                                                                                                   @RequestParam(defaultValue = "0") int page,
+                                                                                                   @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalAttendedByDate(id, fecha, pageable), HttpStatus.OK);
     }
 
     @Operation(

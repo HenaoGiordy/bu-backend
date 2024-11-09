@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,9 +18,18 @@ import java.util.Optional;
 @Repository
 public interface AppointmentReservationRepository extends JpaRepository<AppointmentReservation, Integer> {
     Optional<List<AppointmentReservation>> findByAvailableDates_ProfessionalId(Integer id);
-    Optional<List<AppointmentReservation>> findByAvailableDates_Professional_IdAndPendingAppointmentTrue(Integer id);
+    Page<AppointmentReservation> findByAvailableDates_Professional_IdAndPendingAppointmentTrue(Integer id, Pageable pageable);
 
-    Optional<List<AppointmentReservation>> findByAvailableDates_Professional_IdAndPendingAppointmentFalse(Integer id);
+    Page<AppointmentReservation> findByAvailableDates_Professional_IdAndPendingAppointmentFalse(Integer id, Pageable pageable);
+
+    @Query("SELECT a FROM AppointmentReservation a " +
+            "WHERE a.pendingAppointment = false " +
+            "AND FUNCTION('DATE', a.availableDates.dateTime) = :specificDate " +
+            "AND a.availableDates.professional.id = :professionalId")
+    Page<AppointmentReservation> findAttendedAppointmentsBySpecificDate(
+            @Param("specificDate") LocalDate specificDate,
+            @Param("professionalId") Integer professionalId,
+            Pageable pageable);
 
     Optional<List<AppointmentReservation>> findByEstudiante_Id(Integer id);
 

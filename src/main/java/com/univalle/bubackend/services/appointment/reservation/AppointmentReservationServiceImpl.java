@@ -25,6 +25,8 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -119,39 +121,89 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         return new ResponseAppointmentReservation("Cita reservada con éxito", new AvailableDateDTO(availableDates), new UserResponse(userEntity));
     }
 
+    @Override
+    public ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId) {
+        return null;
+    }
+
     private Instant convertToInstant(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
         return localDateTime.atZone(zoneId).toInstant();
     }
 
     @Override
-    public ResponseAppointmentReservationProfessional allAppointmentProfessional(Integer professionalId) {
-        Optional<List<AppointmentReservation>> appointmentReservationsOpt = appointmentReservationRepository.findByAvailableDates_ProfessionalId(professionalId);
-        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
-                .stream()
-                .map(AppointmentReservationProfessionalDTO::new).toList();
+    public ResponseAppointmentReservationProfessional allAppointmentProfessionalPending(Integer professionalId, Pageable pageable) {
+        Page<AppointmentReservation> appointmentReservationsPage =
+                appointmentReservationRepository.findByAvailableDates_Professional_IdAndPendingAppointmentTrue(professionalId, pageable);
 
-        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
+
+
+        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsPage
+                .getContent()
+                .stream()
+                .map(AppointmentReservationProfessionalDTO::new)
+                .toList();
+
+        return new ResponseAppointmentReservationProfessional(
+                appointmentReservationDTOS,
+                appointmentReservationsPage.getTotalElements(),
+                appointmentReservationsPage.getTotalPages()
+        );
     }
 
     @Override
-    public ResponseAppointmentReservationProfessional allAppointmentProfessionalPending(Integer professionalId) {
-        Optional<List<AppointmentReservation>> appointmentReservationsOpt = appointmentReservationRepository.findByAvailableDates_Professional_IdAndPendingAppointmentTrue(professionalId);
-        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
-                .stream()
-                .map(AppointmentReservationProfessionalDTO::new).toList();
+    public ResponseAppointmentReservationProfessional allAppointmentProfessionalAttended(Integer professionalId, Pageable pageable) {
+        Page<AppointmentReservation> appointmentReservationsPage =
+                appointmentReservationRepository.findByAvailableDates_Professional_IdAndPendingAppointmentFalse(professionalId, pageable);
 
-        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
+
+
+        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsPage
+                .getContent()
+                .stream()
+                .map(AppointmentReservationProfessionalDTO::new)
+                .toList();
+
+        return new ResponseAppointmentReservationProfessional(
+                appointmentReservationDTOS,
+                appointmentReservationsPage.getTotalElements(),
+                appointmentReservationsPage.getTotalPages()
+        );
     }
 
     @Override
-    public ResponseAppointmentReservationProfessional allAppointmentProfessionalAttended(Integer professionalId) {
-        Optional<List<AppointmentReservation>> appointmentReservationsOpt = appointmentReservationRepository.findByAvailableDates_Professional_IdAndPendingAppointmentFalse(professionalId);
-        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsOpt.orElseThrow(()-> new UserNotFound("Usuario no encontrado"))
+    public ResponseAppointmentReservationProfessional allAppointmentProfessionalAttendedByDate(Integer professionalId, String specificDate, Pageable pageable) {
+        // Define el formato esperado
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate date;
+        try {
+            // Convierte el String a LocalDate
+            date = LocalDate.parse(specificDate, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("La fecha proporcionada no tiene el formato correcto: dd/MM/yyyy");
+        }
+
+        Page<AppointmentReservation> appointmentReservationsPage =
+                appointmentReservationRepository.findAttendedAppointmentsBySpecificDate(date, professionalId, pageable);
+
+        if (appointmentReservationsPage.isEmpty()) {
+            throw new UserNotFound("No se encontraron citas atendidas para la fecha especificada.");
+        }
+
+        List<AppointmentReservationProfessionalDTO> appointmentReservationDTOS = appointmentReservationsPage
+                .getContent()
                 .stream()
-                .map(AppointmentReservationProfessionalDTO::new).toList();
-        return new ResponseAppointmentReservationProfessional(appointmentReservationDTOS);
+                .map(AppointmentReservationProfessionalDTO::new)
+                .toList();
+
+        return new ResponseAppointmentReservationProfessional(
+                appointmentReservationDTOS,
+                appointmentReservationsPage.getTotalElements(),
+                appointmentReservationsPage.getTotalPages()
+        );
     }
+
 
     @Override
     public ResponseAppointmentReservationStudent allAppointmentEstudiante(Integer estudianteId) {
