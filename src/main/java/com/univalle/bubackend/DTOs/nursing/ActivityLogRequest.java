@@ -14,7 +14,7 @@ public record ActivityLogRequest(
         @NotNull String name,
         @NotNull String lastname,
         @NotNull String plan,
-        @NotNull @Positive Integer phone,
+        @NotNull @Positive Long phone,
         @NotBlank String semester,
         @NotNull Gender gender,
         @NotNull Diagnostic diagnostic,
