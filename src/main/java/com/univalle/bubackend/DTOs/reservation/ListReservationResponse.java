@@ -15,6 +15,6 @@ public record ListReservationResponse(
         Boolean lunch,
         String username,
         String name,
-        String lastname
+        String lastName
 ) {
 }
