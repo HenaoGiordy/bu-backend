@@ -184,7 +184,7 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public ExternResponse getExtern(String username) {
-        UserEntity user = userEntityRepository.findByUsernameWithRole(username, RoleName.EXTERNO)
+        UserEntity user = userEntityRepository.findByUsernameNoStudent(username, RoleName.ESTUDIANTE)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         return new ExternResponse(
