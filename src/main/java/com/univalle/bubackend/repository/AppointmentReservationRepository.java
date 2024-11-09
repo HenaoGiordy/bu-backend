@@ -17,6 +17,8 @@ import java.util.Optional;
 @Repository
 public interface AppointmentReservationRepository extends JpaRepository<AppointmentReservation, Integer> {
     Optional<List<AppointmentReservation>> findByAvailableDates_ProfessionalId(Integer id);
+    Optional<List<AppointmentReservation>> findByAvailableDates_Professional_IdAndPendingAppointmentTrue(Integer id);
+
     Optional<List<AppointmentReservation>> findByEstudiante_Id(Integer id);
 
     Optional<AppointmentReservation> findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(Integer id, TypeAppointment type);

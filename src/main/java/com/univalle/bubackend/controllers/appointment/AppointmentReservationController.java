@@ -81,6 +81,11 @@ public class AppointmentReservationController {
         return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessional(id), HttpStatus.OK);
     }
 
+    @GetMapping("/professional/pending/{id}")
+    public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentByIdPending( @PathVariable Integer id) {
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalPending(id), HttpStatus.OK);
+    }
+
     @Operation(
             summary = "Obtener la citas del estudiante",
             description = "Permite obtener todas la citas de un estudiante con su Id"
