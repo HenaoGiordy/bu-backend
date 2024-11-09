@@ -106,4 +106,10 @@ public class AppointmentController {
     public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type) {
         return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type), HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete-dates")
+    public ResponseEntity<?> deleteDates(@RequestBody AvailableDatesListDTO availableDatesListDTO) {
+        appointmentService.deleteAllDatesPerDate(availableDatesListDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

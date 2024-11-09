@@ -19,8 +19,11 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -118,5 +121,20 @@ public class AppointmentServiceImpl implements IAppointmentService {
         List<AvailableDateDTO> dateDTOS = datesType.stream().map(AvailableDateDTO::new).toList();
 
         return new ResponseAllDatesType(type.toUpperCase() ,dateDTOS);
+    }
+
+    @Override
+    public void deleteAllDatesPerDate(AvailableDatesListDTO availableDatesListDTO) {
+        String specificDate = availableDatesListDTO.date();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        LocalDate date;
+        try {
+            date = LocalDate.parse(specificDate, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("La fecha proporcionada no tiene el formato correcto: dd/MM/yyyy");
+        }
+        availableDatesRepository.deleteAllBySpecificDate(date);
     }
 }

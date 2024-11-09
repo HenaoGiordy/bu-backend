@@ -2,12 +2,14 @@ package com.univalle.bubackend.repository;
 
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.TypeAppointment;
-import com.univalle.bubackend.models.UserEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +25,9 @@ public interface AvailableDatesRepository extends JpaRepository<AvailableDates, 
             @Param("professionalId") Integer professionalId);
 
     Optional<List<AvailableDates>> findByTypeAppointmentAndAvailableTrue(TypeAppointment typeAppointment);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM AvailableDates ad WHERE FUNCTION('DATE', ad.dateTime) = :specificDate")
+    void deleteAllBySpecificDate(@Param("specificDate")  LocalDate specificDate);
 }

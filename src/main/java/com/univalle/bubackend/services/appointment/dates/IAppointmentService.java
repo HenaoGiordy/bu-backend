@@ -8,4 +8,6 @@ public interface IAppointmentService {
     ResponseDeleteAvailableDate deleteAvailableDate(Integer id);
 
     ResponseAllDatesType getAllAvailableDatesType(String type);
+
+    void deleteAllDatesPerDate(AvailableDatesListDTO availableDatesListDTO);
 }
