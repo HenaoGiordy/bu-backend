@@ -164,7 +164,7 @@ public class ReservationServiceImpl implements IReservationService {
             userService.createUser(userRequest);
         }
 
-        UserEntity userEntity = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.EXTERNO)
+        UserEntity userEntity = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.ESTUDIANTE)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         ReservationUserResponse reservationUserResponse = createReservation(userEntity, reservationRequest.lunch(), reservationRequest.snack());
