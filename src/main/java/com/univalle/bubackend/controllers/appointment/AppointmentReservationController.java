@@ -88,7 +88,7 @@ public class AppointmentReservationController {
 
     @GetMapping("/professional/attended/{id}")
     public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentAttended( @PathVariable Integer id) {
-        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalPending(id), HttpStatus.OK);
+        return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalAttended(id), HttpStatus.OK);
     }
 
     @Operation(
