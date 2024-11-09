@@ -147,7 +147,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         Set<String> roles = Set.of("EXTERNO");
 
-        Optional<UserEntity> user = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.EXTERNO);
+        Optional<UserEntity> user = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE);
 
         if (user.isEmpty()) {
             UserRequest userRequest = new UserRequest(
