@@ -4,10 +4,10 @@ import com.univalle.bubackend.models.OdontologyReason;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record VisitLogRequest(
-        @NotNull LocalDateTime date,
+        @NotNull LocalDate date,
         @NotBlank String username,
         @NotNull String name,
         @NotNull String lastname,

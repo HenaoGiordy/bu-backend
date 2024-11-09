@@ -11,8 +11,8 @@ public record ReservationUserResponse(
         Boolean paid,
         Boolean lunch,
         Boolean snack,
-        String userName,
+        String username,
         String name,
-        String lastname
+        String lastName
 ) {
 }
