@@ -179,6 +179,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         AppointmentReservation appointmentReservation = appointmentReservationOpt.orElseThrow(()-> new ReservationNotFoud("No se encontró la reservasión"));
 
         appointmentReservation.setAssistant(requestAssistance.status());
+        appointmentReservation.setPendingAppointment(false);
         appointmentReservationRepository.save(appointmentReservation);
 
         return new ResponseAssistanceAppointment("Se ha cambiado el estado de la asistencia", requestAssistance.status());
