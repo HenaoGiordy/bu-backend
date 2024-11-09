@@ -8,7 +8,7 @@ import java.util.Set;
 public record UserRequest(
         @NotBlank(message = "Debes proporcionar el usuario") String username,
         @NotBlank(message = "Debes proporcionar el nombre") String name,
-        @NotBlank(message = "Debes proporcionar el apellido") String lastname,
+        @NotBlank(message = "Debes proporcionar el apellido") String lastName,
         @NotBlank(message = "Debes proporcionar el email") @Email(message = "Formato de email incorrecto") String email,
         String password,
         @NotBlank(message = "Debes proporcionar el plan") String plan,

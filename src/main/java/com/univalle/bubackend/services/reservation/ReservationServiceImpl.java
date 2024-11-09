@@ -153,7 +153,7 @@ public class ReservationServiceImpl implements IReservationService {
             UserRequest userRequest = new UserRequest(
                     reservationRequest.username(),
                     reservationRequest.name(),
-                    reservationRequest.lastname(),
+                    reservationRequest.lastName(),
                     reservationRequest.email(),
                     null,
                     reservationRequest.plan(),

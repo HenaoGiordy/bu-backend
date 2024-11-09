@@ -70,11 +70,11 @@ public class UserServiceImpl {
             throw new RoleNotFound("Debe proporcionar al menos un rol para el usuario.");
         }
 
-        String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastname());
+        String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
 
         UserEntity user = UserEntity.builder()
                 .name(userRequest.name())
-                .lastName(userRequest.lastname())
+                .lastName(userRequest.lastName())
                 .email(userRequest.email())
                 .username(userRequest.username())
                 .password(passwordEncoder.encode(generatedPassword))
@@ -229,7 +229,7 @@ public class UserServiceImpl {
             newUser = userOpt.get();
 
             newUser.setName(userRequest.name());
-            newUser.setLastName(userRequest.lastname());
+            newUser.setLastName(userRequest.lastName());
             newUser.setEmail(userRequest.email());
             newUser.setPlan(userRequest.plan());
 
@@ -246,12 +246,12 @@ public class UserServiceImpl {
             }
 
           //  newUser.setRoles(userRequest.roles());
-            String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastname());
+            String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
             newUser.setPassword(passwordEncoder.encode(updatePassword));
             newUser.setIsActive(true);
 
         } else {
-            String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastname());
+            String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
             Set<Role> roles = userRequest.roles().stream().map(role -> roleRepository.findByName(RoleName.valueOf(role.toUpperCase()))
                     .orElseThrow(() -> new RoleNotFound("No se encontro el rol"))).collect(Collectors.toSet());
 
@@ -259,7 +259,7 @@ public class UserServiceImpl {
             newUser = UserEntity.builder()
                     .username(userRequest.username())
                     .name(userRequest.name())
-                    .lastName(userRequest.lastname())
+                    .lastName(userRequest.lastName())
                     .plan(userRequest.plan())
                     .password(passwordEncoder.encode(generatedPassword))
                     .email(userRequest.email())
