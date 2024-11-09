@@ -46,8 +46,8 @@ public class ReservationServiceImpl implements IReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Configuración no encontrada"));
 
 
-        List<Reservation> lunchReservation = reservationRepository.findLunchReservationByUser(user, today);
-        List<Reservation> snackReservation = reservationRepository.findSnackReservationByUser(user, today);
+        List<Reservation> lunchReservation = reservationRepository.findLunchReservationByUser(user.getUsername(), today);
+        List<Reservation> snackReservation = reservationRepository.findSnackReservationByUser(user.getUsername(), today);
 
         // Inicio reserva de almuerzo a beneficiarios
         if (lunch && user.getLunchBeneficiary() && now.isBefore(setting.getStarBeneficiaryLunch())) {
