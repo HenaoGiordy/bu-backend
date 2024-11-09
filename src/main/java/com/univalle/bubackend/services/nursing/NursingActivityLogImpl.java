@@ -7,7 +7,6 @@ import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.nursing.FieldException;
-import com.univalle.bubackend.exceptions.report.CSVFieldException;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.repository.NursingActivityRepository;
@@ -16,7 +15,6 @@ import com.univalle.bubackend.services.user.UserServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.ErrorResponseException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
