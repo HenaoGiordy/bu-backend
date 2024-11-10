@@ -24,7 +24,6 @@ public class VisitOdontologyLog {
     @NotNull
     private LocalDateTime date;
 
-
     private OdontologyReason reason;
 
     private String description;

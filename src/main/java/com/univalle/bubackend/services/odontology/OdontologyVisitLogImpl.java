@@ -3,6 +3,7 @@ package com.univalle.bubackend.services.odontology;
 import com.univalle.bubackend.DTOs.odontology.*;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.nursing.FieldException;
 import com.univalle.bubackend.models.UserEntity;
 import com.univalle.bubackend.models.VisitOdontologyLog;
 import com.univalle.bubackend.repository.OdontologyVisitRepository;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -80,25 +83,49 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
     }
 
     @Override
-    public VisitOdontologyResponse visitsOdonotology(String username, Pageable pageable) {
-        UserEntity usr = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+    public VisitOdontologyResponse visitsOdonotology(String username, LocalDate startDate, LocalDate endDate, Pageable pageable) {
 
-        UserResponse user = new UserResponse(usr);
+        if (username == null && (startDate == null || endDate == null)) {
+            throw new FieldException("Debe suministrar el nombre de usuario o el rango de fechas para realizar la búsqueda");
+        }
 
-        Page<VisitResponse> list;
+        UserResponse user = new UserResponse(null, null, null, null);
+        Page<VisitOdontologyLog> visitResponses;
 
-        list = odontologyVisitRepository.findAllByUserUsername(username, pageable)
+        // Si ambos están presentes, filtrar por username y fecha
+        if (username != null && startDate != null && endDate != null) {
+            UserEntity usr = userEntityRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            user = new UserResponse(usr);
+
+            visitResponses = odontologyVisitRepository.findAllByUserUsernameAndDateBetween(
+                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX), pageable);
+
+            // Solo por username
+        } else if (username != null) {
+            UserEntity usr = userEntityRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            user = new UserResponse(usr);
+            visitResponses = odontologyVisitRepository.findAllByUserUsername(username, pageable);
+
+            // Solo por rango de fechas
+        } else {
+            visitResponses = odontologyVisitRepository.findAllByDateBetween(
+                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX), pageable);
+        }
+
+        UserResponse finalUser = user;
+        visitResponses
                 .map(visit -> new VisitResponse(
-                        visit.date(),
-                        user.name(),
-                        user.username(),
-                        user.plan(),
-                        visit.reason(),
-                        visit.description()
+                        visit.getDate(),
+                        finalUser.name(),
+                        finalUser.username(),
+                        finalUser.plan(),
+                        visit.getReason(),
+                        visit.getDescription()
                 ));
 
-        return new VisitOdontologyResponse(list, user);
+        return new VisitOdontologyResponse(visitResponses, user);
     }
 
     @Override
