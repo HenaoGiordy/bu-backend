@@ -24,7 +24,6 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
     @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE u.username = :username AND r.name <> :student AND r.name <> :monitor")
     Optional<UserEntity> findByUsernameNoStudent(@Param("username") String username, @Param("student") RoleName student, @Param("monitor") RoleName monitor);
 
-
     @Query("SELECT u FROM UserEntity u JOIN u.reservations r WHERE r.lunch = true AND r.paid = true AND r.data BETWEEN :startOfDay AND :endOfDay")
     List<UserEntity> findUserLunchPaid(@Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 
