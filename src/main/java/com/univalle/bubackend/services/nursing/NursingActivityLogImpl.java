@@ -107,9 +107,17 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             activities = nursingActivityLogRepository.findAllByUserUsernameAndDateBetweenOrderByIdDesc(
                     username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
+            if (activities.isEmpty()) {
+                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermeria.");
+            }
+
             // Solo por username
         } else if (username != null) {
             activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
+
+            if (activities.isEmpty()) {
+                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermeria.");
+            }
 
             // Solo por rango de fechas
         } else {
