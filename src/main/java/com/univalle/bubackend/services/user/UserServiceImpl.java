@@ -131,6 +131,9 @@ public class UserServiceImpl {
                         .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
                 .collect(Collectors.toSet());
 
+        user.setUsername(editUserRequest.username());
+        String updatePassword = generatePassword(editUserRequest.name(), editUserRequest.username(), editUserRequest.lastName());
+        user.setPassword(passwordEncoder.encode(updatePassword));
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
