@@ -52,7 +52,33 @@ public class UserServiceImpl {
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
         if (existingUser.isPresent()) {
-            throw new UserNameAlreadyExist("El usuario ya está registrado.");
+            Optional<Role> role = roleRepository.findByName(RoleName.ESTUDIANTE);
+            UserEntity user = existingUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            if(role.isPresent() && user.getRoles().contains(role.get())) {
+
+                Set<Role> roles = userRequest.roles().stream()
+                        .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest))
+                                .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
+                        .collect(Collectors.toSet());
+
+                user.setName(userRequest.name());
+                user.setLastName(userRequest.lastName());
+                user.setEmail(userRequest.email());
+                user.setPlan(userRequest.plan());
+                user.setRoles(roles);
+
+                if(userRequest.beca().equalsIgnoreCase("almuerzo")){
+                    user.setLunchBeneficiary(true);
+                }
+                if(userRequest.beca().equalsIgnoreCase("refrigerio")) {
+                    user.setSnackBeneficiary(true);
+                }
+
+                userEntityRepository.save(user);
+                return new UserResponse(user);
+            } else {
+                throw new UserNameAlreadyExist("El usuario ya está registrado.");
+            }
         }
 
         try{
@@ -155,14 +181,13 @@ public class UserServiceImpl {
                     plan = record.get("area");
                 }
 
-                String nota = null;
+                String nota;
                 if (record.isMapped("Las opciones de beca son: almuerzo/refrigerio")) {
                     nota = record.get("Las opciones de beca son: almuerzo/refrigerio").trim();
                     if (nota.isEmpty()) {
                         nota = null;
                     }
                 }
-
 
                 String beca = record.isMapped("beca") ? record.get("beca") : null;
 
