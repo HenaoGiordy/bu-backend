@@ -105,7 +105,7 @@ public class AppointmentReservationController {
     public ResponseEntity<ResponseAppointmentReservationProfessional> getAppointmentAttendedSearch(@PathVariable Integer id, @RequestParam("fecha") String fecha,
                                                                                                    @RequestParam(defaultValue = "0") int page,
                                                                                                    @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         return new ResponseEntity<>(appointmentReservationService.allAppointmentProfessionalAttendedByDate(id, fecha, pageable), HttpStatus.OK);
     }
 
