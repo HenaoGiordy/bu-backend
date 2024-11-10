@@ -88,10 +88,11 @@ public class ReservationServiceImpl implements IReservationService {
             throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
-        if (!lunchReservation.isEmpty() && now.isBefore(setting.getStarBeneficiaryLunch()) && now.isAfter(setting.getEndLunch())) {
+        if (!lunchReservation.isEmpty() && now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getEndLunch())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
-        if (!snackReservation.isEmpty() && now.isBefore(setting.getStarBeneficiarySnack()) && now.isAfter(setting.getEndSnack())) {
+
+        if (!snackReservation.isEmpty() && now.isAfter(setting.getStarBeneficiarySnack()) && now.isBefore(setting.getEndSnack())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
 
