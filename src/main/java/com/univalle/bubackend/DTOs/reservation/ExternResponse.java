@@ -4,7 +4,7 @@ public record ExternResponse(
         Integer id,
         String username,
         String name,
-        String lastname,
+        String lastName,
         String plan,
         String email
 ) {

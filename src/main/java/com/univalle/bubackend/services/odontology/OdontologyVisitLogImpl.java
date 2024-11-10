@@ -59,7 +59,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
         VisitOdontologyLog visitOdontologyLog = VisitOdontologyLog.builder()
                 .user(user)
-                .date(request.date())
+                .date(request.date().atStartOfDay())
                 .reason(request.reason())
                 .description(request.description())
                 .build();

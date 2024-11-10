@@ -124,7 +124,7 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public ReservationResponse createStudentReservation(ReservationStudentRequest reservationRequest) {
 
-        UserEntity user = userEntityRepository.findByUsernameWithRole(reservationRequest.userName(), RoleName.ESTUDIANTE)
+        UserEntity user = userEntityRepository.findByUsernameWithRole(reservationRequest.username(), RoleName.ESTUDIANTE)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         ReservationUserResponse reservationUserResponse = createReservation(user, reservationRequest.lunch(), reservationRequest.snack());
@@ -136,9 +136,9 @@ public class ReservationServiceImpl implements IReservationService {
                 reservationUserResponse.paid(),
                 reservationUserResponse.lunch(),
                 reservationUserResponse.snack(),
-                reservationUserResponse.userName(),
+                reservationUserResponse.username(),
                 reservationUserResponse.name(),
-                reservationUserResponse.lastname()
+                reservationUserResponse.lastName()
         );
     }
 
@@ -147,7 +147,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         Set<String> roles = Set.of("EXTERNO");
 
-        Optional<UserEntity> user = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE);
+        Optional<UserEntity> user = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE, RoleName.MONITOR);
 
         if (user.isEmpty()) {
             UserRequest userRequest = new UserRequest(
@@ -164,7 +164,7 @@ public class ReservationServiceImpl implements IReservationService {
             userService.createUser(userRequest);
         }
 
-        UserEntity userEntity = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE)
+        UserEntity userEntity = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE, RoleName.MONITOR)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         ReservationUserResponse reservationUserResponse = createReservation(userEntity, reservationRequest.lunch(), reservationRequest.snack());
@@ -176,15 +176,15 @@ public class ReservationServiceImpl implements IReservationService {
                 reservationUserResponse.paid(),
                 reservationUserResponse.lunch(),
                 reservationUserResponse.snack(),
-                reservationUserResponse.userName(),
+                reservationUserResponse.username(),
                 reservationUserResponse.name(),
-                reservationUserResponse.lastname()
+                reservationUserResponse.lastName()
         );
     }
 
     @Override
     public ExternResponse getExtern(String username) {
-        UserEntity user = userEntityRepository.findByUsernameNoStudent(username, RoleName.ESTUDIANTE)
+        UserEntity user = userEntityRepository.findByUsernameNoStudent(username, RoleName.ESTUDIANTE, RoleName.MONITOR)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         return new ExternResponse(
