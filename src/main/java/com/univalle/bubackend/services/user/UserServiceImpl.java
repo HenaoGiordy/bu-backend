@@ -131,9 +131,12 @@ public class UserServiceImpl {
                         .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
                 .collect(Collectors.toSet());
 
+        if (!editUserRequest.username().equalsIgnoreCase(user.getUsername()) || !editUserRequest.name().equalsIgnoreCase(user.getName())
+                || !editUserRequest.lastName().equalsIgnoreCase(user.getLastName())) {
+            String updatePassword = generatePassword(editUserRequest.name(), editUserRequest.username(), editUserRequest.lastName());
+            user.setPassword(passwordEncoder.encode(updatePassword));
+        }
         user.setUsername(editUserRequest.username());
-        String updatePassword = generatePassword(editUserRequest.name(), editUserRequest.username(), editUserRequest.lastName());
-        user.setPassword(passwordEncoder.encode(updatePassword));
         user.setName(editUserRequest.name());
         user.setLastName(editUserRequest.lastName());
         user.setEmail(editUserRequest.email());
@@ -256,6 +259,11 @@ public class UserServiceImpl {
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
 
+            if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
+                String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
+                newUser.setPassword(passwordEncoder.encode(updatePassword));
+            }
+
             newUser.setName(userRequest.name());
             newUser.setLastName(userRequest.lastName());
             newUser.setEmail(userRequest.email());
@@ -274,8 +282,7 @@ public class UserServiceImpl {
             }
 
           //  newUser.setRoles(userRequest.roles());
-            String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
-            newUser.setPassword(passwordEncoder.encode(updatePassword));
+
             newUser.setIsActive(true);
 
         } else {
