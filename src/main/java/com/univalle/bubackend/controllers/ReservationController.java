@@ -168,6 +168,21 @@ public class ReservationController {
         }
     }
 
+    @Operation(summary = "Buscar Funcionario/Externo por username", description = "Obtiene el fucionario o externo por su username.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrada", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExternResponse.class))),
+            @ApiResponse(responseCode = "404", description = "usario no encontrada", content = @Content)
+    })
+    @GetMapping("/extern/{username}")
+    public ResponseEntity<ExternResponse> findExternUsername(@PathVariable String username) {
+        try {
+            ExternResponse responses = reservationService.getExtern(username);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @Operation(summary = "Obtener reservas por día", description = "Obtiene las reservas de un usuario para un día específico.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reservas encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))),
