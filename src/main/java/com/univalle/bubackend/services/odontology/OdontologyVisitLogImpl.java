@@ -89,7 +89,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
             throw new FieldException("Debe suministrar el nombre de usuario o el rango de fechas para realizar la búsqueda");
         }
 
-        UserResponse user = new UserResponse(null, null, null, null);
+        UserResponse user = new UserResponse(null, null, null, null, null);
         Page<VisitOdontologyLog> visitResponses;
 
         // Si ambos están presentes, filtrar por username y fecha
