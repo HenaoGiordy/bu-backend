@@ -50,55 +50,42 @@ public class UserServiceImpl {
     }
 
     public UserResponse createUser(UserRequest userRequest) {
-        Optional<UserEntity> existingUser = userEntityRepository.findByUsername(userRequest.username());
-        if (existingUser.isPresent()) {
-            Optional<Role> role = roleRepository.findByName(RoleName.ESTUDIANTE);
-            UserEntity user = existingUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-            if(role.isPresent() && user.getRoles().contains(role.get())) {
+        Optional<UserEntity> existingUserOpt = userEntityRepository.findByUsername(userRequest.username());
 
-                Set<Role> roles = userRequest.roles().stream()
-                        .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest))
-                                .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
-                        .collect(Collectors.toSet());
+        // Si el usuario ya existe
+        if (existingUserOpt.isPresent()) {
+            UserEntity user = existingUserOpt.get();
+            Optional<Role> studentRole = roleRepository.findByName(RoleName.ESTUDIANTE);
 
-                user.setName(userRequest.name());
-                user.setLastName(userRequest.lastName());
-                user.setEmail(userRequest.email());
-                user.setPlan(userRequest.plan());
-                user.setRoles(roles);
-
-                if(userRequest.beca().equalsIgnoreCase("almuerzo")){
-                    user.setLunchBeneficiary(true);
-                }
-                if(userRequest.beca().equalsIgnoreCase("refrigerio")) {
-                    user.setSnackBeneficiary(true);
-                }
-
-                userEntityRepository.save(user);
-                return new UserResponse(user);
-            } else {
-                throw new UserNameAlreadyExist("El usuario ya está registrado.");
+            // Verifica si el usuario es un estudiante existente
+            if (studentRole.isPresent() && user.getRoles().contains(studentRole.get())) {
+                throw new UserNameAlreadyExist("El usuario ya está registrado con el rol de ESTUDIANTE.");
             }
+
+            // Actualiza datos para el usuario existente
+            Set<Role> roles = getRolesFromRequest(userRequest.roles());
+            user.setName(userRequest.name());
+            user.setLastName(userRequest.lastName());
+            user.setEmail(userRequest.email());
+            user.setPlan(userRequest.plan());
+            user.setRoles(roles);
+            setBeneficiaryStatus(user, userRequest.beca());
+
+            userEntityRepository.save(user);
+            return new UserResponse(user);
         }
 
-        try{
-            userRequest.roles().forEach(RoleName::valueOf);
-        }catch (IllegalArgumentException e){
-            throw new RoleNotFound("El nombre de role no existe");
-        }
-
-        Set<Role> roles = userRequest.roles().stream()
-                .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest))
-                        .orElseThrow(() -> new RoleNotFound("No se ha creado el role " + roleRequest)))
-                .collect(Collectors.toSet());
-
+        // Validación de roles para usuario nuevo
+        Set<Role> roles = getRolesFromRequest(userRequest.roles());
         if (roles.isEmpty()) {
             throw new RoleNotFound("Debe proporcionar al menos un rol para el usuario.");
         }
 
+        // Generación de contraseña
         String generatedPassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
 
-        UserEntity user = UserEntity.builder()
+        // Creación de nuevo usuario
+        UserEntity newUser = UserEntity.builder()
                 .name(userRequest.name())
                 .lastName(userRequest.lastName())
                 .email(userRequest.email())
@@ -106,13 +93,25 @@ public class UserServiceImpl {
                 .password(passwordEncoder.encode(generatedPassword))
                 .plan(userRequest.plan())
                 .roles(roles)
-                .lunchBeneficiary("Beneficiario almuerzo".equalsIgnoreCase(userRequest.beca()))
-                .snackBeneficiary("Beneficiario refrigerio".equalsIgnoreCase(userRequest.beca()))
                 .build();
 
-        userEntityRepository.save(user);
-        return new UserResponse(user);
+        setBeneficiaryStatus(newUser, userRequest.beca());
+        userEntityRepository.save(newUser);
+
+        return new UserResponse(newUser);
     }
+    private Set<Role> getRolesFromRequest(Set<String> roleRequests) {
+        return roleRequests.stream()
+                .map(roleName -> roleRepository.findByName(RoleName.valueOf(roleName))
+                        .orElseThrow(() -> new RoleNotFound("No se ha creado el rol " + roleName)))
+                .collect(Collectors.toSet());
+    }
+
+    private void setBeneficiaryStatus(UserEntity user, String beca) {
+        user.setLunchBeneficiary("Beneficiario almuerzo".equalsIgnoreCase(beca));
+        user.setSnackBeneficiary("Beneficiario refrigerio".equalsIgnoreCase(beca));
+    }
+
 
     public UserResponse findStudentsByUsername(String username) {
         Optional<UserEntity> optionalUser = userEntityRepository.findByUsername(username);
