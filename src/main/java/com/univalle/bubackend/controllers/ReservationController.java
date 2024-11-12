@@ -167,4 +167,19 @@ public class ReservationController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @Operation(summary = "Obtener reservas por día", description = "Obtiene las reservas de un usuario para un día específico.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reservas encontradas", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
+    })
+    @GetMapping("/per-day/{username}")
+    public ResponseEntity<List<ReservationResponse>> getReservationsPerDay(@PathVariable String username) {
+        try {
+            List<ReservationResponse> responses = reservationService.getReservationsPerDay(username);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
