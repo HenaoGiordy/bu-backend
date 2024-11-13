@@ -27,4 +27,6 @@ public interface IAppointmentReservationService {
     ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp);
 
     UserResponseAppointment findReservationsByUsername(String username, Pageable pageable);
+
+    Page<ListReservationResponse> getReservations(Pageable pageable, String username);
 }
