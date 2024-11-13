@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @AllArgsConstructor
@@ -27,11 +28,18 @@ public class EmailServiceImpl implements IEmailService {
 
     @Override
     public void sendReservationCancellationEmail(String type, Reservation reservation, LocalDateTime date, LocalTime time) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        String formattedDate = date.format(dateFormatter);
+        String formattedTime = time.format(timeFormatter);
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(reservation.getUserEntity().getEmail());
         message.setSubject("Confirmación de Cancelación de Reserva");
-        message.setText("Su reserva de " + type + " ha sido cancelada con éxito el día " + date.toLocalDate() +
-                " a las " + time + ".");
+        message.setText("Su reserva de " + type + " ha sido cancelada con éxito el día " + formattedDate +
+                " a las " + formattedTime + ".");
         mailSender.send(message);
     }
+
 }

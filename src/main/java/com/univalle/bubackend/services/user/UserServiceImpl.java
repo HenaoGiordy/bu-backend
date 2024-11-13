@@ -348,11 +348,14 @@ public class UserServiceImpl {
                 Sort.by(Sort.Direction.DESC, "id"));
 
         switch (filter.toLowerCase()) {
-            case "beneficiarios", "estudiantes":
-                users = userEntityRepository.findAllStudents(sortedPageable);
+            case "beneficiarios":
+                users = userEntityRepository.findBeneficiaries(sortedPageable);
                 break;
             case "funcionarios":
-                users = userEntityRepository.findAllUsers(sortedPageable);
+                users = userEntityRepository.findAllNonStudents(sortedPageable);
+                break;
+            case "estudiantes":
+                users = userEntityRepository.findAllStudents(sortedPageable);
                 break;
             default:
                 throw new InvalidFilter("Filtro no válido");
