@@ -296,7 +296,21 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(username, TypeAppointment.PSICOLOGIA, startDate, endDate);
             }
 
-        Page<ListReservationResponse> listReservationResponses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username)
+        Page<ListReservationResponse> listReservationResponses = getReservations(pageable, username);
+
+
+        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("El usuario no ha tenido citas con el servicio de psicología"));
+        return new UserResponseAppointment(user, listReservationResponses);
+
+    }
+
+    @Override
+    public Page<ListReservationResponse> getReservations(Pageable pageable, String username) {
+
+
+        Page<ListReservationResponse> responses = Page.empty();
+
+        responses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getAvailableDates().getDateTime(),
@@ -304,9 +318,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                         reservation.getAssistant()
                 ));
 
-        UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("El usuario no ha tenido citas con el servicio de psicología"));
-        return new UserResponseAppointment(user, listReservationResponses);
-
+        return responses;
     }
 
 }
