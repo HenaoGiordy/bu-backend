@@ -60,7 +60,6 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
             @Param("endDate") LocalDateTime endDate
     );
 
-
-    @Query("SELECT a FROM AppointmentReservation a Where a.estudiante.username = :username")
+    @Query("SELECT a FROM AppointmentReservation a Where a.estudiante.username = :username AND a.assistant IS NULL")
     Page<AppointmentReservation> getAllAppointmentReservationByUsername(Pageable pageable, String username);
 }
