@@ -35,8 +35,11 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
     @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE r.name = 'ESTUDIANTE'")
     Page<UserEntity> findAllStudents(Pageable pageable);
 
-    @Query("SELECT u FROM UserEntity u")
-    Page<UserEntity> findAllUsers(Pageable pageable);
+    @Query("SELECT u FROM UserEntity u WHERE u.lunchBeneficiary = true OR u.snackBeneficiary = true")
+    Page<UserEntity> findBeneficiaries(Pageable pageable);
+
+    @Query("SELECT u FROM UserEntity u JOIN u.roles r where r.name <> 'ESTUDIANTE'")
+    Page<UserEntity> findAllNonStudents(Pageable pageable);
 
 
 }
