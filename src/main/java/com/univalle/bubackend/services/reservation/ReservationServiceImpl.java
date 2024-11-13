@@ -15,6 +15,7 @@ import com.univalle.bubackend.repository.ReservationRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.user.UserServiceImpl;
+import com.univalle.bubackend.services.email.EmailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class ReservationServiceImpl implements IReservationService {
     private final UserEntityRepository userEntityRepository;
     private final SettingRepository settingRepository;
     private final UserServiceImpl userService;
+    private final EmailServiceImpl emailService;
 
     @Override
     public ReservationUserResponse createReservation(UserEntity user, boolean lunch, boolean snack) {
@@ -304,6 +306,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
+        String type = "";
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
         Reservation reservation = new Reservation();
@@ -313,10 +316,12 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+            type = "almuerzo";
             reservation = reservationRepository.findLunchReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de almuerzo para cancelar el día de hoy"));
         }
         if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+            type = "Refrigerio";
             reservation = reservationRepository.findSnackReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de refrigerio para cancelar el día de hoy"));
         }
@@ -332,6 +337,7 @@ public class ReservationServiceImpl implements IReservationService {
         String lastName = reservation.getUserEntity().getLastName();
 
         reservationRepository.delete(reservation);
+        emailService.sendReservationCancellationEmail(type, reservation, date, time);
 
         return new ReservationResponse(
                 "Reserva cancelada con éxito.",
