@@ -322,6 +322,10 @@ public class UserServiceImpl {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(passwordRequest.username());
         UserEntity user = userOpt.orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
 
+        if (passwordRequest.newPassword().length() < 8){
+            throw new PasswordError("La contraseña debe tener minimo 8 caracteres");
+        }
+
         if (!passwordEncoder.matches(passwordRequest.password(), user.getPassword())) {
             throw new PasswordError("La contraseña actual es incorrecta");
         }
