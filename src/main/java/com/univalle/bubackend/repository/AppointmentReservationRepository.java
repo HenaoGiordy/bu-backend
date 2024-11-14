@@ -38,7 +38,7 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
     @Query("SELECT COUNT(a) FROM AppointmentReservation a " +
             "WHERE a.estudiante = :id AND " +
             "a.availableDates.typeAppointment = :typeAppointment AND " +
-            "a.assistant = false AND " +
+            "a.assistant = true AND " +
             "a.availableDates.dateTime BETWEEN :startDate AND :endDate")
     Integer countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(
             @Param("id") UserEntity id,
