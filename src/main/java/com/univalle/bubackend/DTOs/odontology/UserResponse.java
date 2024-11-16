@@ -7,13 +7,15 @@ public record UserResponse(
         Integer id,
         String username,
         String name,
+        String lastName,
         String plan
 ) {
     public UserResponse(UserEntity userEntity) {
         this(
                 userEntity.getId(),
                 userEntity.getUsername(),
-                userEntity.getName() + " " + userEntity.getLastName(),
+                userEntity.getName(),
+                userEntity.getLastName(),
                 userEntity.getPlan()
         );
     }

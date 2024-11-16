@@ -6,9 +6,12 @@ import com.univalle.bubackend.services.odontology.OdontologyVisitLogImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/odontology-visits")
@@ -29,11 +32,13 @@ public class OdontologyVisitLogController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{username}")
+    @GetMapping
     public ResponseEntity<VisitOdontologyResponse> getVisitLog(
-            @PageableDefault(size = 10, page = 0) Pageable pageable,
-            @PathVariable String username) {
-        return new ResponseEntity<>(odontologyVisitLog.visitsOdonotology(username, pageable), HttpStatus.OK);
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @PageableDefault(size = 10, page = 0) Pageable pageable){
+        return new ResponseEntity<>(odontologyVisitLog.visitsOdonotology(username, startDate, endDate, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/visit/{id}")

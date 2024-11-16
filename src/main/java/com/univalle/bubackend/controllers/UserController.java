@@ -48,6 +48,32 @@ public class UserController {
         return new ResponseEntity<>(userService.findStudentsByUsername(username), HttpStatus.OK);
     }
 
+    @Operation(
+            summary = "Buscar usuarios por código y tipo",
+            description = "Permite buscar usuarios por su código de usuario y un filtro de tipo. " +
+                    "Los filtros válidos son: 'beneficiarios', 'estudiantes' y 'funcionarios'."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Filtro no válido",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado o filtro restringido",
+                    content = @Content)
+    })
+    @GetMapping("/search")
+    public ResponseEntity<UserResponse> searchUsersByCode(
+            @Parameter(description = "Código del usuario (username) para buscar.", required = true, example = "12345")
+            @RequestParam String username,
+
+            @Parameter(description = "Filtro de búsqueda. Valores posibles: 'beneficiarios', 'estudiantes', 'funcionarios'.", required = true, example = "estudiantes")
+            @RequestParam String type
+    ) {
+        return ResponseEntity.ok(userService.findUsersByUsername(username, type));
+    }
+
+
     @PutMapping("/edit")
     public ResponseEntity<EditUserResponse> editUser(@Valid @RequestBody EditUserRequest editUserRequest) {
         return new ResponseEntity<>(userService.editUser(editUserRequest), HttpStatus.OK);

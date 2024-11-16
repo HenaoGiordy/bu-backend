@@ -15,6 +15,7 @@ import com.univalle.bubackend.repository.ReservationRepository;
 import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.user.UserServiceImpl;
+import com.univalle.bubackend.services.email.EmailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class ReservationServiceImpl implements IReservationService {
     private final UserEntityRepository userEntityRepository;
     private final SettingRepository settingRepository;
     private final UserServiceImpl userService;
+    private final EmailServiceImpl emailService;
 
     @Override
     public ReservationUserResponse createReservation(UserEntity user, boolean lunch, boolean snack) {
@@ -88,10 +90,11 @@ public class ReservationServiceImpl implements IReservationService {
             throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
-        if (!lunchReservation.isEmpty() && now.isBefore(setting.getStarBeneficiaryLunch()) && now.isAfter(setting.getEndLunch())) {
+        if (!lunchReservation.isEmpty() && now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getEndLunch())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
-        if (!snackReservation.isEmpty() && now.isBefore(setting.getStarBeneficiarySnack()) && now.isAfter(setting.getEndSnack())) {
+
+        if (!snackReservation.isEmpty() && now.isAfter(setting.getStarBeneficiarySnack()) && now.isBefore(setting.getEndSnack())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
 
@@ -164,8 +167,12 @@ public class ReservationServiceImpl implements IReservationService {
             userService.createUser(userRequest);
         }
 
+        if(userEntityRepository.findByUsername(reservationRequest.username()).isEmpty()){
+            throw new UnauthorizedException("usuario no encontrado");
+        }
         UserEntity userEntity = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE, RoleName.MONITOR)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se permite la reserva a usuarios que sean estudiantes en este apartado"));
+
 
         ReservationUserResponse reservationUserResponse = createReservation(userEntity, reservationRequest.lunch(), reservationRequest.snack());
         return new ReservationResponse(
@@ -184,8 +191,11 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public ExternResponse getExtern(String username) {
+        if (userEntityRepository.findByUsername(username).isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
         UserEntity user = userEntityRepository.findByUsernameNoStudent(username, RoleName.ESTUDIANTE, RoleName.MONITOR)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se permite la búsqueda de usuarios que sean estudiantes"));
 
         return new ExternResponse(
                 user.getId(),
@@ -303,6 +313,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
+        String type = "";
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
         Reservation reservation = new Reservation();
@@ -312,10 +323,12 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+            type = "almuerzo";
             reservation = reservationRepository.findLunchReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de almuerzo para cancelar el día de hoy"));
         }
         if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+            type = "Refrigerio";
             reservation = reservationRepository.findSnackReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de refrigerio para cancelar el día de hoy"));
         }
@@ -331,6 +344,7 @@ public class ReservationServiceImpl implements IReservationService {
         String lastName = reservation.getUserEntity().getLastName();
 
         reservationRepository.delete(reservation);
+        emailService.sendReservationCancellationEmail(type, reservation, date, time);
 
         return new ReservationResponse(
                 "Reserva cancelada con éxito.",

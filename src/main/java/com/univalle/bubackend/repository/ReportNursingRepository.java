@@ -12,4 +12,5 @@ public interface ReportNursingRepository extends JpaRepository<NursingReport, In
     Optional<NursingReport> findById(Integer id);
     List<NursingReport> findByYearAndTrimester(Integer year, Integer trimester);
     List<NursingReport> findByYear(Integer year);
+    Optional<NursingReport> findNursingReportByYearAndTrimester(int year, int trimester);
 }

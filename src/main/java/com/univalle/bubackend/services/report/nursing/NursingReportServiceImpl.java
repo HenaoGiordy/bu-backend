@@ -3,6 +3,7 @@ package com.univalle.bubackend.services.report.nursing;
 import com.univalle.bubackend.DTOs.nursing.NursingReportRequest;
 import com.univalle.bubackend.DTOs.nursing.NursingReportResponse;
 import com.univalle.bubackend.exceptions.report.InvalidDateFormat;
+import com.univalle.bubackend.exceptions.report.ReportAlreadyExistsException;
 import com.univalle.bubackend.exceptions.report.ReportNotFound;
 import com.univalle.bubackend.models.Diagnostic;
 import com.univalle.bubackend.models.NursingActivityLog;
@@ -28,6 +29,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +45,14 @@ public class NursingReportServiceImpl implements INursingReportService {
         int trimester = request.trimester();
         if (trimester < 1 || trimester > 4) {
             throw new InvalidDateFormat("El trimestre debe ser un número entero entre 1 y 4");
+        }
+
+        int year = request.year();
+
+        Optional<NursingReport> nursingReportOptional = reportNursingRepository.findNursingReportByYearAndTrimester(year, trimester);
+
+        if (nursingReportOptional.isPresent()) {
+            throw  new ReportAlreadyExistsException("Ya existe un informe con esa fecha");
         }
 
         LocalDate startDate = LocalDate.of(request.year(), (trimester - 1) * 3 + 1, 1);
