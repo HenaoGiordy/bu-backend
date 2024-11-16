@@ -59,7 +59,7 @@ public class InitDatabase {
                     .name("admin")
                     .lastName("Bienestar")
                     .username("enfermero1")
-                    .email("henaogiordy@gmail.com")
+                    .email("giordy@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(enfermero))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("enfermero"))
@@ -79,7 +79,7 @@ public class InitDatabase {
                     .name("psicologo_nombre")
                     .lastName("psicologo_apellido")
                     .username("psicologo")
-                    .email("henaogiordy@gmail.com")
+                    .email("henao@gmail.com")
                     .plan("psicología")
                     .roles(Set.of(psicologo))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("psicologo"))
@@ -89,7 +89,7 @@ public class InitDatabase {
                     .name("odontologo_nombre")
                     .lastName("odontologo_apellido")
                     .username("odontologo")
-                    .email("henaogiordy@gmail.com")
+                    .email("odontologo@gmail.com")
                     .plan("odontólogia")
                     .roles(Set.of(odontologo))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("odontologo"))
@@ -99,7 +99,7 @@ public class InitDatabase {
                     .name("admin")
                     .lastName("Bienestar")
                     .username("estudiante")
-                    .email("henaogiordy@gmail.com")
+                    .email("estudiante@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(estudiante))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("estudiante"))
@@ -109,7 +109,7 @@ public class InitDatabase {
                     .name("admin")
                     .lastName("Bienestar")
                     .username("monitor")
-                    .email("henaogiordy@gmail.com")
+                    .email("monitor@gmail.com")
                     .plan("Bienestar Universitario")
                     .roles(Set.of(estudiante ,monitor))  // Usar el role recuperado y gestionado
                     .password(passwordEncoder.encode("monitor"))
