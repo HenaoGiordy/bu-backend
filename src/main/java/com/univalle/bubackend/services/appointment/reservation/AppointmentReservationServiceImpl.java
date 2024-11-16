@@ -254,18 +254,23 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         Optional<UserEntity> professionalOpt = userEntityRepository.findById(requestAppointmentFollowUp.professionalId());
         UserEntity professional = professionalOpt.orElseThrow(() -> new UserNotFound("No se encontró el professional"));
 
-        appointmentDateCreationValidations.validateIsProfessional(professional);
-
-        dateTimeValidation.validateDateTime(requestAppointmentFollowUp.dateTime().toString(), professional.getId());
         TypeAppointment typeAppointment = defineTypeOfAppointment.defineTypeOfAppointment(professional.getRoles());
-
-
+        appointmentDateCreationValidations.validateIsProfessional(professional);
         AvailableDates availableDates = AvailableDates.builder()
                 .professional(professional)
                 .available(false)
                 .typeAppointment(typeAppointment)
                 .dateTime(requestAppointmentFollowUp.dateTime())
                 .build();
+
+        Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(userEntity.getId(), availableDates.getTypeAppointment());
+
+        if(appointmentReservationOpt.isPresent()) {
+            AppointmentReservation appointmentReservation = appointmentReservationOpt.get();
+            throw new HaveAnAppoinmentPending("Tienes una cita pendiente de " + appointmentReservation.getAvailableDates().getTypeAppointment().toString());
+        }
+
+        dateTimeValidation.validateDateTime(requestAppointmentFollowUp.dateTime().toString(), professional.getId());
 
         availableDatesRepository.save(availableDates);
 
