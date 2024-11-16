@@ -61,12 +61,18 @@ public class UserDetailServiceImpl implements UserDetailsService {
         String username = request.username();
         String password = request.password();
 
+        UserEntity userEntity = userEntityRepository.findByUsername(username)
+                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
+
+        if(!userEntity.getIsActive()){
+            throw new UserNotFound("Usuario Inactivo");
+        }
+
         Authentication authentication = this.authenticate(username, password);
 
         String token = jwtUtils.createToken(authentication);
 
-        UserEntity userEntity = userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new PasswordDoesNotMatch("Usuario o contraseña incorrectas"));
+
 
         UserResponse userResponse = new UserResponse(userEntity);
 
