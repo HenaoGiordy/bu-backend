@@ -128,8 +128,11 @@ public class UserServiceImpl {
 
         switch (filter.toLowerCase()) {
             case "beneficiarios", "estudiantes":
+                if(userEntityRepository.findByUsername(username).isEmpty()){
+                    throw new ResourceNotFoundException("Usuario no encontrado");
+                }
                 optionalUser = userEntityRepository.findByUsernameWithRole(username, RoleName.ESTUDIANTE);
-                user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("No se permite la búsqueda de usuarios que no sean estudiantes"));
                 break;
             case "funcionarios":
                 optionalUser = userEntityRepository.findByUsername(username);
