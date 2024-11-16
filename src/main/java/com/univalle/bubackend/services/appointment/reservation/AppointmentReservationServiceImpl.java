@@ -307,7 +307,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(username, TypeAppointment.PSICOLOGIA, startDate, endDate);
             }
 
-        Page<ListReservationResponse> listReservationResponses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username)
+        Page<ListReservationResponse> listReservationResponses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username, TypeAppointment.PSICOLOGIA)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getAvailableDates().getDateTime(),
