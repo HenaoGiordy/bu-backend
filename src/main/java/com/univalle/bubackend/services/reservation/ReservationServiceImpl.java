@@ -167,8 +167,12 @@ public class ReservationServiceImpl implements IReservationService {
             userService.createUser(userRequest);
         }
 
+        if(userEntityRepository.findByUsername(reservationRequest.username()).isEmpty()){
+            throw new UnauthorizedException("usuario no encontrado");
+        }
         UserEntity userEntity = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE, RoleName.MONITOR)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se permite la reserva a usuarios que sean estudiantes en este apartado"));
+
 
         ReservationUserResponse reservationUserResponse = createReservation(userEntity, reservationRequest.lunch(), reservationRequest.snack());
         return new ReservationResponse(
@@ -187,8 +191,11 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public ExternResponse getExtern(String username) {
+        if (userEntityRepository.findByUsername(username).isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
         UserEntity user = userEntityRepository.findByUsernameNoStudent(username, RoleName.ESTUDIANTE, RoleName.MONITOR)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se permite la búsqueda de usuarios que sean estudiantes"));
 
         return new ExternResponse(
                 user.getId(),
