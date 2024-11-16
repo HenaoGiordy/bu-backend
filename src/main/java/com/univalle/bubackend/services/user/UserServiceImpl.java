@@ -51,7 +51,11 @@ public class UserServiceImpl {
 
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUserOpt = userEntityRepository.findByUsername(userRequest.username());
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
+        if(existinUserByEmailOpt.isPresent()) {
+            throw new UserNameAlreadyExist("El correo ya está registrado");
+        }
         // Si el usuario ya existe
         if (existingUserOpt.isPresent()) {
             UserEntity user = existingUserOpt.get();
