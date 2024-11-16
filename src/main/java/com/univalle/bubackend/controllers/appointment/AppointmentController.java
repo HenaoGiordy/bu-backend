@@ -101,10 +101,10 @@ public class AppointmentController {
                     content = @Content)
     })
 
-    @GetMapping
+    @GetMapping("/{studentId}")
     @PreAuthorize("hasAnyRole('ESTUDIANTE', 'ODONTOLOGO', 'ENFERMERO', 'PSICOLOGO', 'FUNCIONARIO')")
-    public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type) {
-        return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type), HttpStatus.OK);
+    public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type, @PathVariable Integer studentId) {
+        return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type, studentId), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-dates")

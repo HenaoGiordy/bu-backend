@@ -31,6 +31,9 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
             @Param("professionalId") Integer professionalId,
             Pageable pageable);
 
+    List<AppointmentReservation> findByEstudiante_IdAndAvailableDates_TypeAppointment(Integer estudianteId, TypeAppointment typeAppointment);
+
+
     Optional<List<AppointmentReservation>> findByEstudiante_Id(Integer id);
 
     Optional<AppointmentReservation> findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(Integer id, TypeAppointment type);

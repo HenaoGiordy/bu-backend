@@ -25,6 +25,7 @@ public interface AvailableDatesRepository extends JpaRepository<AvailableDates, 
             @Param("professionalId") Integer professionalId);
 
     Optional<List<AvailableDates>> findByTypeAppointmentAndAvailableTrue(TypeAppointment typeAppointment);
+    Optional<List<AvailableDates>> findByTypeAppointmentAndAvailableTrueAndProfessional_Id(TypeAppointment typeAppointment, Integer profesionalId);
 
     @Modifying
     @Transactional

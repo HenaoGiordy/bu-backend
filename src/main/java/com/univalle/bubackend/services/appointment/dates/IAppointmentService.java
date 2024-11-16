@@ -7,7 +7,7 @@ public interface IAppointmentService {
     ResponseAllAvailableDates getAllDatesProfessional(Integer professionalId);
     ResponseDeleteAvailableDate deleteAvailableDate(Integer id);
 
-    ResponseAllDatesType getAllAvailableDatesType(String type);
+    ResponseAllDatesType getAllAvailableDatesType(String type, Integer studentId);
 
     void deleteAllDatesPerDate(AvailableDatesListDTO availableDatesListDTO);
 }

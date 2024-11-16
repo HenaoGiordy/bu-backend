@@ -5,9 +5,11 @@ import com.univalle.bubackend.DTOs.user.UserEntityDTO;
 import com.univalle.bubackend.exceptions.appointment.NoAvailableDateFound;
 import com.univalle.bubackend.exceptions.appointment.HasNoAvailableDates;
 import com.univalle.bubackend.exceptions.change_password.UserNotFound;
+import com.univalle.bubackend.models.AppointmentReservation;
 import com.univalle.bubackend.models.AvailableDates;
 import com.univalle.bubackend.models.TypeAppointment;
 import com.univalle.bubackend.models.UserEntity;
+import com.univalle.bubackend.repository.AppointmentReservationRepository;
 import com.univalle.bubackend.repository.AvailableDatesRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.appointment.validations.AppointmentDateCreationValidation;
@@ -36,6 +38,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
 
     private AvailableDatesRepository availableDatesRepository;
     private UserEntityRepository userEntityRepository;
+    private AppointmentReservationRepository appointmentReservationRepository;
     private AppointmentDateCreationValidation appointmentDateCreationValidations;
     private TaskScheduler taskScheduler;
     private IsValidTypeAppointment isValidTypeAppointment;
@@ -110,10 +113,24 @@ public class AppointmentServiceImpl implements IAppointmentService {
     }
 
     @Override
-    public ResponseAllDatesType getAllAvailableDatesType(String type) {
+    public ResponseAllDatesType getAllAvailableDatesType(String type, Integer studendId) {
         isValidTypeAppointment.validateTypeAppointment(type);
 
         TypeAppointment typeAppointment = TypeAppointment.valueOf(type.toUpperCase());
+
+        if(typeAppointment.equals(TypeAppointment.PSICOLOGIA)){
+            List<AppointmentReservation> lista = appointmentReservationRepository.findByEstudiante_IdAndAvailableDates_TypeAppointment(studendId, TypeAppointment.PSICOLOGIA);
+
+            if(!lista.isEmpty()){
+                Integer professionaId = lista.stream()
+                        .map(appointment -> appointment.getAvailableDates().getProfessional().getId()) // Obtener el ID del profesional
+                        .findFirst().orElseThrow();
+                Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByTypeAppointmentAndAvailableTrueAndProfessional_Id(typeAppointment, professionaId);
+                List<AvailableDates> datesType = datesOp.orElseGet(ArrayList::new);
+                List<AvailableDateDTO> dateDTOS = datesType.stream().map(AvailableDateDTO::new).toList();
+                return new ResponseAllDatesType(type.toUpperCase() ,dateDTOS);
+            }
+        }
 
         Optional<List<AvailableDates>> datesOp = availableDatesRepository.findByTypeAppointmentAndAvailableTrue(typeAppointment);
         List<AvailableDates> datesType = datesOp.orElseGet(ArrayList::new);
