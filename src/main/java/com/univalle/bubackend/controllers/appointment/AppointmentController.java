@@ -101,7 +101,7 @@ public class AppointmentController {
                     content = @Content)
     })
 
-    @GetMapping("/{studentId}")
+    @GetMapping("/all-dates/{studentId}")
     @PreAuthorize("hasAnyRole('ESTUDIANTE', 'ODONTOLOGO', 'ENFERMERO', 'PSICOLOGO', 'FUNCIONARIO')")
     public ResponseEntity<ResponseAllDatesType> getAllAvailableDatesType(@RequestParam String type, @PathVariable Integer studentId) {
         return new ResponseEntity<>(appointmentService.getAllAvailableDatesType(type, studentId), HttpStatus.OK);
