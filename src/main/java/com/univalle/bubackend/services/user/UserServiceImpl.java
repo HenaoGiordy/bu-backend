@@ -153,6 +153,11 @@ public class UserServiceImpl {
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(editUserRequest.email());
+
+        if(existinUserByEmailOpt.isPresent() && !Objects.equals(user.getId(), existinUserByEmailOpt.get().getId())) {
+            throw new UserNameAlreadyExist("El correo ya está registrado");
+        }
 
         Set<Role> roles = editUserRequest.roles().stream()
                 .map(roleRequest -> roleRepository.findByName(RoleName.valueOf(roleRequest.name()))
