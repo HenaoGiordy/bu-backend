@@ -36,6 +36,7 @@ public class UserEntity {
     @NotBlank
     private String lastName;
 
+    @Column(unique = true)
     private String email;
 
     @NotBlank
