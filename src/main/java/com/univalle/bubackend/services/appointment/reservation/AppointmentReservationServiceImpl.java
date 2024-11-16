@@ -50,23 +50,8 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         Optional<AvailableDates> availableDatesOptional = availableDatesRepository.findById(requestAppointmentReservation.availableDateId());
         AvailableDates availableDates = availableDatesOptional.orElseThrow(()-> new NoAvailableDateFound("No se encontró la fecha disponible"));
 
-        Integer count = 0;
-        if(availableDates.getTypeAppointment() == TypeAppointment.PSICOLOGIA){
-            if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
-                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 6, 1, 0, 0); // 1 de junio
-                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59);//31 de Diciembre
-                count = appointmentReservationRepository.countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(userEntity, startDate, endDate, availableDates.getTypeAppointment());
 
-            }else{
-                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0); // 1 de enero
-                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 5, 31, 23, 59); // 30 de junio
-                count = appointmentReservationRepository.countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(userEntity, startDate, endDate, availableDates.getTypeAppointment());
-            }
-            if(count == 4){
-                throw new CantReserveMoreAppointments("Ya tuviste 4 citas de " + availableDates.getTypeAppointment().toString()+ " este semestre");
-            }
-        }
-
+        validateDatesPsicology(userEntity, availableDates);
 
 
         Optional<AppointmentReservation> appointmentReservationOpt = appointmentReservationRepository.findByEstudiante_IdAndPendingAppointmentTrueAndAvailableDates_TypeAppointment(userEntity.getId(), availableDates.getTypeAppointment());
@@ -270,6 +255,8 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
             throw new HaveAnAppoinmentPending("Tienes una cita pendiente de " + appointmentReservation.getAvailableDates().getTypeAppointment().toString());
         }
 
+        validateDatesPsicology(userEntity, availableDates);
+
         dateTimeValidation.validateDateTime(requestAppointmentFollowUp.dateTime().toString(), professional.getId());
 
         availableDatesRepository.save(availableDates);
@@ -281,6 +268,25 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         appointmentReservationRepository.save(appointmentReservation);
         return new ResponseAppointmentFollowUp("Se ha reservado la cita con exito", userEntity.getName(), professional.getName());
+    }
+
+    private void validateDatesPsicology(UserEntity userEntity, AvailableDates availableDates) {
+        Integer count;
+        if(availableDates.getTypeAppointment() == TypeAppointment.PSICOLOGIA){
+            if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
+                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 6, 1, 0, 0); // 1 de junio
+                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59);//31 de Diciembre
+                count = appointmentReservationRepository.countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(userEntity, startDate, endDate, availableDates.getTypeAppointment());
+
+            }else{
+                LocalDateTime startDate = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0); // 1 de enero
+                LocalDateTime endDate = LocalDateTime.of(LocalDateTime.now().getYear(), 5, 31, 23, 59); // 30 de junio
+                count = appointmentReservationRepository.countAppointmentReservationByEstudiante_IdAndAvailableDates_DateTime(userEntity, startDate, endDate, availableDates.getTypeAppointment());
+            }
+            if(count == 4){
+                throw new CantReserveMoreAppointments("Ya tuviste 4 citas de " + availableDates.getTypeAppointment().toString()+ " este semestre");
+            }
+        }
     }
 
     @Override
