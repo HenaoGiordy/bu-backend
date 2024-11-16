@@ -121,6 +121,28 @@ public class UserServiceImpl {
         return new UserResponse(user);
     }
 
+    public UserResponse findUsersByUsername(String username, String filter) {
+
+        UserEntity user = null;
+        Optional<UserEntity> optionalUser = Optional.empty();
+
+        switch (filter.toLowerCase()) {
+            case "beneficiarios", "estudiantes":
+                optionalUser = userEntityRepository.findByUsernameWithRole(username, RoleName.ESTUDIANTE);
+                user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                break;
+            case "funcionarios":
+                optionalUser = userEntityRepository.findByUsername(username);
+                user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                break;
+            default:
+                throw new InvalidFilter("Filtro no válido");
+        }
+
+
+        return new UserResponse(user);
+    }
+
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));

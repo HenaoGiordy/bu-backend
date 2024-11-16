@@ -48,6 +48,14 @@ public class UserController {
         return new ResponseEntity<>(userService.findStudentsByUsername(username), HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<UserResponse> searchUsersByCode(
+            @RequestParam String username,
+            @RequestParam String type
+    ) {
+        return new ResponseEntity<>(userService.findUsersByUsername(username, type), HttpStatus.OK);
+    }
+
     @PutMapping("/edit")
     public ResponseEntity<EditUserResponse> editUser(@Valid @RequestBody EditUserRequest editUserRequest) {
         return new ResponseEntity<>(userService.editUser(editUserRequest), HttpStatus.OK);
