@@ -287,10 +287,14 @@ public class UserServiceImpl {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
         UserEntity newUser;
 
-
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
+
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
+            }
 
             if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
                 String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
@@ -336,6 +340,11 @@ public class UserServiceImpl {
                     .lunchBeneficiary("almuerzo".equalsIgnoreCase(userRequest.beca()))
                     .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
+
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
+            }
+
         }
 
         userEntityRepository.save(newUser);
