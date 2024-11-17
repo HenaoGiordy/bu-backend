@@ -129,8 +129,8 @@ public class UserServiceImpl {
 
     public UserResponse findUsersByUsername(String username, String filter) {
 
-        UserEntity user = null;
-        Optional<UserEntity> optionalUser = Optional.empty();
+        UserEntity user;
+        Optional<UserEntity> optionalUser;
 
         switch (filter.toLowerCase()) {
             case "beneficiarios", "estudiantes":
@@ -155,10 +155,10 @@ public class UserServiceImpl {
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(editUserRequest.email());
 
-        //Verifica si el correo ya está registrado
-        if (!userEntityRepository.findUsersByEmail(editUserRequest.email()).isEmpty() && editUserRequest.email() != null) {
-            throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
+        if(existinUserByEmailOpt.isPresent() && !Objects.equals(user.getId(), existinUserByEmailOpt.get().getId())) {
+            throw new UserNameAlreadyExist("El correo ya está registrado");
         }
 
         Set<Role> roles = editUserRequest.roles().stream()
@@ -289,13 +289,13 @@ public class UserServiceImpl {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
         UserEntity newUser;
 
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
 
-            //Verifica si el correo ya está registrado
-            if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
-                throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
             }
 
             if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
@@ -343,9 +343,8 @@ public class UserServiceImpl {
                     .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
 
-            //Verifica si el correo ya está registrado
-            if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
-                throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
             }
 
         }
