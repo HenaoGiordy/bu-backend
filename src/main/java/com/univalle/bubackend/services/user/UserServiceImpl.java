@@ -5,6 +5,7 @@ import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.exceptions.report.CSVFieldException;
 
 
+import com.univalle.bubackend.exceptions.users.EmailAlreadyExist;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
@@ -64,6 +65,10 @@ public class UserServiceImpl {
             // Verifica si el usuario es un estudiante existente
             if (studentRole.isPresent() && user.getRoles().contains(studentRole.get())) {
                 throw new UserNameAlreadyExist("El usuario ya está registrado con el rol de ESTUDIANTE.");
+            }
+
+            if (userEntityRepository.findByEmail(userRequest.email()).isPresent() && userRequest.email() != null) {
+                throw new EmailAlreadyExist("Ya hay un usuario registrado con el email.");
             }
 
             // Actualiza datos para el usuario existente
