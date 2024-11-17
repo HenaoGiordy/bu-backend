@@ -33,10 +33,10 @@ public class SettingServiceImpl implements ISettingService {
                 .endSnack(settingRequest.endSnack())
                 .numLunch(settingRequest.numLunch())
                 .numSnack(settingRequest.numSnack())
-                .starBeneficiarySnack(settingRequest.starBeneficiarySnack())
-                .starBeneficiaryLunch(settingRequest.starBeneficiaryLunch())
-                .starLunch(settingRequest.starLunch())
-                .starSnack(settingRequest.starSnack())
+                .startBeneficiarySnack(settingRequest.starBeneficiarySnack())
+                .startBeneficiaryLunch(settingRequest.starBeneficiaryLunch())
+                .startLunch(settingRequest.starLunch())
+                .startSnack(settingRequest.starSnack())
                 .build();
 
         settingRepository.save(setting);
@@ -95,13 +95,13 @@ public class SettingServiceImpl implements ISettingService {
                     setting.getEndSemester(),
                     setting.getNumLunch(),
                     setting.getNumSnack(),
-                    setting.getStarBeneficiaryLunch(),
+                    setting.getStartBeneficiaryLunch(),
                     setting.getEndBeneficiaryLunch(),
-                    setting.getStarLunch(),
+                    setting.getStartLunch(),
                     setting.getEndLunch(),
-                    setting.getStarBeneficiarySnack(),
+                    setting.getStartBeneficiarySnack(),
                     setting.getEndBeneficiarySnack(),
-                    setting.getStarSnack(),
+                    setting.getStartSnack(),
                     setting.getEndSnack()
             );
             return List.of(new SettingResponse(setting.getId(), "Ajustes encontrado exitosamente", settingRequest));
@@ -122,13 +122,13 @@ public class SettingServiceImpl implements ISettingService {
             setting.setEndSemester(settingRequest.endSemester());
             setting.setNumLunch(settingRequest.numLunch());
             setting.setNumSnack(settingRequest.numSnack());
-            setting.setStarBeneficiaryLunch(settingRequest.starBeneficiaryLunch());
+            setting.setStartBeneficiaryLunch(settingRequest.starBeneficiaryLunch());
             setting.setEndBeneficiaryLunch(settingRequest.endBeneficiaryLunch());
-            setting.setStarLunch(settingRequest.starLunch());
+            setting.setStartLunch(settingRequest.starLunch());
             setting.setEndLunch(settingRequest.endLunch());
-            setting.setStarBeneficiarySnack(settingRequest.starBeneficiarySnack());
+            setting.setStartBeneficiarySnack(settingRequest.starBeneficiarySnack());
             setting.setEndBeneficiarySnack(settingRequest.endBeneficiarySnack());
-            setting.setStarSnack(settingRequest.starSnack());
+            setting.setStartSnack(settingRequest.starSnack());
             setting.setEndSnack(settingRequest.endSnack());
 
             settingRepository.save(setting);
