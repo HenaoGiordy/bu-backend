@@ -52,11 +52,12 @@ public class UserServiceImpl {
 
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUserOpt = userEntityRepository.findByUsername(userRequest.username());
-        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
-        if(existinUserByEmailOpt.isPresent()) {
-            throw new UserNameAlreadyExist("El correo ya está registrado");
+        //Verifica si el correo ya está registrado
+        if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
+            throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
         }
+
         // Si el usuario ya existe
         if (existingUserOpt.isPresent()) {
             UserEntity user = existingUserOpt.get();
@@ -65,10 +66,6 @@ public class UserServiceImpl {
             // Verifica si el usuario es un estudiante existente
             if (studentRole.isPresent() && user.getRoles().contains(studentRole.get())) {
                 throw new UserNameAlreadyExist("El usuario ya está registrado con el rol de ESTUDIANTE.");
-            }
-
-            if (userEntityRepository.findByEmail(userRequest.email()).isPresent() && userRequest.email() != null) {
-                throw new EmailAlreadyExist("Ya hay un usuario registrado con el email.");
             }
 
             // Actualiza datos para el usuario existente
@@ -158,10 +155,10 @@ public class UserServiceImpl {
     public EditUserResponse editUser(EditUserRequest editUserRequest) {
         Optional<UserEntity> optionalUser = userEntityRepository.findById(editUserRequest.id());
         UserEntity user = optionalUser.orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(editUserRequest.email());
 
-        if(existinUserByEmailOpt.isPresent() && !Objects.equals(user.getId(), existinUserByEmailOpt.get().getId())) {
-            throw new UserNameAlreadyExist("El correo ya está registrado");
+        //Verifica si el correo ya está registrado
+        if (!userEntityRepository.findUsersByEmail(editUserRequest.email()).isEmpty() && editUserRequest.email() != null) {
+            throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
         }
 
         Set<Role> roles = editUserRequest.roles().stream()
@@ -292,13 +289,13 @@ public class UserServiceImpl {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
         UserEntity newUser;
 
-        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
 
-            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
-                throw new UserNameAlreadyExist("El correo ya está registrado");
+            //Verifica si el correo ya está registrado
+            if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
+                throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
             }
 
             if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
@@ -346,8 +343,9 @@ public class UserServiceImpl {
                     .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
 
-            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
-                throw new UserNameAlreadyExist("El correo ya está registrado");
+            //Verifica si el correo ya está registrado
+            if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
+                throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
             }
 
         }
