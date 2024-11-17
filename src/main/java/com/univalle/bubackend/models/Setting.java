@@ -36,25 +36,25 @@ public class Setting {
     private Integer numSnack;
 
     @NotNull
-    private LocalTime starBeneficiaryLunch;
+    private LocalTime startBeneficiaryLunch;
 
     @NotNull
     private LocalTime endBeneficiaryLunch;
 
     @NotNull
-    private LocalTime starLunch;
+    private LocalTime startLunch;
 
     @NotNull
     private LocalTime endLunch;
 
     @NotNull
-    private LocalTime starBeneficiarySnack;
+    private LocalTime startBeneficiarySnack;
 
     @NotNull
     private LocalTime endBeneficiarySnack;
 
     @NotNull
-    private LocalTime starSnack;
+    private LocalTime startSnack;
 
     @NotNull
     private LocalTime endSnack;
