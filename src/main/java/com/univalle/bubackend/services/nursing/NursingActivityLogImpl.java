@@ -109,7 +109,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
                     username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
             UserEntity user = userEntityRepository.findByUsername(username)
-                    .orElseThrow(() -> new UserNotFound("No se encontro el usuario"));
+                    .orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
 
             if (activities.isEmpty()) {
                 throw new ResourceNotFoundException("El usuario no tiene citas realizadas en esa fecha.");
@@ -120,7 +120,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
 
             if (activities.isEmpty()) {
-                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermeria.");
+                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermería.");
             }
 
             // Solo por rango de fechas
@@ -128,7 +128,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             activities = nursingActivityLogRepository.findAllByDateBetweenOrderByIdDesc(
                     startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
             if (activities.isEmpty()) {
-                throw new ResourceNotFoundException("No existen registros de enfermeria en la fecha suministrada.");
+                throw new ResourceNotFoundException("No existen registros de enfermería en la fecha suministrada.");
             }
 
         }
@@ -149,7 +149,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
     @Override
     public ActivityNursingResponse getActivityNursing(Integer id) {
         NursingActivityLog activity = nursingActivityLogRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermeria no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermería no encontrada"));
         return new ActivityNursingResponse(activity);
     }
 }
