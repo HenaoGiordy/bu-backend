@@ -52,11 +52,11 @@ public class ReservationServiceImpl implements IReservationService {
         List<Reservation> snackReservation = reservationRepository.findSnackReservationByUser(user.getUsername(), today);
 
         // Inicio reserva de almuerzo a beneficiarios
-        if (lunch && user.getLunchBeneficiary() && now.isBefore(setting.getStarBeneficiaryLunch())) {
+        if (lunch && user.getLunchBeneficiary() && now.isBefore(setting.getStartBeneficiaryLunch())) {
             throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Todavía no inicia la venta.");
         }
         // Inicio reserva de almuerzo a venta libre
-        if (lunch && !user.getLunchBeneficiary() && now.isBefore(setting.getStarLunch())) {
+        if (lunch && !user.getLunchBeneficiary() && now.isBefore(setting.getStartLunch())) {
             throw new UnauthorizedException("No tienes acceso a reservar almuerzo. Espera a venta libre.");
         }
         // Finalización de reserva de almuerzos
@@ -65,11 +65,11 @@ public class ReservationServiceImpl implements IReservationService {
         }
 
         // Inicio reserva de refrigerio a beneficiarios
-        if (snack && user.getSnackBeneficiary() && now.isBefore(setting.getStarBeneficiarySnack())) {
+        if (snack && user.getSnackBeneficiary() && now.isBefore(setting.getStartBeneficiarySnack())) {
             throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Todavía no inicia la venta.");
         }
         // Inicio reserva de refrigerio a venta libre
-        if (snack && !user.getSnackBeneficiary() && now.isBefore(setting.getStarSnack())) {
+        if (snack && !user.getSnackBeneficiary() && now.isBefore(setting.getStartSnack())) {
             throw new UnauthorizedException("No tienes acceso a reservar refrigerio. Espera a venta libre.");
         }
         // Finalización de reserva de refrigerio
@@ -90,11 +90,11 @@ public class ReservationServiceImpl implements IReservationService {
             throw new NoSlotsAvailableException("No quedan reservas de refrigerio disponibles para hoy.");
         }
 
-        if (!lunchReservation.isEmpty() && now.isAfter(setting.getStarBeneficiaryLunch()) && now.isBefore(setting.getEndLunch())) {
+        if (!lunchReservation.isEmpty() && now.isAfter(setting.getStartBeneficiaryLunch()) && now.isBefore(setting.getEndLunch())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
 
-        if (!snackReservation.isEmpty() && now.isAfter(setting.getStarBeneficiarySnack()) && now.isBefore(setting.getEndSnack())) {
+        if (!snackReservation.isEmpty() && now.isAfter(setting.getStartBeneficiarySnack()) && now.isBefore(setting.getEndSnack())) {
             throw new UnauthorizedException("El usuario ya realizó una reserva el día de hoy");
         }
 
@@ -150,7 +150,7 @@ public class ReservationServiceImpl implements IReservationService {
 
         Set<String> roles = Set.of("EXTERNO");
 
-        Optional<UserEntity> user = userEntityRepository.findByUsernameNoStudent(reservationRequest.username(), RoleName.ESTUDIANTE, RoleName.MONITOR);
+        Optional<UserEntity> user = userEntityRepository.findByUsername(reservationRequest.username());
 
         if (user.isEmpty()) {
             UserRequest userRequest = new UserRequest(
@@ -247,21 +247,21 @@ public class ReservationServiceImpl implements IReservationService {
 
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiaryLunch()) && now.isBefore(setting.get().getStartBeneficiarySnack())) {
             int maxSlots = setting.get().getNumLunch();
             int currentReservations = reservationRepository.countLunchReservationsForDay(today);
             availability = maxSlots - currentReservations;
-            start = setting.get().getStarBeneficiaryLunch();
-            end = setting.get().getStarBeneficiarySnack();
+            start = setting.get().getStartBeneficiaryLunch();
+            end = setting.get().getStartBeneficiarySnack();
             type = "Almuerzo";
 
         }
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())){
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiarySnack())){
             int maxSlots = setting.get().getNumSnack();
             int currentReservations = reservationRepository.countSnackReservationsForDay(today);
             availability = maxSlots - currentReservations;
-            start = setting.get().getStarBeneficiarySnack();
-            end = setting.get().getStarBeneficiaryLunch();
+            start = setting.get().getStartBeneficiarySnack();
+            end = setting.get().getStartBeneficiaryLunch();
             type = "Refrigerio";
         }
 
@@ -322,12 +322,12 @@ public class ReservationServiceImpl implements IReservationService {
             throw new ResourceNotFoundException("Configuración no encontrada");
         }
 
-        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+        if (now.isBefore(setting.get().getStartBeneficiarySnack()) && now.isAfter(setting.get().getStartBeneficiaryLunch())) {
             type = "almuerzo";
             reservation = reservationRepository.findLunchReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de almuerzo para cancelar el día de hoy"));
         }
-        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+        if (now.isAfter(setting.get().getStartBeneficiarySnack())){
             type = "Refrigerio";
             reservation = reservationRepository.findSnackReservationById(reservationId, today)
                     .orElseThrow(() -> new ResourceNotFoundException("El usuario no tiene una reserva de refrigerio para cancelar el día de hoy"));
@@ -376,10 +376,10 @@ public class ReservationServiceImpl implements IReservationService {
         UserEntity user = userEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        if (now.isBefore(setting.get().getStarBeneficiarySnack()) && now.isAfter(setting.get().getStarBeneficiaryLunch())) {
+        if (now.isBefore(setting.get().getStartBeneficiarySnack()) && now.isAfter(setting.get().getStartBeneficiaryLunch())) {
             reservations = reservationRepository.findByUserEntityLunchPaidFalse(user, today);
         }
-        if (now.isAfter(setting.get().getStarBeneficiarySnack())){
+        if (now.isAfter(setting.get().getStartBeneficiarySnack())){
             reservations = reservationRepository.findByUserEntitySnackPaidFalse(user, today);
         }
 
@@ -420,19 +420,19 @@ public class ReservationServiceImpl implements IReservationService {
         List<Reservation> lunchReservations = reservationRepository.findByUserEntityLunchPaidFalse(user, today);
         List<Reservation> snackReservations = reservationRepository.findByUserEntitySnackPaidFalse(user, today);
 
-        if (setting.isPresent() && lunchReservations.isEmpty() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && lunchReservations.isEmpty() && now.isAfter(setting.get().getStartBeneficiaryLunch()) && now.isBefore(setting.get().getStartBeneficiarySnack())) {
             throw new ResourceNotFoundException("No se encontraron reservas de almuerzo pendientes para este usuario.");
         }
 
-        if (setting.isPresent() && snackReservations.isEmpty() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && snackReservations.isEmpty() && now.isAfter(setting.get().getStartBeneficiarySnack())) {
             throw new ResourceNotFoundException("No se encontraron reservas de refrigerio pendientes para este usuario.");
         }
 
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiaryLunch()) && now.isBefore(setting.get().getStartBeneficiarySnack())) {
             reservations = lunchReservations;
         }
 
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiarySnack())) {
             reservations = snackReservations;
         }
 
@@ -458,7 +458,7 @@ public class ReservationServiceImpl implements IReservationService {
         Page<ListReservationResponse> responses = Page.empty();
 
         // Verifcar en qué rango de tiempo estamos, según los ajustes en "setting"
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiaryLunch()) && now.isBefore(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiaryLunch()) && now.isBefore(setting.get().getStartBeneficiarySnack())) {
             // Caso para reservas de almuerzo no pagadas
             responses = reservationRepository.findAllLunchByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(
@@ -474,7 +474,7 @@ public class ReservationServiceImpl implements IReservationService {
                     ));
         }
 
-        if (setting.isPresent() && now.isAfter(setting.get().getStarBeneficiarySnack())) {
+        if (setting.isPresent() && now.isAfter(setting.get().getStartBeneficiarySnack())) {
             // Caso para reservas de refrigerio no pagadas
             responses = reservationRepository.findAllSnackByPaidFalse(pageable, date)
                     .map(reservation -> new ListReservationResponse(

@@ -5,6 +5,7 @@ import com.univalle.bubackend.DTOs.user.*;
 import com.univalle.bubackend.exceptions.report.CSVFieldException;
 
 
+import com.univalle.bubackend.exceptions.users.EmailAlreadyExist;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.change_password.PasswordError;
@@ -51,11 +52,12 @@ public class UserServiceImpl {
 
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUserOpt = userEntityRepository.findByUsername(userRequest.username());
-        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
-        if(existinUserByEmailOpt.isPresent()) {
-            throw new UserNameAlreadyExist("El correo ya está registrado");
+        //Verifica si el correo ya está registrado
+        if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
+            throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
         }
+
         // Si el usuario ya existe
         if (existingUserOpt.isPresent()) {
             UserEntity user = existingUserOpt.get();
@@ -127,8 +129,8 @@ public class UserServiceImpl {
 
     public UserResponse findUsersByUsername(String username, String filter) {
 
-        UserEntity user = null;
-        Optional<UserEntity> optionalUser = Optional.empty();
+        UserEntity user;
+        Optional<UserEntity> optionalUser;
 
         switch (filter.toLowerCase()) {
             case "beneficiarios", "estudiantes":
@@ -287,10 +289,14 @@ public class UserServiceImpl {
         Optional<UserEntity> userOpt = userEntityRepository.findByUsername(userRequest.username());
         UserEntity newUser;
 
-
+        Optional<UserEntity> existinUserByEmailOpt = userEntityRepository.findByEmail(userRequest.email());
 
         if (userOpt.isPresent()) {
             newUser = userOpt.get();
+
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
+            }
 
             if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
                 String updatePassword = generatePassword(userRequest.name(), userRequest.username(), userRequest.lastName());
@@ -336,6 +342,11 @@ public class UserServiceImpl {
                     .lunchBeneficiary("almuerzo".equalsIgnoreCase(userRequest.beca()))
                     .snackBeneficiary("refrigerio".equalsIgnoreCase(userRequest.beca()))
                     .build();
+
+            if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
+                throw new UserNameAlreadyExist("El correo ya está registrado");
+            }
+
         }
 
         userEntityRepository.save(newUser);

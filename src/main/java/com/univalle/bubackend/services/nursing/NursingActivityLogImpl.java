@@ -6,6 +6,7 @@ import com.univalle.bubackend.DTOs.nursing.ActivityNursingResponse;
 import com.univalle.bubackend.DTOs.nursing.UserResponse;
 import com.univalle.bubackend.DTOs.user.UserRequest;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
+import com.univalle.bubackend.exceptions.change_password.UserNotFound;
 import com.univalle.bubackend.exceptions.nursing.FieldException;
 import com.univalle.bubackend.models.NursingActivityLog;
 import com.univalle.bubackend.models.UserEntity;
@@ -107,8 +108,11 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             activities = nursingActivityLogRepository.findAllByUserUsernameAndDateBetweenOrderByIdDesc(
                     username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
+            UserEntity user = userEntityRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
+
             if (activities.isEmpty()) {
-                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermeria.");
+                throw new ResourceNotFoundException("El usuario no tiene citas realizadas en esa fecha.");
             }
 
             // Solo por username
@@ -116,13 +120,17 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             activities = nursingActivityLogRepository.findAllByUserUsernameOrderByIdDesc(username);
 
             if (activities.isEmpty()) {
-                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermeria.");
+                throw new ResourceNotFoundException("El usuario no tiene ningún registro de enfermería.");
             }
 
             // Solo por rango de fechas
         } else {
             activities = nursingActivityLogRepository.findAllByDateBetweenOrderByIdDesc(
                     startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+            if (activities.isEmpty()) {
+                throw new ResourceNotFoundException("No existen registros de enfermería en la fecha suministrada.");
+            }
+
         }
 
         return activities.stream()
@@ -141,7 +149,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
     @Override
     public ActivityNursingResponse getActivityNursing(Integer id) {
         NursingActivityLog activity = nursingActivityLogRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermeria no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Actividad de enfermería no encontrada"));
         return new ActivityNursingResponse(activity);
     }
 }

@@ -63,7 +63,7 @@ public class ReservationController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class))),
             @ApiResponse(responseCode = "404", description = "Resource not found",
                     content = @Content),
-            @ApiResponse(responseCode = "403", description = "Unauthorized to make reservation",
+            @ApiResponse(responseCode = "401", description = "Unauthorized to make reservation",
                     content = @Content),
             @ApiResponse(responseCode = "409", description = "No slots available",
                     content = @Content)
@@ -76,7 +76,7 @@ public class ReservationController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (NoSlotsAvailableException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }

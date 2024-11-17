@@ -293,7 +293,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     public UserResponseAppointment findReservationsByUsername(String username, Pageable pageable) {
 
         UserEntity userTest = userEntityRepository.findByUsername(username).orElseThrow(() ->
-                new ReservationNotFoud("No se encontró un usuario con ese codigo"));
+                new ReservationNotFoud("No se encontró un usuario con ese código o cédula"));
 
         Optional<UserEntity> optionalUser;
             if(LocalDateTime.now().getMonth().getValue() > Month.JUNE.getValue()) {
@@ -307,7 +307,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 optionalUser = appointmentReservationRepository.findByUsernameWithPsychoReservation(username, TypeAppointment.PSICOLOGIA, startDate, endDate);
             }
 
-        Page<ListReservationResponse> listReservationResponses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username)
+        Page<ListReservationResponse> listReservationResponses = appointmentReservationRepository.getAllAppointmentReservationByUsername(pageable, username, TypeAppointment.PSICOLOGIA)
                 .map(reservation -> new ListReservationResponse(
                         reservation.getId(),
                         reservation.getAvailableDates().getDateTime(),

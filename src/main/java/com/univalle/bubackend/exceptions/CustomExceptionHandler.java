@@ -17,6 +17,7 @@ import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.exceptions.users.InvalidFilter;
 import com.univalle.bubackend.exceptions.users.RoleNotFound;
 import com.univalle.bubackend.exceptions.users.UserNameAlreadyExist;
+import com.univalle.bubackend.exceptions.users.EmailAlreadyExist;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -171,6 +172,12 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(UserNameAlreadyExist.class)
     public ResponseEntity<ExceptionDTO> handleUserNameAlreadyExist(UserNameAlreadyExist ex) {
+        String errorMessage = ex.getMessage();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
+    }
+
+    @ExceptionHandler(EmailAlreadyExist.class)
+    public ResponseEntity<ExceptionDTO> handleEmailAlreadyExist(EmailAlreadyExist ex) {
         String errorMessage = ex.getMessage();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ExceptionDTO(errorMessage) );
     }
