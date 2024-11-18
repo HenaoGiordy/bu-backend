@@ -119,6 +119,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
                 .map(visit -> new VisitResponse(
                         visit.getDate(),
                         finalUser.name(),
+                        finalUser.lastName(),
                         finalUser.username(),
                         finalUser.plan(),
                         visit.getReason(),
@@ -135,6 +136,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
         return new VisitResponse(
                 visit.getDate(),
                 user.name(),
+                user.lastName(),
                 user.username(),
                 user.plan(),
                 visit.getReason(),
