@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record VisitResponse(
         LocalDateTime date,
         String name,
+        String lastName,
         String username,
         String plan,
         OdontologyReason reason,
