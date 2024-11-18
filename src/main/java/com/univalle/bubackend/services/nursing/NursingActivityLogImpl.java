@@ -106,7 +106,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
         // Si ambos están presentes, filtrar por username y fecha
         if (username != null && startDate != null && endDate != null) {
             activities = nursingActivityLogRepository.findAllByUserUsernameAndDateBetweenOrderByIdDesc(
-                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MIDNIGHT));
 
             UserEntity user = userEntityRepository.findByUsername(username)
                     .orElseThrow(() -> new UserNotFound("No se encontró el usuario"));
@@ -126,7 +126,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
             // Solo por rango de fechas
         } else {
             activities = nursingActivityLogRepository.findAllByDateBetweenOrderByIdDesc(
-                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MIDNIGHT));
             if (activities.isEmpty()) {
                 throw new ResourceNotFoundException("No existen registros de enfermería en la fecha suministrada.");
             }

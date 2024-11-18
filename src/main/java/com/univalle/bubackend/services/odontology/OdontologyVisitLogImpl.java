@@ -99,7 +99,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
             user = new UserResponse(usr);
 
             visitResponses = odontologyVisitRepository.findAllByUserUsernameAndDateBetween(
-                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX), pageable);
+                    username, startDate.atStartOfDay(), endDate.atTime(LocalTime.MIDNIGHT), pageable);
 
             // Solo por username
         } else if (username != null) {
@@ -111,7 +111,7 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
             // Solo por rango de fechas
         } else {
             visitResponses = odontologyVisitRepository.findAllByDateBetween(
-                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX), pageable);
+                    startDate.atStartOfDay(), endDate.atTime(LocalTime.MIDNIGHT), pageable);
         }
 
         UserResponse finalUser = user;
