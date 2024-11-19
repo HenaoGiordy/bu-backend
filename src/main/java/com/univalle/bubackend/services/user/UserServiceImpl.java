@@ -295,7 +295,7 @@ public class UserServiceImpl {
             newUser = userOpt.get();
 
             if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
-                throw new UserNameAlreadyExist("El correo ya está registrado");
+                throw new UserNameAlreadyExist("El usuario con codigo " + newUser.getUsername() + " tiene un correo el cual ya está registrado");
             }
 
             if (!userRequest.name().equalsIgnoreCase(newUser.getName()) || !userRequest.lastName().equalsIgnoreCase(newUser.getLastName())) {
@@ -344,7 +344,7 @@ public class UserServiceImpl {
                     .build();
 
             if(existinUserByEmailOpt.isPresent() && !Objects.equals(newUser.getId(), existinUserByEmailOpt.get().getId())) {
-                throw new UserNameAlreadyExist("El correo ya está registrado");
+                throw new UserNameAlreadyExist("El usuario con codigo " + newUser.getUsername() + " tiene un correo el cual ya está registrado");
             }
 
         }
