@@ -136,6 +136,7 @@ public class ReportServiceImpl {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Informe");
 
+            // Encabezado del informe
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Fecha");
             headerRow.createCell(1).setCellValue(report.getDate().toString());
@@ -146,30 +147,70 @@ public class ReportServiceImpl {
                 headerRow.createCell(4).setCellValue("Semestre: " + report.getSemester());
             }
 
-            Row userHeader = sheet.createRow(2);
+            int rowNum = 2; // Inicializamos la fila
+
+            // Encabezado de "Beneficiarios"
+            Row beneficiariesHeader = sheet.createRow(rowNum++);
+            beneficiariesHeader.createCell(0).setCellValue("Beneficiarios");
+
+            // Encabezado de columnas
+            Row userHeader = sheet.createRow(rowNum++);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
             userHeader.createCell(1).setCellValue("Nombre");
             userHeader.createCell(2).setCellValue("Plan/Area");
             userHeader.createCell(3).setCellValue("Correo");
-
             int countCellIndex = 4;
             if (report.getSemester() != null) {
                 userHeader.createCell(countCellIndex).setCellValue("Cantidad de " + report.getBeca());
             }
 
-            int rowNum = 3;
+            // Beneficiarios
             for (UserEntity user : report.getUserEntities()) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(user.getUsername());
-                row.createCell(1).setCellValue(user.getName() + " " + user.getLastName());
-                row.createCell(2).setCellValue(user.getPlan());
-                row.createCell(3).setCellValue(user.getEmail());
+                if (user.getLunchBeneficiary() || user.getSnackBeneficiary()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(user.getUsername());
+                    row.createCell(1).setCellValue(user.getName() + " " + user.getLastName());
+                    row.createCell(2).setCellValue(user.getPlan());
+                    row.createCell(3).setCellValue(user.getEmail());
 
-                if (report.getSemester() != null) {
-                    int count = report.getUserReportCount().getOrDefault(user.getId(), 0);
-                    row.createCell(countCellIndex).setCellValue(count);
+                    if (report.getSemester() != null) {
+                        int count = report.getUserReportCount().getOrDefault(user.getId(), 0);
+                        row.createCell(countCellIndex).setCellValue(count);
+                    }
                 }
+            }
 
+            // Espacio entre secciones
+            rowNum++;
+
+            // Encabezado de "Venta libre"
+            Row nonBeneficiariesHeader = sheet.createRow(rowNum++);
+            nonBeneficiariesHeader.createCell(0).setCellValue("Venta libre");
+
+            // Encabezado de columnas (reutilizado)
+            userHeader = sheet.createRow(rowNum++);
+            userHeader.createCell(0).setCellValue("Codigo/Cedula");
+            userHeader.createCell(1).setCellValue("Nombre");
+            userHeader.createCell(2).setCellValue("Plan/Area");
+            userHeader.createCell(3).setCellValue("Correo");
+            if (report.getSemester() != null) {
+                userHeader.createCell(countCellIndex).setCellValue("Cantidad de " + report.getBeca());
+            }
+
+            // No beneficiarios
+            for (UserEntity user : report.getUserEntities()) {
+                if (!user.getLunchBeneficiary() && !user.getSnackBeneficiary()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(user.getUsername());
+                    row.createCell(1).setCellValue(user.getName() + " " + user.getLastName());
+                    row.createCell(2).setCellValue(user.getPlan());
+                    row.createCell(3).setCellValue(user.getEmail());
+
+                    if (report.getSemester() != null) {
+                        int count = report.getUserReportCount().getOrDefault(user.getId(), 0);
+                        row.createCell(countCellIndex).setCellValue(count);
+                    }
+                }
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -180,6 +221,7 @@ public class ReportServiceImpl {
             throw new RuntimeException("Error al generar el archivo Excel", e);
         }
     }
+
 
     public List<Report> findReportsBySemester(String semester) {
         return reportRepository.findBySemester(semester);
