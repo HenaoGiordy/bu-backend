@@ -136,32 +136,81 @@ public class ReportServiceImpl {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Informe");
 
+            // Crear estilos
+            CellStyle boldStyle = workbook.createCellStyle();
+            Font boldFont = workbook.createFont();
+            boldFont.setBold(true);
+            boldFont.setFontHeightInPoints((short) 12);
+            boldStyle.setFont(boldFont);
+
+            CellStyle redBoldStyle = workbook.createCellStyle();
+            Font redBoldFont = workbook.createFont();
+            redBoldFont.setBold(true);
+            redBoldFont.setFontHeightInPoints((short) 12);
+            redBoldFont.setColor(IndexedColors.RED.getIndex());
+            redBoldStyle.setFont(redBoldFont);
+
+            CellStyle grayHeaderStyle = workbook.createCellStyle();
+            grayHeaderStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            grayHeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            grayHeaderStyle.setFont(boldFont);
+            grayHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            CellStyle normalStyle = workbook.createCellStyle();
+            Font normalFont = workbook.createFont();
+            normalFont.setFontHeightInPoints((short) 12);
+            normalStyle.setFont(normalFont);
+
             // Encabezado del informe
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Fecha");
-            headerRow.createCell(1).setCellValue(report.getDate().toString());
-            headerRow.createCell(2).setCellValue("Tipo de beca");
-            headerRow.createCell(3).setCellValue(report.getBeca());
+            Cell cell = headerRow.createCell(0);
+            cell.setCellValue("Fecha");
+            cell.setCellStyle(boldStyle);
+
+            cell = headerRow.createCell(1);
+            cell.setCellValue(report.getDate().toString());
+            cell.setCellStyle(normalStyle);
+
+            cell = headerRow.createCell(2);
+            cell.setCellValue("Tipo de beca");
+            cell.setCellStyle(boldStyle);
+
+            cell = headerRow.createCell(3);
+            cell.setCellValue(report.getBeca());
+            cell.setCellStyle(normalStyle);
 
             if (report.getSemester() != null) {
-                headerRow.createCell(4).setCellValue("Semestre: " + report.getSemester());
+                cell = headerRow.createCell(4);
+                cell.setCellValue("Semestre: " + report.getSemester());
+                cell.setCellStyle(normalStyle);
             }
 
             int rowNum = 2; // Inicializamos la fila
 
             // Encabezado de "Beneficiarios"
             Row beneficiariesHeader = sheet.createRow(rowNum++);
-            beneficiariesHeader.createCell(0).setCellValue("Beneficiarios");
+            Cell beneficiariesTitle = beneficiariesHeader.createCell(0);
+            beneficiariesTitle.setCellValue("Beneficiarios");
+            beneficiariesTitle.setCellStyle(redBoldStyle);
 
             // Encabezado de columnas
             Row userHeader = sheet.createRow(rowNum++);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
+            userHeader.getCell(0).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(1).setCellValue("Nombre");
+            userHeader.getCell(1).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(2).setCellValue("Plan/Area");
+            userHeader.getCell(2).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(3).setCellValue("Correo");
+            userHeader.getCell(3).setCellStyle(grayHeaderStyle);
+
             int countCellIndex = 4;
             if (report.getSemester() != null) {
                 userHeader.createCell(countCellIndex).setCellValue("Cantidad de " + report.getBeca());
+                userHeader.getCell(countCellIndex).setCellStyle(grayHeaderStyle);
             }
 
             // Beneficiarios
@@ -185,16 +234,27 @@ public class ReportServiceImpl {
 
             // Encabezado de "Venta libre"
             Row nonBeneficiariesHeader = sheet.createRow(rowNum++);
-            nonBeneficiariesHeader.createCell(0).setCellValue("Venta libre");
+            Cell nonBeneficiariesTitle = nonBeneficiariesHeader.createCell(0);
+            nonBeneficiariesTitle.setCellValue("Venta libre");
+            nonBeneficiariesTitle.setCellStyle(redBoldStyle);
 
             // Encabezado de columnas (reutilizado)
             userHeader = sheet.createRow(rowNum++);
             userHeader.createCell(0).setCellValue("Codigo/Cedula");
+            userHeader.getCell(0).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(1).setCellValue("Nombre");
+            userHeader.getCell(1).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(2).setCellValue("Plan/Area");
+            userHeader.getCell(2).setCellStyle(grayHeaderStyle);
+
             userHeader.createCell(3).setCellValue("Correo");
+            userHeader.getCell(3).setCellStyle(grayHeaderStyle);
+
             if (report.getSemester() != null) {
                 userHeader.createCell(countCellIndex).setCellValue("Cantidad de " + report.getBeca());
+                userHeader.getCell(countCellIndex).setCellStyle(grayHeaderStyle);
             }
 
             // No beneficiarios
@@ -211,6 +271,10 @@ public class ReportServiceImpl {
                         row.createCell(countCellIndex).setCellValue(count);
                     }
                 }
+            }
+            // Ajustar el ancho de las columnas automáticamente
+            for (int i = 0; i <= countCellIndex; i++) {
+                sheet.autoSizeColumn(i);
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
