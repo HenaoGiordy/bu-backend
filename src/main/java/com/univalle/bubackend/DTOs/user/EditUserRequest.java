@@ -13,7 +13,7 @@ public record EditUserRequest(@NotNull(message = "Debes proporcionar un Id") Int
                               @NotBlank(message = "Debes proporcionar el username") String username,
                               @NotBlank(message = "Debes proporcionar el name") String name,
                               @NotBlank(message = "Debes proporcionar el LastName") String lastName,
-                              @NotBlank(message = "Debes proporcionar el email") @Email(message = "Formato de email incorrecto") String email,
+                              @NotBlank(message = "Debes proporcionar el email") String email,
                               @NotBlank(message = "Debes proporcionar el plan") String plan,
                               String eps,
                               String semester,
