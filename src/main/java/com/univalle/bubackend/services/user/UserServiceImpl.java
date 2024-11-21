@@ -225,14 +225,14 @@ public class UserServiceImpl {
                 }
 
                 String nota;
-                if (record.isMapped("Las opciones de beca son: almuerzo/refrigerio")) {
-                    nota = record.get("Las opciones de beca son: almuerzo/refrigerio").trim();
+                if (record.isMapped("Las opciones de beneficio son: almuerzo/refrigerio")) {
+                    nota = record.get("Las opciones de beneficio son: almuerzo/refrigerio").trim();
                     if (nota.isEmpty()) {
                         nota = null;
                     }
                 }
 
-                String beca = record.isMapped("beca") ? record.get("beca") : null;
+                String beca = record.isMapped("beneficio") ? record.get("beneficio") : null;
 
                 if (username == null || username.trim().isEmpty()) {
                     throw new CSVFieldException("El campo 'codigo/cedula' está vacío en el archivo CSV.");
