@@ -1,6 +1,8 @@
 package com.univalle.bubackend.services.appointment.reservation;
 
 import com.univalle.bubackend.DTOs.appointment.*;
+import com.univalle.bubackend.DTOs.appointment.report.AppointmentReservationDTO;
+import com.univalle.bubackend.DTOs.appointment.report.UserAppointmentDTO;
 import com.univalle.bubackend.DTOs.user.UserResponse;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.appointment.CantReserveMoreAppointments;
@@ -19,11 +21,20 @@ import com.univalle.bubackend.services.appointment.validations.DateTimeValidatio
 import com.univalle.bubackend.services.appointment.validations.DefineTypeOfAppointment;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -320,4 +331,95 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
     }
 
+    @Override
+    public ByteArrayInputStream downloadAppointmentReport(Integer professionalId) {
+        // Obtener todas las citas atendidas por un profesional
+        List<AppointmentReservation> appointmentReservations =
+                appointmentReservationRepository.findByAvailableDates_Professional_IdAndPendingAppointmentFalse(professionalId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        // Convertir las citas en DTOs
+        List<AppointmentReservationDTO> reservationDTOs = appointmentReservations.stream()
+                .map(reservation -> new AppointmentReservationDTO(
+                        reservation.getId(),
+                        reservation.getAvailableDates().getDateTime(),
+                        reservation.getAvailableDates().getTypeAppointment().name(),
+                        reservation.getAssistant(),
+                        reservation.getPendingAppointment(),
+                        new UserAppointmentDTO(
+                                reservation.getEstudiante().getUsername(),
+                                reservation.getEstudiante().getName(),
+                                reservation.getEstudiante().getLastName(),
+                                reservation.getEstudiante().getEmail(),
+                                reservation.getEstudiante().getPlan(),
+                                reservation.getEstudiante().getSemester(),
+                                reservation.getEstudiante().getEps(),
+                                reservation.getEstudiante().getPhone(),
+                                reservation.getEstudiante().getGender() != null
+                                        ? reservation.getEstudiante().getGender().name()
+                                        : null
+                        )
+                ))
+                .toList();
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Citas Atendidas");
+
+            // Crear estilos
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setFontHeightInPoints((short) 12);
+            headerStyle.setFont(headerFont);
+
+            CellStyle normalStyle = workbook.createCellStyle();
+            Font normalFont = workbook.createFont();
+            normalFont.setFontHeightInPoints((short) 12);
+            normalStyle.setFont(normalFont);
+
+            // Crear encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {
+                    "Fecha", "Tipo de Cita", "Paciente", "Email", "Teléfono", "Plan", "Semestre", "EPS", "Género", "Asistió"
+            };
+
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Poblar filas con datos
+            int rowNum = 1;
+            for (AppointmentReservationDTO dto : reservationDTOs) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(dto.dateTime().format(formatter));
+                row.createCell(1).setCellValue(dto.typeAppointment());
+                row.createCell(2).setCellValue(dto.user().name() + " " + dto.user().lastName());
+                row.createCell(3).setCellValue(dto.user().email());
+                row.createCell(4).setCellValue(dto.user().phone() != null ? dto.user().phone().toString() : "");
+                row.createCell(5).setCellValue(dto.user().plan());
+                row.createCell(6).setCellValue(dto.user().semester());
+                row.createCell(7).setCellValue(dto.user().eps());
+                row.createCell(8).setCellValue(dto.user().gender());
+                row.createCell(9).setCellValue(dto.assistant() != null && dto.assistant() ? "Sí" : "No");
+            }
+
+            // Ajustar ancho de columnas automáticamente
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Generar archivo Excel
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error al generar el archivo Excel", e);
+        }
+
+
+    }
 }

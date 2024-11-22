@@ -22,6 +22,8 @@ public interface AppointmentReservationRepository extends JpaRepository<Appointm
 
     Page<AppointmentReservation> findByAvailableDates_Professional_IdAndPendingAppointmentFalse(Integer id, Pageable pageable);
 
+    List<AppointmentReservation> findByAvailableDates_Professional_IdAndPendingAppointmentFalse(Integer id);
+
     @Query("SELECT a FROM AppointmentReservation a " +
             "WHERE a.pendingAppointment = false " +
             "AND FUNCTION('DATE', a.availableDates.dateTime) = :specificDate " +
