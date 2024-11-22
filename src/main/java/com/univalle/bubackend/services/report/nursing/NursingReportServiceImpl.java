@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +153,9 @@ public class NursingReportServiceImpl implements INursingReportService {
         NursingReport nursingReport = reportNursingRepository.findById(id)
                 .orElseThrow(() -> new ReportNotFound("Informe de enfermería no encontrado"));
 
+        // Formato para las fechas
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Informe de enfermería");
 
@@ -173,7 +177,7 @@ public class NursingReportServiceImpl implements INursingReportService {
             normalFont.setFontHeightInPoints((short) 12);
             normalStyle.setFont(normalFont);
 
-            // Información del informe
+            // Información del informe (encabezado)
             Row headerRow = sheet.createRow(0);
             Cell cell = headerRow.createCell(0);
             cell.setCellValue("Fecha");
@@ -194,7 +198,7 @@ public class NursingReportServiceImpl implements INursingReportService {
             // Espacio entre secciones
             sheet.createRow(1);
 
-            // Información de las actividades de enfermería
+            // Tabla 1: Información de los diagnósticos
             Row reportHeader = sheet.createRow(2);
             Cell headerCell = reportHeader.createCell(0);
             headerCell.setCellValue("Motivo");
@@ -208,7 +212,6 @@ public class NursingReportServiceImpl implements INursingReportService {
             for (NursingReportDetail detail : nursingReport.getDiagnosticCount()) {
                 Row row = sheet.createRow(rowNum++);
 
-                // Convertir el diagnóstico a formato normal (por ejemplo: "DOLOR_MUSCULAR" -> "Dolor muscular")
                 String formattedDiagnostic = detail.getDiagnostic()
                         .toString()
                         .toLowerCase()
@@ -224,11 +227,46 @@ public class NursingReportServiceImpl implements INursingReportService {
                 countCell.setCellStyle(normalStyle);
             }
 
+            // Espacio entre tablas
+            rowNum++;
+
+            // Tabla 2: Información de las actividades realizadas
+            Row activityHeader = sheet.createRow(rowNum++);
+            String[] activityHeaders = {
+                    "Fecha", "Codigo/CC", "Nombre", "Apellido", "Teléfono", "Plan", "Semestre", "Género", "Diagnóstico", "Conducta"
+            };
+
+            for (int i = 0; i < activityHeaders.length; i++) {
+                Cell activityHeaderCell = activityHeader.createCell(i);
+                activityHeaderCell.setCellValue(activityHeaders[i]);
+                activityHeaderCell.setCellStyle(grayHeaderStyle);
+            }
+
+            // Poblar filas con actividades
+            for (NursingActivityLog activity : nursingReport.getActivities()) {
+                Row row = sheet.createRow(rowNum++);
+
+                row.createCell(0).setCellValue(activity.getDate().format(dateFormatter));
+                row.createCell(1).setCellValue(activity.getUser().getUsername());
+                row.createCell(2).setCellValue(activity.getUser().getName());
+                row.createCell(3).setCellValue(activity.getUser().getLastName());
+                row.createCell(4).setCellValue(activity.getUser().getPhone() != null ? activity.getUser().getPhone().toString() : "");
+                row.createCell(5).setCellValue(activity.getUser().getPlan());
+                row.createCell(6).setCellValue(activity.getUser().getSemester());
+                row.createCell(7).setCellValue(activity.getUser().getGender() != null ? activity.getUser().getGender().name() : "");
+                String formattedDiagnostic = activity.getDiagnostic()
+                        .toString()
+                        .toLowerCase()
+                        .replace("_", " ");
+                formattedDiagnostic = Character.toUpperCase(formattedDiagnostic.charAt(0)) + formattedDiagnostic.substring(1);
+                row.createCell(8).setCellValue(formattedDiagnostic);
+                row.createCell(9).setCellValue(activity.getConduct());
+            }
+
             // Ajustar ancho de columnas automáticamente
-            sheet.autoSizeColumn(0);
-            sheet.autoSizeColumn(1);
-            sheet.autoSizeColumn(2);
-            sheet.autoSizeColumn(3);
+            for (int i = 0; i < activityHeaders.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
@@ -238,6 +276,7 @@ public class NursingReportServiceImpl implements INursingReportService {
             throw new RuntimeException("Error al generar el archivo Excel", e);
         }
     }
+
 
 
     @Override
