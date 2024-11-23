@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.appointment.*;
 import com.univalle.bubackend.DTOs.appointment.report.AppointmentReservationDTO;
 import com.univalle.bubackend.DTOs.appointment.report.UserAppointmentDTO;
 import com.univalle.bubackend.DTOs.user.UserResponse;
+import com.univalle.bubackend.config.TaskManager;
 import com.univalle.bubackend.exceptions.ResourceNotFoundException;
 import com.univalle.bubackend.exceptions.appointment.CantReserveMoreAppointments;
 import com.univalle.bubackend.exceptions.appointment.HaveAnAppoinmentPending;
@@ -19,6 +20,7 @@ import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.appointment.validations.AppointmentDateCreationValidation;
 import com.univalle.bubackend.services.appointment.validations.DateTimeValidation;
 import com.univalle.bubackend.services.appointment.validations.DefineTypeOfAppointment;
+import com.univalle.bubackend.services.notification.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -52,6 +54,8 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
     private DefineTypeOfAppointment defineTypeOfAppointment;
     private AvailableDatesRepository availableDatesRepository;
     private TaskScheduler taskScheduler;
+    private NotificationService notificationService;
+    private TaskManager taskManager;
 
 
     @Override
@@ -107,14 +111,40 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         }
         userEntityRepository.save(userEntity);
         availableDatesRepository.save(availableDates);
-        AppointmentReservation appointmentReservation1= appointmentReservationRepository.save(appointmentReservation);
 
-        taskScheduler.schedule(()->{
-            appointmentReservation1.setPendingAppointment(false);
-            appointmentReservationRepository.save(appointmentReservation1);
-            }, convertToInstant(appointmentReservation1.getAvailableDates().getDateTime()));
+
+        AppointmentReservation savedAppointment = appointmentReservationRepository.save(appointmentReservation);
+
+        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(1)).toMillis();
+        taskManager.scheduleTask(savedAppointment.getId(), () -> sendNotification(userEntity, availableDates), delayNotification);
+
+        long delayStatusUpdate = Duration.between(LocalDateTime.now(), availableDates.getDateTime()).toMillis();
+        taskManager.scheduleTask(savedAppointment.getId(), () -> {
+            savedAppointment.setPendingAppointment(false);
+            appointmentReservationRepository.save(savedAppointment);
+        }, delayStatusUpdate);
 
         return new ResponseAppointmentReservation("Cita reservada con éxito", new AvailableDateDTO(availableDates), new UserResponse(userEntity));
+    }
+    // Metodo para Enviar notificaciones
+    private void sendNotification(UserEntity userEntity, AvailableDates availableDates) {
+        // Formatear la fecha y hora
+        String formattedDateTime = availableDates.getDateTime()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'a las' HH:mm"));
+
+        // Construir el asunto y el cuerpo del mensaje
+        String subject = "Recordatorio de tu cita";
+        String body = String.format(
+                "<p>Cordial saludo:</p>" +
+                        "<p>Te queremos recordar que tienes una cita pendiente de <strong>%s</strong> programada para <strong>%s</strong>.</p>" +
+                        "<p>Te esperamos, gracias.</p>" +
+                        "<p><em>Bienestar Universitario.</em></p>",
+                availableDates.getTypeAppointment(),
+                formattedDateTime
+        );
+
+        // Enviar la notificación
+        notificationService.sendNotification(userEntity.getEmail(), subject, body);
     }
 
     @Override
@@ -223,6 +253,8 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         AvailableDates availableDates = appointmentReservation.getAvailableDates();
 
+        taskManager.cancelTask(id);
+
         availableDates.setAvailable(true);
 
         availableDatesRepository.save(availableDates);
@@ -266,6 +298,14 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
             throw new HaveAnAppoinmentPending("Tienes una cita pendiente de " + appointmentReservation.getAvailableDates().getTypeAppointment().toString());
         }
 
+        if ((!LocalDateTime.now().isBefore(availableDates.getDateTime()))) {
+            throw new DateNotAvailable("Ya pasó la fecha de reserva");
+        }
+
+        if (availableDates.getDateTime().isBefore(LocalDateTime.now().plusMinutes(60))) {
+            throw new DateNotAvailable("No puedes reservar la fecha con menos de una hora de antelación");
+        }
+
         validateDatesPsicology(userEntity, availableDates);
 
         dateTimeValidation.validateDateTime(requestAppointmentFollowUp.dateTime().toString(), professional.getId());
@@ -277,7 +317,18 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
                 .availableDates(availableDates)
                 .build();
 
-        appointmentReservationRepository.save(appointmentReservation);
+        AppointmentReservation savedAppointment = appointmentReservationRepository.save(appointmentReservation);
+
+        /*
+        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(1)).toMillis();
+        taskManager.scheduleTask(savedAppointment.getId(), () -> sendNotification(userEntity, availableDates), delayNotification);
+
+        long delayStatusUpdate = Duration.between(LocalDateTime.now(), availableDates.getDateTime()).toMillis();
+        taskManager.scheduleTask(savedAppointment.getId(), () -> {
+            savedAppointment.setPendingAppointment(false);
+            appointmentReservationRepository.save(savedAppointment);
+        }, delayStatusUpdate);*/
+
         return new ResponseAppointmentFollowUp("Se ha reservado la cita con exito", userEntity.getName(), professional.getName());
     }
 

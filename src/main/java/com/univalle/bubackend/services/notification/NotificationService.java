@@ -8,10 +8,13 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class NotificationService {
 
     private JavaMailSender mailSender;
+
+    public NotificationService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendNotification(String to, String subject, String body) {
         try {
