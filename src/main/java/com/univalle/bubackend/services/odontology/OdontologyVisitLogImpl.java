@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -154,8 +155,12 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
 
     @Override
     public ByteArrayInputStream downloadOdontologyReport() {
+        // Calcular el rango de fechas para el último año
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusYears(1);
 
-        List<VisitOdontologyLog> visitLogs = odontologyVisitRepository.findAll();
+        // Obtener las visitas de odontología dentro del último año
+        List<VisitOdontologyLog> visitLogs = odontologyVisitRepository.findAllWithinLastYear(startDate, endDate);
 
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("Reporte de Odontología");
