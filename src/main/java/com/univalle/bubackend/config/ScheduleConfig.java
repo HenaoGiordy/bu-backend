@@ -12,6 +12,11 @@ public class ScheduleConfig {
     @Primary
     @Bean
     TaskScheduler taskScheduler() {
-        return new ThreadPoolTaskScheduler();
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(50);
+        scheduler.setThreadNamePrefix("TaskScheduler-");
+        scheduler.setRemoveOnCancelPolicy(true);
+        scheduler.initialize();
+        return scheduler;
     }
 }
