@@ -319,7 +319,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         AppointmentReservation savedAppointment = appointmentReservationRepository.save(appointmentReservation);
 
-        /*
+
         long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(1)).toMillis();
         taskManager.scheduleTask(savedAppointment.getId(), () -> sendNotification(userEntity, availableDates), delayNotification);
 
@@ -327,7 +327,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         taskManager.scheduleTask(savedAppointment.getId(), () -> {
             savedAppointment.setPendingAppointment(false);
             appointmentReservationRepository.save(savedAppointment);
-        }, delayStatusUpdate);*/
+        }, delayStatusUpdate);
 
         return new ResponseAppointmentFollowUp("Se ha reservado la cita con exito", userEntity.getName(), professional.getName());
     }
