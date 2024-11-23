@@ -10,13 +10,22 @@ import com.univalle.bubackend.repository.OdontologyVisitRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.user.UserServiceImpl;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -143,5 +152,80 @@ public class OdontologyVisitLogImpl implements IOdontologyVisitLog {
                 visit.getDescription()
         );
     }
+
+    @Override
+    public ByteArrayInputStream downloadOdontologyReport() {
+        // Calcular el rango de fechas para el último año
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusYears(1);
+
+        // Obtener las visitas de odontología dentro del último año
+        List<VisitOdontologyLog> visitLogs = odontologyVisitRepository.findAllWithinLastYear(startDate, endDate);
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Reporte de Odontología");
+
+            // Crear estilos
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setFontHeightInPoints((short) 12);
+            headerStyle.setFont(headerFont);
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+
+            CellStyle normalStyle = workbook.createCellStyle();
+            Font normalFont = workbook.createFont();
+            normalFont.setFontHeightInPoints((short) 12);
+            normalStyle.setFont(normalFont);
+
+            // Encabezado de la tabla
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Fecha", "Codigo/CC", "Nombre", "Apellido", "Plan", "Motivo", "Descripción"};
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Llenar datos
+            int rowNum = 1;
+            for (VisitOdontologyLog visit : visitLogs) {
+                Row row = sheet.createRow(rowNum++);
+
+                // Fecha (formato legible)
+                row.createCell(0).setCellValue(visit.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+                // Datos del usuario
+                row.createCell(1).setCellValue(visit.getUser().getUsername());
+                row.createCell(2).setCellValue(visit.getUser().getName());
+                row.createCell(3).setCellValue(visit.getUser().getLastName());
+                row.createCell(4).setCellValue(visit.getUser().getPlan());
+
+                // Motivo (formateado)
+                String formattedReason = visit.getReason()
+                        .toString()
+                        .toLowerCase()
+                        .replace("_", " ");
+                formattedReason = Character.toUpperCase(formattedReason.charAt(0)) + formattedReason.substring(1);
+                row.createCell(5).setCellValue(formattedReason);
+
+                // Descripción
+                row.createCell(6).setCellValue(visit.getDescription());
+            }
+
+            // Ajustar ancho de columnas automáticamente
+            for (int i = 0; i < headers.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Escribir el archivo Excel
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException("Error al generar el archivo Excel", e);
+        }
+    }
+
 
 }

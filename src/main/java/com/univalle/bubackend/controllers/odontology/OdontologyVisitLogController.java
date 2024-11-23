@@ -4,13 +4,17 @@ package com.univalle.bubackend.controllers.odontology;
 import com.univalle.bubackend.DTOs.odontology.*;
 import com.univalle.bubackend.services.odontology.OdontologyVisitLogImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 
 @RestController
@@ -45,4 +49,18 @@ public class OdontologyVisitLogController {
     public ResponseEntity<VisitResponse> getVisit(@PathVariable Long id) {
         return new ResponseEntity<>(odontologyVisitLog.getOdontologyVisit(id), HttpStatus.OK);
     }
+
+    @GetMapping("/download")
+    public ResponseEntity<InputStreamResource> downloadOdontologyReport(){
+        ByteArrayInputStream excelStream = odontologyVisitLog.downloadOdontologyReport();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=odontologia.xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(excelStream));
+    }
+
 }

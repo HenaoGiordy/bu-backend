@@ -4,6 +4,7 @@ import com.univalle.bubackend.DTOs.appointment.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 
 public interface IAppointmentReservationService {
@@ -27,4 +28,6 @@ public interface IAppointmentReservationService {
     ResponseAppointmentFollowUp followUp(RequestAppointmentFollowUp requestAppointmentFollowUp);
 
     UserResponseAppointment findReservationsByUsername(String username, Pageable pageable);
+
+    ByteArrayInputStream downloadAppointmentReport(Integer professionalId);
 }
