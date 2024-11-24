@@ -1,11 +1,11 @@
 package com.univalle.bubackend.services.menu;
 
-import com.univalle.bubackend.DTOs.CreateMenuRequest;
+import com.univalle.bubackend.DTOs.menu.CreateMenuRequest;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface IMenuService {
     CreateMenuRequest createMenu(CreateMenuRequest createMenuRequest);
-    Optional<CreateMenuRequest> getMenu(Integer menuId);
+    List<CreateMenuRequest> getMenu();
     CreateMenuRequest editMenu(CreateMenuRequest createMenuRequest);
 }

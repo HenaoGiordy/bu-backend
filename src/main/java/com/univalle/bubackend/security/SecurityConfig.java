@@ -3,7 +3,7 @@ package com.univalle.bubackend.security;
 
 import com.univalle.bubackend.security.filters.JwtFilter;
 import com.univalle.bubackend.security.utils.JwtUtils;
-import com.univalle.bubackend.services.UserDetailServiceImpl;
+import com.univalle.bubackend.services.user.UserDetailServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
