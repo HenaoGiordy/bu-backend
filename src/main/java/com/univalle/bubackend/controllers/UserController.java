@@ -226,7 +226,6 @@ public class UserController {
         return new ResponseEntity<>(new DeleteResponse("Beneficiario borrado exitosamente"), HttpStatus.OK);
     }
 
-
     @GetMapping("/{username}")
     public ResponseEntity<ViewProfileResponse> getUserBenefits(@PathVariable String username) {
         ViewProfileResponse userBenefits = userDetailServiceImpl.getUserDetails(username);
