@@ -2,7 +2,7 @@ package com.univalle.bubackend.models;
 
 public enum OdontologyReason {
     AYUDAS_DIAGNOSTICAS,
-    FOMULACION_DE_MEDICAMENTOS,
+    FORMULACION_DE_MEDICAMENTOS,
     HIGIENE_ORAL,
     REMISION_A_OTRAS_DEPENDENCIAS,
     RESINA_DE_FOTOCURADO,
