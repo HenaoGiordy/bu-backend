@@ -1,5 +1,6 @@
 package com.univalle.bubackend.services.reservation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentRequest;
 import com.univalle.bubackend.DTOs.payment.ReservationPaymentResponse;
 import com.univalle.bubackend.DTOs.reservation.*;
@@ -16,6 +17,7 @@ import com.univalle.bubackend.repository.SettingRepository;
 import com.univalle.bubackend.repository.UserEntityRepository;
 import com.univalle.bubackend.services.user.UserServiceImpl;
 import com.univalle.bubackend.services.email.EmailServiceImpl;
+import com.univalle.bubackend.websocket.WebSocketHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,8 @@ public class ReservationServiceImpl implements IReservationService {
     private final SettingRepository settingRepository;
     private final UserServiceImpl userService;
     private final EmailServiceImpl emailService;
+    private final WebSocketHandler webSocketHandler;
+    private final ObjectMapper objectMapper;
 
     @Override
     public ReservationUserResponse createReservation(UserEntity user, boolean lunch, boolean snack) {
@@ -215,10 +219,9 @@ public class ReservationServiceImpl implements IReservationService {
         Optional<Setting> setting = settingRepository.findSettingById(1);
 
         if (setting.isEmpty()) {
-            return new AvailabilityResponse(
-                    0,
-                    0
-            );
+            AvailabilityResponse emptyResponse = new AvailabilityResponse(0, 0);
+            broadcastAvailability(emptyResponse); // Transmite la respuesta vacía
+            return emptyResponse;
         }
 
         int maxLunchSlots = setting.get().getNumLunch();
@@ -229,10 +232,27 @@ public class ReservationServiceImpl implements IReservationService {
         int currentSnackReservations = reservationRepository.countSnackReservationsForDay(today);
         int remainingSlotsSnack = maxSnackSlots - currentSnackReservations;
 
-        return new AvailabilityResponse(
+        AvailabilityResponse availabilityResponse = new AvailabilityResponse(
                 remainingSlotsLunch,
                 remainingSlotsSnack
         );
+
+        // Envía la actualización de disponibilidad a los clientes conectados
+        broadcastAvailability(availabilityResponse);
+
+        return availabilityResponse;
+    }
+
+    /**
+     * Método para transmitir la disponibilidad actual a los clientes conectados mediante WebSockets.
+     */
+    private void broadcastAvailability(AvailabilityResponse availabilityResponse) {
+        try {
+            String message = objectMapper.writeValueAsString(availabilityResponse);
+            webSocketHandler.broadcast(message); // Envía el mensaje a todos los clientes conectados
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
