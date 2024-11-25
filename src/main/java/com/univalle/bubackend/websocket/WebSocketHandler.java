@@ -17,7 +17,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
+        System.out.println("Nueva conexión establecida: " + session.getId());
+        System.out.println("Sesiones activas: " + sessions.size());
     }
+
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {

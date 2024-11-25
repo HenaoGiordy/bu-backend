@@ -246,10 +246,10 @@ public class ReservationServiceImpl implements IReservationService {
     /**
      * Método para transmitir la disponibilidad actual a los clientes conectados mediante WebSockets.
      */
-    private void broadcastAvailability(AvailabilityResponse availabilityResponse) {
+    public void broadcastAvailability(AvailabilityResponse availabilityResponse) {
         try {
             String message = objectMapper.writeValueAsString(availabilityResponse);
-            webSocketHandler.broadcast(message); // Envía el mensaje a todos los clientes conectados
+            webSocketHandler.broadcast(message); // Envía el mensaje a los clientes conectados
         } catch (Exception e) {
             e.printStackTrace();
         }

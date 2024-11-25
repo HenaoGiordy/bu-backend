@@ -1,11 +1,13 @@
 package com.univalle.bubackend.services.setting;
 
+import com.univalle.bubackend.DTOs.reservation.AvailabilityResponse;
 import com.univalle.bubackend.DTOs.setting.SettingRequest;
 import com.univalle.bubackend.DTOs.setting.SettingResponse;
 import com.univalle.bubackend.exceptions.setting.InvalidTimeException;
 import com.univalle.bubackend.exceptions.setting.SettingNotFound;
 import com.univalle.bubackend.models.Setting;
 import com.univalle.bubackend.repository.SettingRepository;
+import com.univalle.bubackend.services.reservation.ReservationServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class SettingServiceImpl implements ISettingService {
 
     private SettingRepository settingRepository;
+    private ReservationServiceImpl reservationService;
 
     @Override
     public SettingResponse createSetting(SettingRequest settingRequest) {
@@ -40,6 +43,13 @@ public class SettingServiceImpl implements ISettingService {
                 .build();
 
         settingRepository.save(setting);
+
+        // Obtener la disponibilidad actual después de crear el ajuste
+        AvailabilityResponse availabilityResponse = reservationService.getAvailability();
+
+        // Transmitir la disponibilidad actual a los clientes conectados
+        reservationService.broadcastAvailability(availabilityResponse);
+
         return new SettingResponse(setting.getId(), "Ajustes creados exitosamente", settingRequest);
     }
 
