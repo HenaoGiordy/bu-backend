@@ -296,13 +296,10 @@ public class ReservationServiceImpl implements IReservationService {
                 type
         );
 
-        // Opcional: Transmitir la disponibilidad por hora
-        try {
-            String message = objectMapper.writeValueAsString(response);
-            webSocketHandler.broadcast(message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Transmitir la disponibilidad actualizada
+        AvailabilityResponse availabilityResponse = getAvailability();
+        broadcastAvailability(availabilityResponse);
+
 
         return response;
     }
@@ -480,6 +477,10 @@ public class ReservationServiceImpl implements IReservationService {
 
         lastReservation.setPaid(paymentRequest.paid());
         reservationRepository.save(lastReservation);
+
+        // Transmitir la disponibilidad actualizada
+        AvailabilityResponse availabilityResponse = getAvailability();
+        broadcastAvailability(availabilityResponse);
 
         return new ReservationPaymentResponse("Pago registrado con éxito.", lastReservation.getId());
     }
