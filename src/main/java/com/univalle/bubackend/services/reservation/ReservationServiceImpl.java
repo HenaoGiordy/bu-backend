@@ -114,6 +114,10 @@ public class ReservationServiceImpl implements IReservationService {
 
         reservationRepository.save(reservation);
 
+        // Transmitir la disponibilidad actualizada
+        AvailabilityResponse availabilityResponse = getAvailability();
+        broadcastAvailability(availabilityResponse);
+
         return new ReservationUserResponse(
                 "Reserva realizada con éxito.",
                 reservation.getId(),
@@ -285,12 +289,22 @@ public class ReservationServiceImpl implements IReservationService {
             type = "Refrigerio";
         }
 
-        return new AvailabilityPerHourResponse(
+        AvailabilityPerHourResponse response = new AvailabilityPerHourResponse(
                 availability,
                 start,
                 end,
                 type
         );
+
+        // Opcional: Transmitir la disponibilidad por hora
+        try {
+            String message = objectMapper.writeValueAsString(response);
+            webSocketHandler.broadcast(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
 
     public void addReservationstoReservationResponse(List<ReservationResponse> list, Optional<Reservation> r) {
@@ -365,6 +379,10 @@ public class ReservationServiceImpl implements IReservationService {
 
         reservationRepository.delete(reservation);
         emailService.sendReservationCancellationEmail(type, reservation, date, time);
+
+        // Transmitir la disponibilidad actualizada
+        AvailabilityResponse availabilityResponse = getAvailability();
+        broadcastAvailability(availabilityResponse);
 
         return new ReservationResponse(
                 "Reserva cancelada con éxito.",
