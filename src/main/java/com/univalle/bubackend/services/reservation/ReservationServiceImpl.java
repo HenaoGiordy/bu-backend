@@ -375,7 +375,7 @@ public class ReservationServiceImpl implements IReservationService {
         String lastName = reservation.getUserEntity().getLastName();
 
         reservationRepository.delete(reservation);
-        emailService.sendReservationCancellationEmail(type, reservation, date, time);
+        emailService.sendReservationCancellationEmail(type, reservation, today, now);
 
         // Transmitir la disponibilidad actualizada
         AvailabilityResponse availabilityResponse = getAvailability();
