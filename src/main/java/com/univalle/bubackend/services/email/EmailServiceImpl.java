@@ -6,7 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -27,7 +27,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    public void sendReservationCancellationEmail(String type, Reservation reservation, LocalDateTime date, LocalTime time) {
+    public void sendReservationCancellationEmail(String type, Reservation reservation, LocalDate date, LocalTime time) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
