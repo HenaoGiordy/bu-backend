@@ -98,7 +98,7 @@ public class NursingActivityLogImpl implements INursingActivityLog {
     public List<ActivityNursingResponse> activitiesNursing(String username, LocalDate startDate, LocalDate endDate) {
 
         if (username == null && (startDate == null || endDate == null)) {
-            throw new FieldException("Debe suministrar el nombre de usuario o el rango de fechas para realizar la búsqueda");
+            throw new FieldException("Debe suministrar el codigo del usuario o el rango de fechas para realizar la búsqueda");
         }
 
         List<NursingActivityLog> activities;
