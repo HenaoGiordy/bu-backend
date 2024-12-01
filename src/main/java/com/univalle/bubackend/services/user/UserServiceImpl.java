@@ -53,32 +53,14 @@ public class UserServiceImpl {
     public UserResponse createUser(UserRequest userRequest) {
         Optional<UserEntity> existingUserOpt = userEntityRepository.findByUsername(userRequest.username());
 
+        // Si el usuario ya existe
+        if (existingUserOpt.isPresent()) {
+            throw new UserNameAlreadyExist("El usuario ya está registrado.");
+        }
+
         //Verifica si el correo ya está registrado
         if (!userEntityRepository.findUsersByEmail(userRequest.email()).isEmpty() && userRequest.email() != null) {
             throw new EmailAlreadyExist("Ya hay un usuario registrado con este correo.");
-        }
-
-        // Si el usuario ya existe
-        if (existingUserOpt.isPresent()) {
-            UserEntity user = existingUserOpt.get();
-            Optional<Role> studentRole = roleRepository.findByName(RoleName.ESTUDIANTE);
-
-            // Verifica si el usuario es un estudiante existente
-            if (studentRole.isPresent() && user.getRoles().contains(studentRole.get())) {
-                throw new UserNameAlreadyExist("El usuario ya está registrado con el rol de ESTUDIANTE.");
-            }
-
-            // Actualiza datos para el usuario existente
-            Set<Role> roles = getRolesFromRequest(userRequest.roles());
-            user.setName(userRequest.name());
-            user.setLastName(userRequest.lastName());
-            user.setEmail(userRequest.email());
-            user.setPlan(userRequest.plan());
-            user.setRoles(roles);
-            setBeneficiaryStatus(user, userRequest.beca());
-
-            userEntityRepository.save(user);
-            return new UserResponse(user);
         }
 
         // Validación de roles para usuario nuevo
@@ -106,6 +88,7 @@ public class UserServiceImpl {
 
         return new UserResponse(newUser);
     }
+
     private Set<Role> getRolesFromRequest(Set<String> roleRequests) {
         return roleRequests.stream()
                 .map(roleName -> roleRepository.findByName(RoleName.valueOf(roleName))
