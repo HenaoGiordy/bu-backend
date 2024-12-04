@@ -45,5 +45,8 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, Integer>
     @Query("SELECT u FROM UserEntity u JOIN u.roles r where r.name <> 'ESTUDIANTE'")
     Page<UserEntity> findAllNonStudents(Pageable pageable);
 
+    @Query("SELECT DISTINCT u FROM UserEntity u JOIN u.reservations r WHERE r.data BETWEEN :startDate AND :endDate")
+    List<UserEntity> findAllByReservationDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
 
 }
