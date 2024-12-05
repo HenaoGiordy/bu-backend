@@ -115,7 +115,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
 
         AppointmentReservation savedAppointment = appointmentReservationRepository.save(appointmentReservation);
 
-        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(1)).toMillis();
+        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(2)).toMillis();
         taskManager.scheduleTask(savedAppointment.getId(), () -> sendNotification(userEntity, availableDates), delayNotification);
 
         long delayStatusUpdate = Duration.between(LocalDateTime.now(), availableDates.getDateTime()).toMillis();
@@ -320,7 +320,7 @@ public class AppointmentReservationServiceImpl implements IAppointmentReservatio
         AppointmentReservation savedAppointment = appointmentReservationRepository.save(appointmentReservation);
 
 
-        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(1)).toMillis();
+        long delayNotification = Duration.between(LocalDateTime.now(), availableDates.getDateTime().minusHours(2)).toMillis();
         taskManager.scheduleTask(savedAppointment.getId(), () -> sendNotification(userEntity, availableDates), delayNotification);
 
         long delayStatusUpdate = Duration.between(LocalDateTime.now(), availableDates.getDateTime()).toMillis();

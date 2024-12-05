@@ -93,8 +93,11 @@ public class ReportServiceImpl {
             LocalDate startSemester = setting.getStartSemester();
             LocalDate endSemester = setting.getEndSemester();
 
+            // Obtener todos los usuarios con reservas dentro del rango del semestre
+            List<UserEntity> allUsersInSemester = userEntityRepository.findAllByReservationDateRange(startSemester.atStartOfDay(), endSemester.atTime(LocalTime.MAX));
+
             // Filtrar y contar cuántas veces cada usuario apareció en reportes diarios dentro del semestre actual
-            for (UserEntity user : filterUsers) {
+            for (UserEntity user : allUsersInSemester) {
                 long count = user.getReports().stream()
                         .filter(r -> r.getBeca().equalsIgnoreCase(reportRequest.beca()) &&  // Tipo de beca coincide
                                 r.getSemester() == null &&                               // Solo reportes diarios (semestre null)
@@ -105,14 +108,16 @@ public class ReportServiceImpl {
                 // Almacenamos el conteo en el mapa solo para este semestre
                 countReports.put(user.getId(), (int) count);
             }
+
+            // Guardar el conteo de reportes en el reporte semestral
+            report.setUserReportCount(countReports);
+            report.setUserEntities(new HashSet<>(allUsersInSemester));
         }
 
-        // Guardar el conteo de reportes en el reporte semestral
-        report.setUserReportCount(countReports);
         report = reportRepository.save(report);  // Guardar el reporte en la base de datos
 
         // Guardar el reporte en la lista de reportes del usuario
-        for (UserEntity user : filterUsers) {
+        for (UserEntity user : report.getUserEntities()) {
             user.getReports().add(report);
             userEntityRepository.save(user);
         }
